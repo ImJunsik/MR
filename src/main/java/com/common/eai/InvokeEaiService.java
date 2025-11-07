@@ -1,0 +1,52 @@
+package com.common.eai;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+public class InvokeEaiService {
+    public static void main(String[] args) {
+        HashMap request = new HashMap();	// 실제로 전송할 HashMap
+        HashMap IF_IN = new HashMap();		// Input
+        HashMap IF_OUT = new HashMap();		// Output
+
+        request.put("IF_IN", IF_IN);
+        IF_IN.put("REVDATE", "20050905");	/// 취소일자 입력
+
+        try {
+            // eAI Server Connect & Execute Service
+            CmEaiManager eaiCon = new CmEaiManager();
+            //EAI 운영기
+            //IF_OUT = eaiCon.executeService("172.18.3.110:6300", "JYG_Posting_Closing_Create.srv", "srcRoutine_Pub", request);    
+
+            //SAP S4/HANA용 EAI 검증기 테스트
+            //IF_OUT = eaiCon.executeService("10.171.24.38:6300", "JYG_Posting_Closing_Create.srv", "srcRoutine_Pub", request);
+            //SAP S4/HANA용 EAI 운영기 테스트
+            IF_OUT = eaiCon.executeService("10.171.26.124:6300", "JYG_Posting_Closing_Create.srv", "srcRoutine_Pub", request);
+            
+            
+            
+            Set set = IF_OUT.keySet();
+
+            for(Iterator iterator = set.iterator(); iterator.hasNext();) {
+                String key = (String)iterator.next();
+                Object obj1 = IF_OUT.get(key);
+
+                HashMap outDoc =(HashMap)obj1;
+
+                System.out.println(outDoc.get("TYPE"));			// 메세지 유형
+                System.out.println(outDoc.get("ID"));			// ID
+                System.out.println(outDoc.get("NUMBER"));		// NUMBER
+                System.out.println(outDoc.get("MESSAGE"));		// Message Text
+                System.out.println(outDoc.get("LOG_NO"));		// Application Log : Log Number
+                System.out.println(outDoc.get("LOG_MSG_NO"));	// Application Log : 내부 메세지 일련번호
+                System.out.println(outDoc.get("MESSAGE_V1"));	// 기간시작
+                System.out.println(outDoc.get("MESSAGE_V2"));	// 기간종료
+                System.out.println(outDoc.get("MESSAGE_V3"));	// 'Y' or 'N'
+                System.out.println(outDoc.get("MESSAGE_V4"));
+            }
+        } catch(Exception ex) {
+            System.out.println("Exception : " + ex);
+        }
+    }
+}

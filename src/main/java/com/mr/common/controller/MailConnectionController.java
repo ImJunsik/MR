@@ -1,0 +1,246 @@
+package com.mr.common.controller;
+
+import java.util.Calendar;
+import java.util.Date;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.commons.configuration.XMLConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import com.mr.common.domain.Authentication;
+import com.mr.common.domain.EmpInfoVo;
+import com.mr.common.service.LoginService;
+import com.mr.step.service.MrMailService;
+
+/**
+ * 메일화면으로 접속할 경우
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * </pre>
+ */
+
+@Controller
+@RequestMapping(value = "/")
+public class MailConnectionController {
+
+    @Autowired
+    LoginService loginService;
+
+    @Autowired
+    MrMailService mrMailService;
+
+    @Autowired
+    private XMLConfiguration appConfig;
+
+    /**
+     * 로그인 처리
+     * 세션을 체크하여 자동으로 로그인 혹은 로그인페이지로 이동시킨다.
+     * @param loginVo
+     * @param model
+     * @param session
+     * @return
+     */
+    @RequestMapping(value = "/mail.do")
+    public String login(Authentication auth, Model model) {
+        String enKey = loginService.encrypt(auth.getMrURL()+mrReqNoEncryptionKeyGenerator(auth.getMrReqNo())+auth.getMailDate()+auth.getEmpNo());
+        String reqURL = auth.getMrURL();
+
+        /**
+         * 로그인 동작여부
+         * app-config.xml mail에서 설정하시고 사용하세요.
+         */
+
+        if(appConfig.getBoolean("mail.login")) {
+
+            if(auth.getMailKey().equals(enKey)) {
+
+                /**
+                 * 로그인 유효일 체크
+                 * app-config.xml mail에서 설정하시고 사용하세요.
+                 */
+
+                if(appConfig.getBoolean("mail.login-limit")){
+                    Date mailDate = new Date(auth.getMailDate());
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(mailDate);
+                    cal.add(Calendar.DATE, appConfig.getInt("mail.login-day"));
+
+                    if(auth.getMailDate()<=cal.getTimeInMillis()){
+                        createLoginSession(auth);
+                    }
+
+                } else {
+                    createLoginSession(auth);
+                }
+            }
+
+        }
+        return "redirect:"+reqURL+"?mrReqNo=" + auth.getMrReqNo();
+    }
+
+    @RequestMapping(value = "/limitMail.do")
+    public String mailCheck(Model model) {
+        mrMailService.limitDateMrSendMail();
+        return "redirect:main.do";
+    }
+
+
+
+    private boolean createLoginSession(Authentication mailAuth){
+
+        String URL = "";
+        ServletRequestAttributes sra = (ServletRequestAttributes)RequestContextHolder.currentRequestAttributes();
+        HttpServletRequest request = sra.getRequest();
+        HttpSession session = request.getSession();
+        EmpInfoVo loginEmpInfoVo = loginService.loginUserInfo(mailAuth.getEmpNo());
+        if(loginEmpInfoVo!=null) {
+            Authentication authentication = new Authentication();
+            authentication.setEmpNo(loginEmpInfoVo.getEmpNo());
+            authentication.setEmpName(loginEmpInfoVo.getEmpName());
+            authentication.setTeamNo(loginEmpInfoVo.getTeamNo());
+            authentication.setTeamName(loginEmpInfoVo.getTeamName());
+            authentication.setDutyNo(loginEmpInfoVo.getDutyNo());
+            authentication.setDutyName(loginEmpInfoVo.getDutyName());
+            authentication.setIsMail(true);
+            authentication.setMrReqNo(mailAuth.getMrReqNo());
+
+            switch (mailAuth.getMrURL()) {
+                case "mrRqRegister.do":
+                    URL="mrRq";
+                    break;
+
+                case "mrTech.do":
+                    URL="mrTech";
+                    break;
+                    
+                case "mrJobsCheck.do":
+                    URL="mrJobsCheck";
+                    break;
+
+                case "mrComplete.do":
+                    URL="mrComplete";
+                    break;
+
+                case "mrTechInvest.do":		//초기투자비 산정 조회
+                    URL="mrTechInvest";
+                    break;
+
+                case "mrJobsReview.do":
+                    URL="mrJobsReview";
+                    break;
+
+                case "ivstCostRegister.do":
+                    URL="ivstCost";
+                    break;
+
+                case "safeCheckExe.do":
+                    URL="safeCheckExe";
+                    break;
+
+                case "safeCheckRegister.do":
+                    URL="safeCheckRegister";
+                    break;
+
+                case "compFileManage.do":
+                    URL="compFileManage";
+                    break;
+
+                case "compRptRegister.do":
+                    URL="compRptRegister";
+                    break;
+
+                default :
+                    URL="mailFail";
+                    break;
+            }
+
+            authentication.setMrURL(URL);
+            session.setAttribute(Authentication.SESSION_ATTRIBUTE_KEY, authentication);
+            return true;
+        }
+        return false;
+    }
+
+
+    /**
+     * 6자리 로그인 암호화키
+     * 첫자리 : 현재시간 홀 (마지막 숫자) / 짝 (0)
+     * 두번째 ~ 다섯번째 : mrReqNo * (홀수 일 경우 * 5 , 짝수일 경우 * 7) 값의 16진수 맨뒤 부터 4자리
+     * 여섯번째 : 시간 마지막 숫자 (1 : O, 2 : I, 3 : L, 4 : B, 5 : A, 6 : N, 7 : K, 8 : !, 9 : M, 0 : R) Oilbank!MR
+     * @param time
+     * @return
+     */
+    private String mrReqNoEncryptionKeyGenerator(int mrReqNo){
+        String encryptionKey = "";
+        String mrReqNoHex;
+        String strMrReqNo = mrReqNo+"";
+
+        int lastNo = Integer.parseInt(strMrReqNo.substring(strMrReqNo.length()-1));
+
+        if(mrReqNo % 2 == 0 ){
+            encryptionKey += "0";
+            mrReqNoHex= Long.toHexString(mrReqNo * 7000);
+        }else{
+            encryptionKey += lastNo+"";
+            mrReqNoHex= Long.toHexString(mrReqNo * 5000);
+        }
+
+        encryptionKey += mrReqNoHex.substring(mrReqNoHex.length()-4);
+
+        switch (lastNo) {
+            case 1:
+                encryptionKey +="O";
+                break;
+
+            case 2:
+                encryptionKey +="I";
+                break;
+
+            case 3:
+                encryptionKey +="L";
+                break;
+
+            case 4:
+                encryptionKey +="B";
+                break;
+
+            case 5:
+                encryptionKey +="A";
+                break;
+
+            case 6:
+                encryptionKey +="N";
+                break;
+
+            case 7:
+                encryptionKey +="K";
+                break;
+
+            case 8:
+                encryptionKey +="!";
+                break;
+
+            case 9:
+                encryptionKey +="M";
+                break;
+
+            case 0:
+                encryptionKey +="R";
+                break;
+        }
+        return encryptionKey;
+    }
+}

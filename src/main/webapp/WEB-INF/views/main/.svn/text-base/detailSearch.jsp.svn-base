@@ -1,0 +1,610 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+
+<style type="text/css">
+#overlay {
+	top: 500px;
+	left: 50%;
+	position: absolute;
+	margin-left: -100px;
+	width: 200px;
+	text-align: center;
+	display: none;
+	margin-top: -10px;
+	background: #000;
+	color: #FFF;
+}
+
+#searchList.tablesorter thead tr th, #searchList.tablesorter tfoot tr th {
+	background-color: whiteblue;
+	border: 1px solid #FFF;
+	font-size: 8pt;
+	padding: 4px;
+}
+#searchList.tablesorter thead tr .header {
+	background-image: url(js/sortable/themes/blue/bg.gif);
+	background-repeat: no-repeat;
+	background-position: center right;
+	cursor: pointer;
+}
+
+#searchList.tablesorter tbody tr.odd td {
+	background-color:#F0F0F6;
+}
+#searchList.tablesorter thead tr .headerSortUp {
+	background-image: url(js/sortable/themes/blue/asc.gif);
+}
+#searchList.tablesorter thead tr .headerSortDown {
+	background-image: url(js/sortable/themes/blue/desc.gif);
+}
+#searchList.tablesorter thead tr .headerSortDown, #searchList.tablesorter thead tr .headerSortUp {
+background-color: #8dbdd8;
+}
+</style>
+<!-- title -->
+<div id="content_header">
+    <h4 class="content_header title">상세조회</h4>
+</div>
+<div id="overlay">
+		Please wait...
+</div>
+
+<!-- button -->
+<div class="button_top">
+    <input class="search"  type="image" src="images/btn_searchmyMR.png" data-role="Y">
+    <input class="search search_nomal" type="image" src="images/btn_inquiry.png" data-role="">
+    <input id="excel" type="image" src="images/btn_excel.png">
+</div>
+
+<div id="content_wrap">
+<form id="searchForm">
+    <input type="hidden" name="page" class="page" value="1" readOnly/>
+    <input type="hidden" name="myMrSearch" class="myMrSearch" value="" readOnly/>
+
+    <table class="table_row" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="8%">
+        <col width="17%">
+        <col width="8%">
+        <col width="17%">
+        <col width="8%">
+        <col width="17%">
+        <col width="8%">
+        <col width="17%">
+        </colgroup>
+        <tbody>
+        <tr>
+            <td colspan="8" class="topbg"></td>
+        </tr>
+        <tr>
+            <th scope="row">요청일</th>
+            <td colspan="3">
+                <div class="form_group">
+                <input type="text" name="fromDate" class="i_input inputBeforeDate fromDate schForm" value="" readOnly/> ~ <input type="text" name="toDate" class="i_input inputBeforeDate toDate schForm" value="" readOnly/>
+                </div>
+            </td>
+            <th scope="row">진행상태</th>
+            <td><select class="status schForm" name="mrStepCd"></select></td>
+            <th scope="row">MR 번호</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="mrNo" class="i_input schForm">
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">요청팀</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="requestOrgName" class="i_input requestOrgText schForm" readOnly/>
+                <input type="hidden" name="requestTeamNo" class="requestOrgValue" />
+                <img src="images/icon_search.png" class="cursor teamSearch" data-role="requestOrg"/>
+                </div>
+            </td>
+            <th scope="row">요청자</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="requestEmpName" class="i_input requestEmpText schForm" readOnly/>
+                <input type="hidden" class="requestEmpValue" name="requestEmpNo" />
+                <img src="images/icon_search.png" class="cursor empSearch" data-role="requestEmp"/>
+                </div>
+            </td>
+            <th scope="row">도면번호</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="drawNo" class="i_input schForm">
+                </div>
+            </td>
+            <th scope="row">Job Eng.</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="jopEmpName" class="i_input jobEmpText schForm" readOnly/>
+                <input type="hidden" class="jobEmpValue" name="jobEmpNo" />
+                <img src="images/icon_search.png" class="cursor empSearch"  data-role="jobEmp"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">수행팀</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="actionOrgName" class="i_input actionOrgText schForm" readOnly/>
+                <input type="hidden" name="actionTeamNo"  class="actionOrgValue"/>
+                <img src="images/icon_search.png" class="cursor teamSearch" data-role="actionOrg"/>
+                </div>
+            </td>
+            <th scope="row">Project Eng.</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="projectEmpName" class="i_input projectEmpText schForm" readOnly/>
+                <input type="hidden" class="projectEmpValue" name="projectEmpNo"  />
+                <img src="images/icon_search.png" class="cursor empSearch"  data-role="projectEmp"/>
+                </div>
+            </td>
+            <th scope="row">공정</th>
+            <td class="vat">
+                <div class="in_search">
+                플랜트 : <select class="plantNo schForm" name="plant"></select>
+                </div>
+                <div class="in_search_lp">
+                <img src="images/icon_search.png" class="cursor unitSearch"/>
+                </div>
+                <div id="unitDiv" class="in_search">
+                    <table id="selectUnit" class="table_default">
+                        <c:forEach var="proc" items="${register.procs}" varStatus="loop">
+                            <tr>
+                              <td><c:out value="${proc.mrProcNo}"/><input type="hidden" class="procNo" name="procs[${loop.index}].mrProcNo" value="${proc.mrProcNo}"></td>
+                              <td><c:out value="${proc.mrProcName}"/><input type="hidden" class="mrProcName" name="procs[${loop.index}].mrProcName" value="${proc.mrProcName}"></td>
+                            <tr>
+                        </c:forEach>
+                    </table>
+                </div>
+            </td>
+            <th scope="row">설비</th>
+            <td class="vat">
+                <div class="in_search">
+                <img src="images/icon_search.png" class="cursor equipSearch"/>
+                </div>
+                <div id="equipDiv" class="in_search">
+                    <table id="selectEquip" class="table_default">
+                        <c:forEach var="equip" items="${register.equips}" varStatus="loop">
+                          <tr>
+                            <td><c:out value="${equip.mrEquipCd}"/><input type="hidden" class="equipCd" name="equips[${loop.index}].mrEquipCd" value="${equip.mrEquipCd}"><input type="hidden" class="equipProcNo" name="equips[${loop.index}].mrProcNo" value="${equip.mrProcNo}"></td>
+                            <td><c:out value="${equip.mrEquipName}"/><input type="hidden" class="equipName" name="equips[${loop.index}].mrEquipName" value="${equip.mrEquipName}"></td>
+                          <tr>
+                        </c:forEach>
+                    </table>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">사업명/제목</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="projectTitle" class="i_input schForm">
+                </div>
+            </td>
+            <th scope="row">요청구분</th>
+            <td><select class="reqType schForm" name="reqType"></select></td>
+            <th scope="row">작업시점</th>
+            <td><select class="work schForm" name="work"></select></td>
+            <th scope="row">Capex No</th>
+            <td>
+                <div class="form_group">
+                <input type="text" name="capexNo" class="i_input schForm">
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+
+<!-- space non 10 -->
+<hr class="divider_none_10" />
+
+<div class="tr bold divCount" style="display:none;">
+    총 <span class="totalCount"></span> 건
+
+</div>
+
+<!-- space non 5 -->
+<hr class="divider_none_5" />
+
+<table id="searchList" class="table_col searchList tablesorter" border="1" cellspacing="0">
+    <colgroup>
+    <col width="8%">
+    <col width="15%">
+    <col width="8%">
+    <col width="8%">
+    <col width="8%">
+    <col width="8%">
+    <col width="8%">
+    <col width="8%">
+    <col width="8%">
+    <col width="8%">
+    </colgroup>
+<thead></thead>
+<tbody></tbody>
+</table>
+<form id="excelForm" method="post">
+<input type="hidden" name="innerHtml" id="innerHtml">
+<input type="hidden" name="browser" id="browser">
+
+</form>
+</div>
+<script>
+var sorterble;
+$(document).on("keydown", "input", function (e) {
+    if (e.keyCode == 13) {
+        $(".search_nomal").click();
+        return false;
+    }
+});
+
+var page = 1;
+var count = 0;
+var totalCount = 0 ;
+$(window).ready(function() {
+	
+	//전체조회로 변경하므로 주석처리함.
+/* 	$(window).scroll(function() {
+	    var tr = "";
+	    if ($(window).scrollTop() == $(document).height() - $(window).height() && count < totalCount) {
+	        page++;
+	        $(".page").val(page);
+	        var formData = $("#searchForm").serialize();
+	        $.ajax({
+	            type:"POST",
+	            url:"detailSearch.do",
+	            data:formData,
+	            dataType:"JSON",
+	            success : function(data) {
+	                if(data.mrSearchList!=null) {
+	                      $.each(data.mrSearchList, function() {
+	                          count++;
+	                          tr = "";
+	                          tr += "<tr class='mrLink cursor'>";
+	                          tr += "<td style='display:none'>"+this.mrReqNo+"</td>";
+	                          tr += "<td style='display:none'>"+this.mrStepCd+"</td>";
+	                          tr += "<td style='display:none'>"+this.procStCd+"</td>";
+	                          tr += "<td>"+this.mrNo+"</td>";
+	                          tr += "<td>"+this.mrReqTitle+"</td>";
+	                          tr += "<td>"+this.reqEmpName+"</td>";
+	                          tr += "<td>"+this.reqTeamName+"</td>";
+	                          tr += "<td>"+this.jobTeamName+"</td>";
+	                          tr += "<td>"+this.jobEmpName+"</td>";
+	                          tr += "<td>"+this.actTeamName+"</td>";
+	                          tr += "<td>"+this.proEmpName+"</td>";
+	                          if(this.mrStepCd=='Z0030' && (this.procStCd == 'Z0133' || this.procStCd == 'Z0122' || this.procStCd == 'Z0131')){
+		                          tr += "<td>타당성검토 확인</td>";
+	                          }else{
+		                          tr += "<td>"+this.mrStepNm+"</td>";
+	                          }
+	                          tr += "<td>"+this.capexNo+"</td>";
+	                          tr += "</tr>";
+	                          $(".searchList tbody").append(tr);
+	                       });
+	                      $(".searchList").trigger("update");
+	                }
+	             },
+	             error : function(request) {
+	                 if(request.status==500) {
+	                     history.go(0);
+	                 }
+	             }
+	         });
+	    }
+	}); */
+
+	$(".empSearch").click(function() {
+		$.popup({url:"popup/empSearch.do", width:"500", height:"500", targetName:$(this).attr("data-role")});
+	});
+
+	$(".teamSearch").click(function() {
+	    $.popup({url:"popup/teamSearch.do", width:"500", height:"500", targetName:$(this).attr("data-role")});
+	});
+
+	$(".search").click(function(){
+		var obj = this;
+		if(checkSearchFormCnt() == 0){
+			if(confirm("조건이 없습니다.계속 진행하시겠습니까?")){
+				searchData(obj);
+			}
+		}else{
+			searchData(obj);
+		}
+
+	});
+	
+
+
+});
+
+function searchData(obj){
+	$(".divCount").hide();
+	$(".myMrSearch").val($(obj).attr("data-role"));
+	var tr ="";
+	page=1;
+	count = 0;
+	totalCount=0;
+	$(".totalCount").html("");
+	$(".page").val("1");
+	var formData = $("#searchForm").serialize();
+	$(".searchList").find("tr").remove().end();
+	tr ="<tr>";
+    tr += "<th scope='col' style='display:none'>MR Req No.</th>";
+    tr += "<th scope='col' style='display:none'>상태 코드</th>";
+    tr += "<th scope='col' style='display:none'>상세 상태 코드</th>";
+	tr += "<th scope='col'>MR No.</th>";
+	tr += "<th scope='col'>사업명</th>";
+	tr += "<th scope='col'>요청자</th>";
+	tr += "<th scope='col'>요청팀</th>";
+	tr += "<th scope='col'>기술검토팀</th>";
+	tr += "<th scope='col'>Job Eng.</th>";
+	tr += "<th scope='col'>수행팀</th>";
+	tr += "<th scope='col'>Project Eng.</th>";
+	tr += "<th scope='col'>진행상태</th>";
+	tr += "<th scope='col'>Capex No</th>";
+	tr += "<th scope='col'>품의금액(천원)</th>";
+	tr += "<th scope='col'>예산금액(천원)</th>";
+	tr += "</tr>";
+//tr += "<td>"+this.costTotalSum+"</td>";
+    $(".searchList thead").append(tr);
+    $.ajax({
+           type:"POST",
+           //url:"detailSearch.do", //전체조회 변경으로 인하여 주석
+           url:"detailSearchTotal.do",
+           data:formData,
+           dataType:"JSON",
+           success : function(data) {
+        	   if(data.mrSearchList!=null) {
+                     $.each(data.mrSearchList, function() {
+                         if(totalCount==0){
+                        	 $(".divCount").show();
+                        	 totalCount = this.totalCount;
+                        	 $(".totalCount").html(totalCount);
+                         }
+                          
+                         count++;
+                         tr = "";
+                         tr += "<tr class='mrLink cursor'>";
+                         tr += "<td style='display:none'>"+this.mrReqNo+"</td>";
+                         tr += "<td style='display:none'>"+this.mrStepCd+"</td>";
+                         tr += "<td style='display:none'>"+this.procStCd+"</td>";
+                         tr += "<td>"+this.mrNo+"</td>";
+                         tr += "<td>"+this.mrReqTitle+"</td>";
+                         tr += "<td>"+this.reqEmpName+"</td>";
+                         tr += "<td>"+this.reqTeamName+"</td>";
+                         tr += "<td>"+this.jobTeamName+"</td>";
+                         tr += "<td>"+this.jobEmpName+"</td>";
+                         tr += "<td>"+this.actTeamName+"</td>";
+                         tr += "<td>"+this.proEmpName+"</td>";
+                          if(this.mrStepCd=='Z0030' && (this.procStCd == 'Z0133' || this.procStCd == 'Z0122' || this.procStCd == 'Z0131')){
+	                          tr += "<td>타당성검토 확인</td>";
+                          }else{
+	                          tr += "<td>"+this.mrStepNm+"</td>";
+                          }
+                         tr += "<td>"+this.capexNo+"</td>";                                
+                         tr += "<td style='text-align:right'>"+this.costTotalSum+"</td>";
+                         tr += "<td style='text-align:right'>"+this.sapCostTot+"</td>";
+                         tr += "</tr>";
+                         $(".searchList tbody").append(tr);
+                      });
+                	    $("#searchList").tablesorter();
+                		$("#searchList").bind("sortStart",function() {
+                			$("#overlay").show();
+                		}).bind("sortEnd",function() {
+                			$("#overlay").hide();
+                		});
+                }
+            },
+            error : function(request) {
+                if(request.status==500) {
+                	history.go(0);
+                }
+            }
+    });
+}
+
+$(window).load(function() {
+
+    $.selectLoad({
+        className : "plantNo",
+        url : "codeList.do?mrCommGrpCd=PLANT",
+        defaultText : "선택",
+        selectValue : "${register.plant}"
+    });
+
+    $.selectLoad({
+        className : "actionTeam",
+        url : "allTeam.do",
+        defaultText : "전체"
+    });
+
+    $.selectLoad({
+        className : "status",
+        url : "codeList.do?mrCommGrpCd=MR_PROC&mrCommCd=Z00",
+        defaultText : "전체"
+    });
+
+    $.selectLoad({
+        className : "work",
+        url : "codeList.do?mrCommGrpCd=WORK",
+        defaultText : "전체"
+    });
+
+    $.selectLoad({
+        className : "reqType",
+        url : "codeList.do?mrCommGrpCd=REQ_DET",
+        defaultText : "전체"
+    });
+
+    $.selectLoad({
+        className : "proc",
+        url : "allUnit.do",
+        defaultText : "전체",
+    });
+
+});
+
+/* $(document).on("change",".proc", function () {
+    if($(this).val()=="") {
+    	$(".equip").hide();
+    	$(".equipHint").show();
+    } else {
+    	$(".equip").show();
+    	$(".equipHint").hide();
+        $.selectLoad({
+            className : "equip",
+            url : "getEquip.do?unitNo="+$(this).val(),
+            defaultText : "전체"
+        });
+    }
+}); */
+
+$(document).on("click",".unitSearch", function () {
+    if($(".plantNo").val()=="") {
+        alert("플랜트를 선택하세요.");
+        return;
+    }
+
+    $.popup({url:"popup/unitSearch.do?"+$("form").serialize()+"&plantNo="+$(".plantNo").val() +"&plantName="+$(".plantNo option:selected").text(), width:"880", height:"500"});
+    $("#selectUnit").find("tr").remove().end();
+    /* $("#selectEquip").find("tr").remove().end(); */
+});
+
+$(document).on("click",".equipSearch", function () {
+    var count = 0;
+    $("#selectUnit").children("tbody").children("tr").each(function(){
+        count++;
+    });
+    if(count<1){
+        alert("공정을 선택하세요.");
+        return;
+    }
+
+    $.popup({url:"popup/equipSearch.do?"+$("form").serialize(), width:"880", height:"600"});
+    $("#selectEquip").find("tr").remove().end();
+});
+
+$(".plantNo").change(function(){
+    $("#selectUnit").find("tr").remove().end();
+    $("#selectEquip").find("tr").remove().end();
+});
+
+$.sortUintList = function(option){
+    $.sort({className : "mrProcNo", fristName : "procs", lastName : "mrProcNo"});
+    $.sort({className : "mrProcName", fristName : "procs", lastName : "mrProcName"});
+};
+
+$.sortEquipList = function(option){
+    $.sort({className : "procNo", fristName : "equips", lastName : "mrProcNo"});
+    $.sort({className : "equipName", fristName : "equips", lastName : "mrEquipName"});
+    $.sort({className : "equipCd", fristName : "equips", lastName : "mrEquipCd"});
+};
+
+$(document).on("click","#excel",function() {
+	$("#searchForm").attr("action", "detailSearchExcel.do").submit();
+	    
+	/* var excelTable ="";
+	var count = 0;
+		$("#searchList").children("tbody").children("tr").each(function(){
+			count++;
+			excelTable += "<tr>";
+	        $(this).children("th").each(function(){
+	                if($(this).css("display")!="none") {
+	                    excelTable += "<td>";
+	                    excelTable += $(this).html();
+	                    excelTable += "</td>";
+	                }
+	        });
+			$(this).children("td").each(function(){
+				if($(this).css("display")!="none") {
+					excelTable += "<td>";
+					excelTable += $(this).html();
+					excelTable += "</td>";
+				}
+			});
+			excelTable += "</tr>";
+		});
+
+		if(count<2){
+			alert("조회된 자료가 없습니다.");
+		} else {
+			 $("#innerHtml").val("<table border='1px'>"+excelTable+"</table>");
+			 $("#browser").val(navigator.userAgent);
+
+			 $("#excelForm").attr("action", "toExcel.do").submit();
+		} */
+});
+
+
+$(document).on("mouseover",".mrLink",function() {
+    $(this).css("background","#fcf8e3");
+}).on("mouseleave",".mrLink",function() {
+   $(this).css("background","#ffffff");
+}).on("click",".mrLink",function() {
+    var url ="";
+    switch ($(this).children("td:eq(1)").html()) {
+    case "Z0010":
+        url="mrRqRegister";
+        break;
+    case "Z0020":
+        url="mrTech";
+        break;
+    case "Z0030":
+    	if($(this).children("td:eq(2)").html()=="Z0122" || $(this).children("td:eq(2)").html()=="Z0131" || $(this).children("td:eq(2)").html()=="Z0133") {
+            url="mrComplete";
+        } else {
+            url="mrTechInvest";
+        }
+        break;
+    case "Z0040":
+        url="mrJobsReview";
+        break;
+    case "Z0050":
+        url="ivstCostRegister";
+        break;
+    case "Z0060":
+        url="safeCheckExe";
+        break;
+    case "Z0070":
+        url="safeCheckRegister";
+        break;
+    case "Z0080":
+        url="compFileManage";
+        break;
+    case "Z0090":
+        url="compRptRegister";
+        break;
+    default:
+        url="mrRqRegister";
+        break;
+    }
+
+    window.open(url+".do?mrReqNo="+$(this).children("td:eq(0)").html(),"_blank","scrollbars=yes,resizable=yes,location=no, status=no, menubar=no, toolbar=no");
+});
+
+$(document).on("change", ".inputBeforeDate", function () {
+	var fromDate = $(".fromDate").val().replace(/[^0-9]/g, '');
+	var toDate = $(".toDate").val().replace(/[^0-9]/g, '');
+	if(fromDate != "" && toDate != "" && parseInt(toDate) < parseInt(fromDate)) {
+		$(".fromDate").val("");
+		$(".toDate").val("");
+		alert("종료일이 시작일보다 빠를수 없습니다. 다시 입력하세요.");
+	}
+
+});
+
+function checkSearchFormCnt(){
+	var notNullCnt = 0;
+	$(".schForm").each(function (){
+		if($(this).val()!=""){
+			notNullCnt++;
+		}
+	});
+	return notNullCnt;
+}
+
+ </script>

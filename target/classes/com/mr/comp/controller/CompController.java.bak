@@ -1,0 +1,273 @@
+package com.mr.comp.controller;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.base.servlet.BaseController;
+import com.mr.comp.domain.CompChrgrChgHistVO;
+import com.mr.comp.domain.CompFileManageVO;
+import com.mr.comp.domain.CompFileVO;
+import com.mr.comp.domain.CompRptVO;
+import com.mr.comp.service.CompService;
+import com.mr.step.service.MrStepService;
+
+/**
+ * 자료등록관리 컨트롤러
+ *
+ * @author 조상욱
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.28 조상욱 최초 작성
+ * </pre>
+ */
+@Controller
+@RequestMapping(value = "/")
+public class CompController  extends BaseController {
+    private final Logger logger = Logger.getLogger(this.getClass());
+    @Autowired
+    CompService compService;
+
+    @Autowired
+    MrStepService mrStepService;
+
+    //자료등록관리 조회
+    @RequestMapping(value = "/compFileManage.do")
+    public String compFileManage(Integer mrReqNo, Model model){
+
+        CompFileVO compFileVO = null;
+
+        //CompFileManageVO vo에 CompChrgrChgHistVO vo가 List 형식으로 선언되어 있음
+        List<CompFileManageVO> compFileManageVO = null;
+
+        String modeClass ="";
+        String rtnJsp = "comp/compFileManage";
+
+      //자료등록관리 MR 마스터 조회 
+        compFileVO = compService.selectCompFile(mrReqNo);
+        
+        //자료등록관리 조회
+        compFileManageVO = compService.selectCompFileManage(mrReqNo);
+        
+        System.out.println("--modeClass::: 시작-----");   
+        modeClass = mrStepService.getModeClass(mrReqNo);
+        System.out.println(modeClass);
+        System.out.println("--modeClass::: 끝-----");
+        
+        
+
+        model.addAttribute("modeClass",modeClass);
+        model.addAttribute("saveURL","compFileSave.do");
+
+        model.addAttribute("mrSteps",mrStepService.selectAllMrReqStep(mrReqNo));
+        model.addAttribute("register",compFileVO);
+        model.addAttribute("fileManage",compFileManageVO);
+        return rtnJsp;
+    }
+
+    /*
+     * 자료등록관리 임시저장
+     */
+    @RequestMapping(value = "/compFileSave.do")
+    public String compFileSave(CompFileManageVO compFileManageVO, CompFileVO compFileVO, Model model){
+
+    	CompChrgrChgHistVO compFileCount = null;
+        
+        //자료등록관리 담당자 등록여부
+        compFileCount = compService.countCompFile(compFileManageVO);
+
+        //자료등록관리 담당자 저장(수정), 자료등록관리 진행상세 저장(수정)
+        if(compFileCount.getCheckCnt().equals("0")) {
+            compService.insertCompFile(compFileManageVO, compFileVO);
+        } else {
+            compService.updateCompFile(compFileManageVO, compFileVO);
+        }
+
+        return "redirect:compFileManage.do?mrReqNo=" + compFileManageVO.getMrReqNo();
+    }
+
+
+    /*
+     * 자료등록관리 임시저장(Update)
+     */
+    @RequestMapping(value = "/compFileUpdate.do")
+    public String compFileUpdate(CompFileManageVO compFileManageVO, CompFileVO compFileVO, Model model){
+        compService.updateCompFile(compFileManageVO, compFileVO);
+        return "redirect:compFileManage.do?mrReqNo=" + compFileManageVO.getMrReqNo();
+    }
+
+    /*
+     * 자료등록관리 완료(P/E=>J/E)
+     */
+    @RequestMapping(value = "/compFileComp.do")
+    public String compFileComp(CompFileManageVO compFileManageVO, CompFileVO compFileVO, Model model){
+
+        CompChrgrChgHistVO compFileCount = null;
+        compFileCount = compService.countCompFile(compFileManageVO);
+
+        if(compFileCount.getCheckCnt().equals("0")) {
+            compService.insertCompFile(compFileManageVO, compFileVO);
+        } else {
+            compService.updateCompFile(compFileManageVO, compFileVO);
+        }
+        compService.updateCompFileComp(compFileManageVO);
+
+        return "redirect:compFileManage.do?mrReqNo=" + compFileManageVO.getMrReqNo();
+    }
+
+    /*
+     * 자료등록관리 문서등록요청
+     */
+    @RequestMapping(value = "/compFileRequest.do")
+    public String compFileRequest(CompFileManageVO compFileManageVO, CompFileVO compFileVO, Model model){
+
+        CompChrgrChgHistVO compFileCount = null;
+        compFileCount = compService.countCompFile(compFileManageVO);
+
+        if(compFileCount.getCheckCnt().equals("0")) {
+            compService.insertCompFile(compFileManageVO, compFileVO);
+        } else {
+            compService.updateCompFile(compFileManageVO, compFileVO);
+        }
+
+        compService.requestCompFile(compFileManageVO);
+        return "redirect:compFileManage.do?mrReqNo=" + compFileManageVO.getMrReqNo();
+    }
+
+    /*
+     * MR완료 등록
+     */
+    @RequestMapping(value = "/compRptRegister.do")
+    public String compRptRegister(Integer mrReqNo, String mrAction, Model model){
+
+        CompRptVO compRptVO = null;
+
+        String modeClass ="";
+        String rtnJsp = "comp/compRptRegister";
+
+        compRptVO = compService.selectCompRpt(mrReqNo);
+        modeClass = mrStepService.getModeClass(mrReqNo);
+
+        if(compRptVO.getCapexClose()==null) {
+            compService.insertCompRpt(compRptVO);
+        }
+
+        if(compRptVO.getCapexClose()==null || compRptVO.getCapexClose().equals("N")) {
+            compService.compRptCapex(compRptVO);
+        }
+
+        model.addAttribute("modeClass",modeClass);
+        model.addAttribute("saveURL","compRptSave.do");
+
+        model.addAttribute("mrSteps",mrStepService.selectAllMrReqStep(mrReqNo));
+        model.addAttribute("register",compRptVO);
+        //hajewook 추가 
+        model.addAttribute("mrAction", mrAction);
+        
+        return rtnJsp;
+    }
+
+
+    /*
+     * MR완료 성과품조회
+     */
+    @RequestMapping(value = "/popup/compFileManage.do")
+    public String compFilePopup(Integer mrReqNo, Model model){
+
+        CompFileVO compFileVO = null;
+        List<CompFileManageVO> compFileManageVO = null;
+
+        String modeClass ="";
+        String rtnJsp = "comp/compFilePop";
+
+        compFileVO = compService.selectCompFile(mrReqNo);
+        compFileManageVO = compService.selectCompFileManage(mrReqNo);
+        modeClass = mrStepService.getModeClass(mrReqNo);
+
+        model.addAttribute("modeClass",modeClass);
+
+        model.addAttribute("saveURL","compFileSave.do");
+
+        model.addAttribute("mrSteps",mrStepService.selectAllMrReqStep(mrReqNo));
+        model.addAttribute("register",compFileVO);
+        model.addAttribute("fileManage",compFileManageVO);
+        return rtnJsp;
+    }
+
+    /*
+     * MR완료 임시저장
+     */
+    @RequestMapping(value = "/compRptSave.do")
+    public String compRptSave(CompRptVO compRptVO, Model model){
+
+        CompChrgrChgHistVO compFileCount = null;
+        compFileCount = compService.countCompRpt(compRptVO);
+
+        if(compFileCount.getCheckCnt().equals("0")) {
+            compService.insertCompRpt(compRptVO);
+        } else {
+            compService.updateCompRpt(compRptVO);
+        }
+
+        return "redirect:compRptRegister.do?mrReqNo=" + compRptVO.getMrReqNo();
+    }
+
+    /*
+     * MR완료 승인요청
+     */
+    @RequestMapping(value = "/compRptAppReq.do")
+    public String compRptAppReq(CompRptVO compRptVO, Model model){
+
+        CompChrgrChgHistVO compFileCount = null;
+        compFileCount = compService.countCompRpt(compRptVO);
+        
+        //mr승인요청시  p&id, pdf 체크 후 she 인터페이스 
+        compService.insertCompRptShe(compRptVO);
+        
+        if(compFileCount.getCheckCnt().equals("0")) {
+            compService.insertCompRpt(compRptVO);
+        } else {
+            compService.updateCompRpt(compRptVO);
+        }       
+        
+        compService.compRptAppReq(compRptVO);
+
+        return "redirect:compRptRegister.do?mrReqNo=" + compRptVO.getMrReqNo()+"&mrAction=compRptAppReq";
+    }
+
+    /*
+     * MR완료 반송
+     */
+    @RequestMapping(value = "/compRptRet.do")
+    public String compRptRet(CompRptVO compRptVO, Model model){
+        compService.compRptRet(compRptVO);
+        return "redirect:compRptRegister.do?mrReqNo=" + compRptVO.getMrReqNo();
+    }
+
+    /*
+     * MR완료 승인
+     */
+    @RequestMapping(value = "/compRptAppr.do")
+    public String compRptAppr(CompRptVO compRptVO, Model model){
+        compService.compRptAppr(compRptVO);
+        return "redirect:compRptRegister.do?mrReqNo=" + compRptVO.getMrReqNo();
+    }
+
+    /*
+     * CAPEX 완료 조회
+     */
+    @RequestMapping(value = "/compRptCapex.do")
+    public String compRptCapex(CompRptVO compRptVO, Model model){
+        compService.compRptCapex(compRptVO);
+        return "redirect:compRptRegister.do?mrReqNo=" + compRptVO.getMrReqNo();
+    }
+
+
+}

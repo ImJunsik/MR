@@ -1,0 +1,576 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+
+<style>
+/* 비활성화된 inputDate_t 섹션 스타일 */
+.inputDate_t.disabled-section {
+    background-color: #f5f5f5;
+    opacity: 0.7;
+}
+
+.inputDate_t.disabled-section input[type="text"] {
+    background-color: #eeeeee;
+    color: #999999;
+    cursor: not-allowed;
+}
+
+.inputDate_t.disabled-section img.ui-datepicker-trigger {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* P&ID, MR수행완료 개별 컨트롤 비활성화 스타일 */
+.pnid-input.disabled, .mrprfm-input.disabled {
+    background-color: #eeeeee !important;
+    color: #999999 !important;
+    cursor: not-allowed !important;
+    border: 1px solid #dddddd !important;
+}
+
+.disabled-calendar {
+    opacity: 0.5 !important;
+    cursor: not-allowed !important;
+    pointer-events: none !important;
+}
+
+/* 비활성화된 버튼 스타일 */
+.disabled-button {
+    opacity: 0.3 !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
+    filter: grayscale(80%);
+}
+
+/* HAZOP 관련 메시지 스타일 */
+.hazop-info-message {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 4px;
+    font-size: 12px;
+    display: inline-block;
+}
+
+/* HAZOP 버튼 위치 조정 */
+.hazop-button-wrapper {
+    margin-left: 20px;
+    display: inline-block;
+}
+</style>
+
+<!-- title -->
+<div id="content_header">
+    <h4 class="content_header title">MR수행</h4>
+</div>
+
+<!-- button -->
+<div class="button_top">
+	<c:if test="${register.jobsSkipCheck=='false'}">
+		<!-- HAZOP 상태에 따른 안내 메시지 -->
+		<c:if test="${register.hazopActYn=='Y'}">
+			<div class="hazop-info-message completion-status-message">
+				<span class="hazop-pending-message">⚠️ HAZOP List 작성 후 완료 버튼 활성화.</span>
+				<span class="hazop-completed-message" style="display:none;">✅ HAZOP List 작성 완료.</span>
+			</div>
+		</c:if>
+		
+		<!-- 임시저장 버튼 (기술검토자용) - HAZOP 상태와 무관하게 동작 -->
+		<input type="image" src="images/btn_temp.png" class="save2 FAD" name="save2" style="display:none" />
+		
+		<!-- MR수행완료 버튼 - HAZOP 완료 후 활성화 -->
+		<input type="image" src="images/btn_exec_complete.png" class="safeCNF FAI completion-button" name="safeCNF" style="display:none"/>
+		
+		<!-- 기술검토 확인 버튼 - HAZOP 완료 후 활성화 -->
+		<input type="image" src="images/btn_checkZ02D.png" class="checkZ02D FAD completion-button" name="checkZ02D" style="display:none" />
+		
+		<!-- 완료 버튼 - HAZOP 완료 후 활성화 -->
+		<input type="image" src="images/btn_complete.png" class="comp FAA completion-button" name="comp" style="display:none" />
+		
+		<!-- 점검항목 버튼 - 항상 활성화 -->
+		<input type="image" src="images/btn_checkitem.png" class="safeRPT FAA GAA" name="safeRPT" />
+	</c:if>
+	
+	<c:if test="${register.jobsSkipCheck=='true'}">
+		<div class="red"> * 직무검토 보류건이 있습니다.</div>
+	</c:if>
+</div>
+
+<!-- 1 -->
+<div id="content_wrap">
+	<form id="registerForm" method="post">
+	<input type="hidden" id="mrReqNo" name="mrReqNo" value="<c:out value="${register.mrReqNo}"/>"/>
+	<input type="hidden" id="mrNo" name="mrNo" value="<c:out value="${register.mrNo}"/>"/>
+	<input type="hidden" id="plantNo" name="plant" value="<c:out value="${register.plant}"/>"/>
+	
+	<table class="table_row" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="15%">
+        <col width="35%">
+        <col width="15%">
+        <col width="35%">
+        </colgroup>
+        <tbody>
+        <tr>
+        <td colspan="4" class="topbg"></td>
+	    </tr>
+        <tr>
+	        <th scope="row">MR번호</th>
+	        <td><c:out value="${register.mrNo}"/></td>
+	        <th scope="row">CAPEX번호</th>
+	        <td><c:out value="${register.capexNo}"/></td>
+	    </tr>
+	    <tr>
+	        <th scope="row">사업명</th>
+	        <td colspan="3"><c:out value="${register.mrReqTitle}"/></td>
+	    </tr>
+	    <tr>
+	        <th scope="row">개선대상</th>
+	        <td><c:out value="${register.plantNm}"/></td>
+	        <th scope="row">공정</th>
+	        <td>
+	              <c:forEach var="proc" items="${register.procs}" varStatus="loop" begin="0" end="0">
+	                  <c:out value="${proc.mrProcName}"/>
+	              </c:forEach>
+	        </td>
+	    </tr>
+	    <tr>
+	        <th scope="row">설 비</th>
+	        <td>
+	              <c:forEach var="equip" items="${register.equips}" varStatus="loop" >
+	                  <c:out value="${equip.mrEquipName}"/><br/>
+	              </c:forEach>
+	        </td>
+	        <th scope="row">투자구분</th>
+	        <td><c:out value="${register.invstCdNm}"/></td>
+	    </tr>
+	    <tr>
+	        <th scope="row">작업시기</th>
+	        <td><c:out value="${register.workPsblClNm}"/></td>
+	        <th scope="row">투자목적</th>
+	        <td><c:out value="${register.invstPurpCdNm}"/></td>
+	    </tr>
+	    </tbody>
+	</table>
+	
+	<!-- 2 HAZOP 관련 -->
+	<hr class="divider_none_10" />
+    <table class="table_row" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="20%">
+        <col width="80%">
+        </colgroup>
+        <tbody>
+        <tr>
+            <th scope="row">추가 위험성 검토 필요 여부 (Y/N)</th>
+            <td>
+            	<div class="form_group">
+	            	<input type="radio" class="hazopActYn FAA GAA" name="hazopActYn" value="Y" <c:if test="${register.hazopActYn=='Y'}">checked </c:if> > 필요
+		            <input type="radio" class="hazopActYn FAA GAA" name="hazopActYn" value="N" <c:if test="${register.hazopActYn=='N'}">checked </c:if> > 불필요
+		            
+		            <!-- HAZOP 버튼을 20px 오른쪽으로 이동 -->
+		            <span class="hazop-button-wrapper">
+		            	<img src="images/btn_apply.png" class="vam cursor hazop"/>
+		            </span>
+	            </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+	<!-- 3 P&ID최종본 -->
+	<hr class="divider_none_10" />
+    <table class="table_row inputDate_t" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="15%">
+        <col width="85%">
+        </colgroup>
+        <tbody>
+        <tr>
+	    	<th scope="row">P&ID최종본</th>
+		    <td>
+		        <div class="form_group">
+		            <c:if test="${modeClass=='FAD'}">
+					    <input type="text" name="pnidDt" class="i_input inputDate pnid-input" value="${register.pnidDt}" readOnly/>
+					    <img name="pnid-calendar" class="ui-datepicker-trigger pnid-calendar" src="images/icon_calendar_.png" alt="..." title="..." style="border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;">
+					    <span>기술검토 담당자 확인 일자</span>
+					</c:if>
+					<c:if test="${modeClass!='FAD'}">
+					    <input type="text" class="i_input pnid-input" value="${register.pnidDt}" readOnly/>
+					    <img name="pnid-calendar" class="ui-datepicker-trigger pnid-calendar" src="images/icon_calendar_.png" alt="..." title="..." style="border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;">
+					    <span>기술검토 담당자 확인 일자</span>
+					</c:if>
+		        </div>
+		    </td>
+		</tr>
+        </tbody>
+    </table>
+
+	<!-- 4 MR수행완료 -->   
+    <hr class="divider_none_10" />
+    <table class="table_row inputDate_t" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="15%">
+        <col width="85%">
+        </colgroup>
+        <tbody>
+        <tr>
+		    <th scope="row">MR수행완료</th>
+		    <td>
+		        <div class="form_group">
+		            <c:if test="${modeClass=='FAI'}">
+					    <input type="text" name="mrPrfmDt" class="i_input inputDate mrprfm-input" value="${register.mrPrfmDt}" readOnly/>
+					    <img name="mrprfm-calendar" class="ui-datepicker-trigger mrprfm-calendar" src="images/icon_calendar_.png" alt="..." title="..." style="border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;">
+					    <span>Project Engineer 확인 일자</span>
+					</c:if>
+					<c:if test="${modeClass!='FAI'}">
+					    <input type="text" class="i_input mrprfm-input" value="${register.mrPrfmDt}" readOnly/>
+					    <img name="mrprfm-calendar" class="ui-datepicker-trigger mrprfm-calendar" src="images/icon_calendar_.png" alt="..." title="..." style="border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;">
+					    <span>Project Engineer 확인 일자</span>
+					</c:if>
+		        </div>
+		    </td>
+		</tr>
+        </tbody>
+    </table>
+	
+	<!-- 5 첨부파일 -->	
+    <hr class="divider_none_10" />
+    <table class="table_row inputDate_t" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="15%">
+        <col width="85%">
+        </colgroup>
+        <tbody>
+        <tr>
+        <th scope="row" class="vam fileAdd">첨부파일
+            <img id="addFile" src="images/icon_s_plus.png" border="0" class="cursor FAD GAA GBA fileAdd mt-2" disabled="true"/>
+        </th>
+        <td class="section_text pl5 pt5 pb5">
+            <div class="form_group">
+            <table id="fileList" class="table_default_margin" border="1" cellspacing="0">
+                <tr style="display:none"><td></td></tr>
+                <c:forEach var="mrAtchFiles" items="${register.mrAtchFiles}" varStatus="loop">
+                <tr>
+                <td>
+                    <input type="text" class="i_input" value="${mrAtchFiles.fileCdNm}" readonly>
+                    <input type="text" class="i_input_300" value="${mrAtchFiles.fileNm}" readonly>
+                    <img src="images/btn_inFile.png" class="cursor fileDown" />
+                    <img class="cursor FAD GBA removeDownFile" src="images/icon_minus.png" style="display:none"/>
+                    <input type="hidden" value="${mrAtchFiles.fileCd}"/>
+                    <input type="hidden" class="delFlag" name="mrAtchFiles[${loop.index}].deleted" value="false"/>
+                    <input type="hidden" class="insFlag" name="mrAtchFiles[${loop.index}].inserted" value="false"/>
+                    <input type="hidden" name="mrAtchFiles[${loop.index}].mrAtchFileNo" value="${mrAtchFiles.mrAtchFileNo}"/>
+                    <input type="hidden" class="drawMngNo" name="mrAtchFiles[${loop.index}].drawMngNo" value="${mrAtchFiles.drawMngNo}"/>
+                    
+                    <!-- wj: 이미 저장된 첨부파일 체크를 위한 hidden field 추가-->
+                    <input type="hidden" class="fileCdFlag" name="mrAtchFiles[${loop.index}].fileCd" value="${mrAtchFiles.fileCd}"/>
+                    <input type="hidden" class="fileNmFlag" name="mrAtchFiles[${loop.index}].fileNm" value="${mrAtchFiles.fileNm}"/>
+                </td>
+                </tr>
+            </c:forEach>
+            </table>
+            </div>
+        </td>
+        </tr>
+        </tbody>
+       </table>
+<!-- 4 -->	
+	<!-- space non 10 -->
+<!-- 	<hr class="divider_none_10" />
+	
+	<div class="tl"> * 안전점검 수행문서 원본 또는 스캔본 필히 첨부 (가동전 점검결과, 변경관리 교육 결과 첨부 필수)</div> -->
+	
+	</form>
+</div>
+
+<!-- js -->
+
+<script>
+
+$(window).load(function() {
+	
+    //alert("${modeClass}"); 
+    //alert("${appLine.chrgrClCd}");
+    //alert("${appLine.ifStatCd}");
+    //alert("${appLine.chrgEmpNo}");
+    //alert("${appLine.loginEmpNo}");
+    
+    $(".safeRPT").click(function() {
+        $.popup({url:"/mr/HDO_safeRPT.jsp", width:"0", height:"0"});
+    });
+
+    $(".save").click(function() {
+        if(confirm("임시저장 하시겠습니까?")) {
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "${saveURL}").submit(); //saveURL: safeCheckSave.do, safeCheckUpdate.do
+        }
+    });
+    
+  	//임시저장 mr수행의 기술검토확인 용
+    $(".save2").click(function() {
+        if(confirm("임시저장 하시겠습니까?")) {
+            $('#pageLoadingWrap').show();            
+            //저장 분기 saveURL: safeCheckSave2.do, safeCheckUpdate2.do 
+            	//alert("${saveURL2}");
+            
+        	//첨부파일 첨부여부 카운트
+        	var riskFileCnt = 0;
+        	var AttechChkCnt = 0;
+        	
+        	//wj:이미 저장된 첨부파일 체크를 위한 로직 추가(20180125)
+        	var riskFileCnt2 = 0;
+        	var AttechChkCnt2 = 0;        	
+        	
+        	$("#fileList > tbody> tr").each(function (){
+        		if(!$(this).is(":hidden")){
+            		var fileCd = $(this).children("td").children(".fileCd").val();
+            		var file = $(this).children("td").children(".fileNm").val();            		 
+            		//var fileCd_2 = $(this).children("td").children(".fileCdFlag").val();
+            		//var file2 = $(this).children("td").children(".fileNmFlag").val();
+    				
+    			    //alert(fileCd);
+        			if(file != "" && file != undefined) {
+            			riskFileCnt++;
+            			//alert(riskFileCnt);
+       	    		}
+        		}
+    		});        	
+        	
+        	$("form").attr("action", "safeCheckAppr2.do").submit();		//가동전 안전점검 승인        	
+        }
+    });
+  	
+  	if("${modeClass}" == "FAD" && $("input[name = pnidDt]").val() == ""){
+  		$("input[name = pnidDt]").val($.getCurrentDate());
+  	}
+  	if("${modeClass}" == "FAI" && $("input[name = mrPrfmDt]").val() == ""){
+  		$("input[name = mrPrfmDt]").val($.getCurrentDate());
+  	}
+
+    $(".safeCNF").click(function() {
+        if($.validation())
+        if(confirm("MR수행 완료를 하시겠습니까?")) {
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "safeCheckConf.do").submit();
+        }
+    });
+
+    
+    $(".comp").click(function() {
+        if($.validation()){
+            /*-- 승인 로직으로 이동함.
+            //첨부파일 첨부여부 카운트
+            var riskFileCnt = 0;
+            var AttechChkCnt = 0;
+            $("#fileList > tbody> tr").each(function (){
+                if(!$(this).is(":hidden")){
+                    var file = $(this).children("td").children(".fileNm").val();
+                    var fileCd = $(this).children("td").children(".fileCd").val();
+                    switch (fileCd) {
+                    case "0014":  //가동전 점검결과
+                        AttechChkCnt++;
+                        break;
+                    case "0015":  //변경관리 교육 결과
+                        AttechChkCnt++;
+                        break;
+                    }
+                    if(file != "" && file != undefined){
+                        riskFileCnt++;
+                    }
+                }
+            });    	
+
+            if(riskFileCnt < 1){
+                alert("가동전 점검결과 및 변경관리 교육 결과를 필히 첨부하세요.");
+                return;
+            }
+            if(AttechChkCnt < 2){
+                alert("가동전 점검결과 및 변경관리 교육 결과를 필히 첨부하세요.");
+                return;
+            }      
+            */
+            if(confirm("완료 하시겠습니까?")) {
+                $('#pageLoadingWrap').show();
+                $("form").attr("action", "safeCheckComp.do").submit();
+            }
+        }
+    });
+    
+    //승인
+    $(".appr").click(function() { 
+        
+        //첨부파일 첨부여부 카운트
+        var riskFileCnt = 0;
+        var AttechChkCnt = 0;
+        
+        //wj:이미 저장된 첨부파일 체크를 위한 로직 추가(20180125)
+        var riskFileCnt2 = 0;
+        var AttechChkCnt2 = 0;
+        
+        $("#fileList > tbody> tr").each(function (){
+            if(!$(this).is(":hidden")){
+                var fileCd = $(this).children("td").children(".fileCd").val();
+                var file = $(this).children("td").children(".fileNm").val();
+                
+                var fileCd_2 = $(this).children("td").children(".fileCdFlag").val();
+                var file2 = $(this).children("td").children(".fileNmFlag").val();
+                
+                //alert("기존fileCd:" + fileCd +"||추가fileCd_2:" + fileCd_2);
+                //alert("기존file:" + file + "||추가file2:" + file2);        		
+                //alert(fileCd);
+                switch (fileCd) {
+                case "0014":  //가동전 점검결과
+                    AttechChkCnt++;
+                    break;
+                case "0015":  //변경관리 교육 결과
+                    AttechChkCnt++;
+                    break;
+                }
+
+                //wj:기존로직에선 fileCd 조회안되기 때문에 로직 추가(20180125)
+                switch (fileCd_2) {
+                case "0014":  //가동전 점검결과
+                    AttechChkCnt2++;
+                    break;
+                case "0015":  //변경관리 교육 결과
+                    AttechChkCnt2++;
+                    break;
+                }
+                
+                if(file != "" && file != undefined) {
+                    riskFileCnt++;
+                }
+                
+                //wj: 기존로직에선 fileCd 조회안되기 때문에 로직 추가(20180125)
+                if(file2 != "" && file2 != undefined) {
+                    riskFileCnt2++;
+                }
+            }
+        });    	
+
+        if(riskFileCnt < 1 && riskFileCnt2 < 1 ){
+            alert("가동전(항목) 점검결과 및 변경관리 교육 결과를 필히 첨부하세요.");
+            return;
+        }
+        if(AttechChkCnt < 2 && AttechChkCnt2 < 1){
+            alert("가동전(파일) 점검결과 및 변경관리 교육 결과를 필히 첨부하세요.");
+            return;
+        }    	
+        
+        if(confirm("승인 하시겠습니까?")) {
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "safeCheckAppr.do").submit();
+        }
+    });
+    
+    //202109 MR수행일자 입력NOW()(safeCNF)
+    $(".checkZ02D").click(function() {
+        
+        if(confirm("완료 하시겠습니까? 완료 후 Project Engineer가 다음 단계를 진행합니다")) {
+            $('#pageLoadingWrap').show();
+            //참고 $("form").attr("action", "safeCheckConf.do").submit();
+            
+        
+	        //첨부파일 첨부여부 카운트
+	        var riskFileCnt = 0;
+	        var AttechChkCnt = 0;
+	        
+	        //wj:이미 저장된 첨부파일 체크를 위한 로직 추가(20180125)
+	        var riskFileCnt2 = 0;
+	        var AttechChkCnt2 = 0;        	
+	        
+	        $("#fileList > tbody> tr").each(function (){
+	            if(!$(this).is(":hidden")){
+	                var fileCd = $(this).children("td").children(".fileCd").val();
+	                var file = $(this).children("td").children(".fileNm").val();            		 
+	                //var fileCd_2 = $(this).children("td").children(".fileCdFlag").val();
+	                //var file2 = $(this).children("td").children(".fileNmFlag").val();
+	                
+	                //alert(fileCd);
+	                if(file != "" && file != undefined) {
+	                    riskFileCnt++;
+	                    //alert(riskFileCnt);
+	                    }
+	            }
+	        });        	
+	        $("form").attr("action", "safeCheckZ02d.do").submit();
+	        
+        
+        }
+    
+    });
+
+
+    $.validation = function(){
+        var isValid = false;
+        isValid = $.validator({
+            safetyChkDt : {method:"class",type:"text", msg:"P&ID 최종본 일자를 입력하세요."},
+            safetyChkDt2 : {method:"class",type:"text", msg:"MR수행 일자를 입력하세요."},
+        });
+        return isValid;
+    };
+
+    $.validation2 = function(){
+        var isValid = false;
+        isValid = $.validator({
+            fileAdd : {method:"class",type:"text", msg:"안전점검 수행결과 파일을 첨부하세요."},
+        });
+        return isValid;
+    };
+
+});
+
+$(window).ready(function() {
+/*     $(".inputTime").timepicker({
+        dateformat:"yyyy-mm-dd",
+        showOn:"button",
+        changeYear: true,
+        changeMonth: true,
+        buttonImage:"images/icon_calendar.png",
+        buttonImageOnly:true,
+        minDate: "today"
+    });
+ */
+    $(".inputLimitDate").datepicker({
+        dateformat:"yyyy-mm-dd",
+        showOn:"button",
+        changeYear: true,
+        changeMonth: true,
+        buttonImage:"images/icon_calendar.gif",
+        buttonImageOnly:true,
+        minDate :"today",
+        maxDate :"+3M"
+    });
+    $("img.ui-datepicker-trigger").attr("style", "border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;");
+    $(".ui-datepicker-month").attr("width", "30px");
+
+    $.injectUintList = function(option){
+        var tr ="";
+        tr += "<tr>";
+        tr += "<td>"+option.unitNo+"<input type='hidden' class='mrProcNo' name='unitNo' value='"+option.unitNo+"'></td>";
+        tr += "<td>"+option.unitName+"<input type='hidden' class='mrProcName' name='unitNo' value='"+option.unitName+"'></td>";
+        tr += "<tr>";
+        $("#selectUnit").append(tr);
+        $.sort({className : "mrProcNo", fristName : "procs", lastName : "mrProcNo"});
+        $.sort({className : "mrProcName", fristName : "procs", lastName : "mrProcName"});
+    };
+});
+/* 
+$(document).on("change",".safetyChkDt",function() {
+    $(".safetyDate").val($(".safetyChkDt").val());
+});
+
+
+$(document).on("change",".safetyChkDt2",function() {
+	$(".safetyDate2").val($(".safetyChkDt2").val());
+});  */
+
+</script>

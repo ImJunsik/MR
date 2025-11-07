@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.step">
+    <resultMap id="procStepDetMap" type="com.mr.step.domain.MrReqProcStepDetVO">
+        <id property="mrReqProcStepDetNo" column="MR_REQ_PROC_STEP_DET_NO" />
+        <result property="mrReqProcStepNo" column="MR_REQ_PROC_STEP_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="jobRvCd" column="JOB_RV_CD" />
+        <result property="mrProcStepDetClCd" column="MR_PROC_STEP_DET_CL_CD" />
+        <result property="rvReqCtt" column="RV_REQ_CTT" />
+        <result property="reqDt" column="REQ_DT" />
+        <result property="endDt" column="END_DT" />
+        <result property="procTrmClCd" column="PROC_TRM_CL_CD" />
+        <result property="fstProcTrmDt" column="FST_PROC_TRM_DT" />
+        <result property="scndProcTrmDt" column="SCND_PROC_TRM_DT" />
+        <result property="thrdProcTrmDt" column="THRD_PROC_TRM_DT" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <result property="connIfName" column="IF_NAME" />
+        <result property="connIfStatGubun" column="IF_STAT_CD" />
+    </resultMap>
+
+    <insert id="insertMrReqProcStepDet" parameterType="com.mr.step.domain.MrReqProcStepDetVO">    
+        <selectKey keyProperty="mrReqProcStepDetNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_PROC_STEP_DET_NO),0)+1
+              FROM MR_REQ_PROC_STEP_DET
+        </selectKey>
+        --insertMrReqProcStepDet(step det 입력)
+        INSERT INTO MR_REQ_PROC_STEP_DET (
+                    MR_REQ_PROC_STEP_DET_NO,
+                    MR_REQ_PROC_STEP_NO,
+                    MR_REQ_NO,
+                    MR_STEP_CD,
+                    PROC_ST_CD,
+                    JOB_RV_CD,
+                    MR_PROC_STEP_DET_CL_CD,
+                    RV_REQ_CTT,
+                    REQ_DT,
+                    END_DT,
+                    PROC_TRM_CL_CD,
+                    FST_PROC_TRM_DT,
+                    SCND_PROC_TRM_DT,
+                    THRD_PROC_TRM_DT,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqProcStepDetNo},
+                        #{mrReqProcStepNo},
+                        #{mrReqNo},
+                        #{mrStepCd},
+                        #{procStCd},
+                        #{jobRvCd},
+                        #{mrProcStepDetClCd},
+                        #{rvReqCtt},
+                        #{reqDt},
+                        #{endDt},
+                        #{procTrmClCd},
+                        #{fstProcTrmDt},
+                        #{scndProcTrmDt},
+                        #{thrdProcTrmDt},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+       <insert id="insertMrReqProcStepDetForStepLast" parameterType="com.mr.step.domain.MrReqProcStepDetVO">
+        <selectKey keyProperty="mrReqProcStepDetNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_PROC_STEP_DET_NO),0)+1
+              FROM MR_REQ_PROC_STEP_DET
+        </selectKey>
+        INSERT INTO MR_REQ_PROC_STEP_DET (
+                    MR_REQ_PROC_STEP_DET_NO,
+                    MR_REQ_PROC_STEP_NO,
+                    MR_REQ_NO,
+                    MR_STEP_CD,
+                    PROC_ST_CD,
+                    JOB_RV_CD,
+                    MR_PROC_STEP_DET_CL_CD,
+                    RV_REQ_CTT,
+                    REQ_DT,
+                    END_DT,
+                    PROC_TRM_CL_CD,
+                    FST_PROC_TRM_DT,
+                    SCND_PROC_TRM_DT,
+                    THRD_PROC_TRM_DT,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqProcStepDetNo},
+                        (SELECT MAX(MR_REQ_PROC_STEP_NO)
+                           FROM MR_REQ_PROC_STEP
+                          WHERE MR_REQ_NO=#{mrReqNo}
+                            AND EFF_END_DTM = '99991231235959'
+                            AND DEL_YN=0),
+                        #{mrReqNo},
+                        #{mrStepCd},
+                        #{procStCd},
+                        #{jobRvCd},
+                        #{mrProcStepDetClCd},
+                        #{rvReqCtt},
+                        #{reqDt},
+                        #{endDt},
+                        #{procTrmClCd},
+                        #{fstProcTrmDt},
+                        #{scndProcTrmDt},
+                        #{thrdProcTrmDt},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+
+    <update id="updateMrReqProcStepDetDelYn" parameterType="map">
+    --updateMrReqProcStepDetDelYn(상세스텝논리삭제)
+        UPDATE MR_REQ_PROC_STEP_DET
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND MR_STEP_CD = #{mrStepCd}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateMrReqProcStepDetJobRvCd" parameterType="map">    
+        UPDATE MR_REQ_PROC_STEP_DET
+           SET JOB_RV_CD = #{jobRvCd},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateMrReqProcStepDetProcTrmDt" parameterType="map">
+        UPDATE MR_REQ_PROC_STEP_DET
+           SET FST_PROC_TRM_DT = #{fstProcTrmDt},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updatePorcStepDetDelYn" parameterType="map">
+        UPDATE MR_REQ_PROC_STEP_DET
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN
+        (SELECT DET.MR_REQ_PROC_STEP_DET_NO
+           FROM MR_REQ_PROC_STEP_DET DET,
+                MR_REQ_CHRGR_CHG_HIST HIST
+          WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+            AND DET.MR_REQ_NO = #{mrReqNo}
+            AND DET.MR_STEP_CD = #{mrStepCd}
+            AND HIST.CHRGR_CL_CD LIKE 'Z02L%'
+            AND DET.DEL_YN=0)
+
+    </update>
+    
+    <update id="updatePorcStepDetNoDelYn" parameterType="map">
+        UPDATE MR_REQ_PROC_STEP_DET
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND DEL_YN=0
+    </update>
+        
+
+    <!-- 상신 -->
+     <update id="updateMrIfStat" parameterType="map">
+      UPDATE MR_REQ_CHRGR_CHG_HIST
+	     SET IF_NAME    = '',
+	         IF_STAT_CD = '',
+	         IF_STAT_NM = ''
+	   WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+    </update>
+    
+    <!-- 승인 반려 -->
+    <update id="updateMrIfStat01" parameterType="map">
+      UPDATE MR_REQ_CHRGR_CHG_HIST
+         SET IF_NAME    = #{connIfName}
+           , IF_STAT_CD = #{connIfStatGubun}
+           , IF_STAT_NM = DECODE(#{connIfStatGubun}, '01', '성공','02', '실패' ) 
+       WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+    </update>
+
+
+    <!-- 상신 복사 
+     <update id="updateMrIfStat" parameterType="map">
+      UPDATE MR_REQ_CHRGR_CHG_HIST
+	     SET IF_NAME = ''
+	   WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+	     AND MR_REQ_NO   = #{connkey}
+	     AND CHRGR_CL_CD = 'Z02A'
+	     AND EFF_END_DTM &lt;&gt; '99991231235959' 
+    </update>
+     
+      승인 반려 복사 
+    <update id="updateMrIfStat01" parameterType="map">
+      UPDATE MR_REQ_CHRGR_CHG_HIST
+         SET IF_NAME    = #{connIfName}
+           , IF_STAT_CD = #{connIfStatGubun}
+           , IF_STAT_NM = DECODE(#{connIfStatGubun}, '01', '성공','02', '실패' ) 
+       WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+	     AND MR_REQ_NO   = #{connkey}
+         AND CHRG_EMP_NO = #{uid}
+         AND CHRGR_CL_CD = 'Z02A'
+         AND EFF_END_DTM = '99991231235959'
+    </update>
+    -->    
+    
+</mapper>

@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.step">
+    <resultMap id="procStepMap" type="com.mr.step.domain.MrReqProcStepVO">
+        <id property="mrReqProcStepNo" column="MR_REQ_PROC_STEP_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="procStNm" column="PROC_ST_NM" />
+        <result property="effEndDtm" column="EFF_END_DTM" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+
+    </resultMap>
+
+    <select id="getMrReqProcStepNo" resultType="int">
+         SELECT MAX(MR_REQ_PROC_STEP_NO) AS MR_REQ_PROC_STEP_NO
+           FROM MR_REQ_PROC_STEP
+          WHERE MR_REQ_NO = #{mrReqNo}
+            AND MR_STEP_CD = #{mrStepCd}
+            AND PROC_ST_CD = #{procStCd}
+            AND EFF_END_DTM ='99991231235959'
+            AND DEL_YN=0
+    </select>
+
+    <select id="selectOneMrReqStep" resultMap="procStepMap" parameterType="map">
+    --selectOneMrReqStep
+        SELECT STEP.MR_REQ_PROC_STEP_NO,
+               STEP.MR_STEP_CD,
+               STEP.PROC_ST_CD,
+               DECODE(STEP.EFF_END_DTM,'99991231235959', PRCD.MR_COMM_NM, TO_CHAR(STEP.LAST_CHG_DT,'YYYY-MM-DD')) AS PROC_ST_NM,
+               STEP.LAST_CHG_DT
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_COMM_COD PRCD
+         WHERE  STEP.PROC_ST_CD = PRCD.MR_COMM_CD
+           AND STEP.MR_REQ_PROC_STEP_NO IN
+               (SELECT MAX(MR_REQ_PROC_STEP_NO)
+                  FROM MR_REQ_PROC_STEP
+                 WHERE MR_REQ_NO=#{mrReqNo}
+                   AND MR_STEP_CD = #{mrStepCd}
+                   AND DEL_YN = 0
+                 GROUP BY MR_STEP_CD)
+           AND STEP.DEL_YN=0
+    </select>
+
+
+    <select id="selectAllMrReqStep" resultMap="procStepMap">
+    --selectAllMrReqStep
+        SELECT STEP.MR_STEP_CD,
+               STEP.PROC_ST_CD,
+               DECODE(STEP.EFF_END_DTM,'99991231235959', PRCD.MR_COMM_NM, TO_CHAR(STEP.LAST_CHG_DT,'YYYY-MM-DD')) AS PROC_ST_NM,
+               STEP.LAST_CHG_DT
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_COMM_COD PRCD
+         WHERE  STEP.PROC_ST_CD = PRCD.MR_COMM_CD
+           AND STEP.MR_REQ_PROC_STEP_NO IN
+               (SELECT MAX(MR_REQ_PROC_STEP_NO)
+                  FROM MR_REQ_PROC_STEP
+                 WHERE MR_REQ_NO=#{mrReqNo}
+                   AND DEL_YN = 0
+                 GROUP BY MR_STEP_CD)
+           AND STEP.DEL_YN=0
+    </select>
+
+
+    <insert id="insertProcStep" parameterType="com.mr.step.domain.MrReqProcStepVO">
+        <selectKey keyProperty="mrReqProcStepNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_PROC_STEP_NO),0)+1
+              FROM MR_REQ_PROC_STEP
+        </selectKey>
+        --insertProcStep(Step 생성)
+        INSERT INTO MR_REQ_PROC_STEP (
+                    MR_REQ_PROC_STEP_NO,
+                    MR_REQ_NO,
+                    MR_STEP_CD,
+                    PROC_ST_CD,
+                    EFF_END_DTM,
+                    EFF_STA_DTM,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqProcStepNo},
+                        #{mrReqNo},
+                        #{mrStepCd},
+                        #{procStCd},
+                        '99991231235959',
+                        TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <update id="updateProcStepDelYn" parameterType="map">
+    --updateProcStepDelYn(step 삭제처리) 
+        UPDATE MR_REQ_PROC_STEP
+           SET DEL_YN = 1,
+               EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateProcStepDelYnBack" parameterType="map">
+    --updateProcStepDelYnBack(201904추가 반송처리를 위한 step 삭제) 
+        UPDATE MR_REQ_PROC_STEP
+           SET DEL_YN = 1,
+               EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND MR_STEP_CD = #{mrStepCd}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateProcStepEffEnd" parameterType="map">
+        UPDATE MR_REQ_PROC_STEP
+           SET EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE EFF_END_DTM ='99991231235959'
+           AND MR_REQ_NO = #{mrReqNo}
+         <if test="mrReqProcStepNo!=null and mrReqProcStepNo>0">
+           AND MR_REQ_PROC_STEP_NO = #{mrReqProcStepNo}
+         </if>
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateProcStep" parameterType="map">
+    	--mr step변경(updateMrStep)
+        UPDATE MR_REQ_PROC_STEP
+           SET LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo},
+               <if test="mrStepCd!=null">
+                  MR_STEP_CD = #{mrStepCd},
+               </if>
+               PROC_ST_CD = #{procStCd}
+         WHERE MR_REQ_PROC_STEP_NO =
+               (SELECT MAX(MR_REQ_PROC_STEP_NO)
+                  FROM MR_REQ_PROC_STEP
+                 WHERE MR_REQ_NO = #{mrReqNo}
+                   AND EFF_END_DTM ='99991231235959'
+                   AND DEL_YN=0)
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateProcStepActive" parameterType="map">
+        UPDATE MR_REQ_PROC_STEP
+           SET EFF_END_DTM ='99991231235959',
+               DEL_YN=0,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo},
+               PROC_ST_CD = #{procStCd}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND MR_STEP_CD = #{mrStepCd}
+           AND DEL_YN=0
+    </update>
+</mapper>

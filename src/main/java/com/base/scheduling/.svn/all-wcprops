@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/base/scheduling
+END
+JobAttributes.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/base/scheduling/JobAttributes.java
+END
+JobManuallyExecution.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/base/scheduling/JobManuallyExecution.java
+END
+JobListenerImpl.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/base/scheduling/JobListenerImpl.java
+END
+JobException.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/base/scheduling/JobException.java
+END
+JobState.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/base/scheduling/JobState.java
+END

@@ -1,0 +1,372 @@
+package com.mr.jobs.domain;
+
+import java.util.Date;
+import java.util.List;
+
+import org.codehaus.jackson.map.annotate.JsonSerialize;
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.base.domain.Domain;
+import com.common.file.domain.MrAtchFile;
+import com.mr.common.domain.MrRvRstVO;
+import com.mr.mrrq.domain.MrReqEquipVO;
+import com.mr.mrrq.domain.MrReqProcVO;
+import com.mr.step.domain.ChrgrChgHist;
+
+/**
+ * 직무검토용 도메인
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.16 박성룡 최초 작성
+ * </pre>
+ */
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_DEFAULT)
+public class JobsReviewVO extends Domain {
+    private int mrReqNo;
+    private int mrReqProcStepDetNo;
+    private boolean isPorcDisagree = false;
+    private boolean isJobsComplete = false;
+    private String mrNo;
+    private String mrReqTitle;
+    private String plant;
+    private String plantNm;
+    private String reqClCd;
+    private String reqClCdNm;
+    private String reqClDtlCd;
+    private String reqClDtlCdNm;
+    private String workPsblClCd;
+    private String workPsblClCdNm;
+    private Date workPsblDt;
+    private String qualEptEftCtt;
+    private String quanEptEftCtt;
+    private String quanEptEftCd;
+    private String quanEptEftCdNm;
+
+    private String hazopActYn;
+    private String porcActYn;
+
+    private List<MrReqEquipVO> equips;
+    private List<MrReqProcVO> procs;
+    private List<ChrgrChgHist> appLine;
+    private List<MrRvRstVO> rvRsts;
+
+    private List<ChrgrChgHist> jobs;
+
+    private int delYn;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date fstRgstDt;
+    private String fstRgstr;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date lastChgDt;
+    private String lastChgr;
+
+    private List<MrAtchFile> mrAtchFiles;
+    private List<MrAtchFile> mrJobAtchFiles;
+    
+    private String mrStepCd;
+    
+   
+    public String getMrStepCd() {
+		return mrStepCd;
+	}
+
+	public void setMrStepCd(String mrStepCd) {
+		this.mrStepCd = mrStepCd;
+	}
+
+	public int getMrReqNo() {
+        return mrReqNo;
+    }
+
+    public void setMrReqNo(int mrReqNo) {
+        this.mrReqNo = mrReqNo;
+    }
+
+    public int getMrReqProcStepDetNo() {
+        return mrReqProcStepDetNo;
+    }
+
+    public void setMrReqProcStepDetNo(int mrReqProcStepDetNo) {
+        this.mrReqProcStepDetNo = mrReqProcStepDetNo;
+    }
+
+    public boolean getIsPorcDisagree() {
+        return isPorcDisagree;
+    }
+
+    public void setPorcDisagree(boolean isPorcDisagree) {
+        this.isPorcDisagree = isPorcDisagree;
+    }
+
+    public boolean getIsJobsComplete() {
+        return isJobsComplete;
+    }
+
+    public void setJobsComplete(boolean isJobsComplete) {
+        this.isJobsComplete = isJobsComplete;
+    }
+
+    public String getMrNo() {
+        return mrNo;
+    }
+
+    public void setMrNo(String mrNo) {
+        this.mrNo = mrNo;
+    }
+
+    public String getMrReqTitle() {
+        return mrReqTitle;
+    }
+
+    public void setMrReqTitle(String mrReqTitle) {
+        this.mrReqTitle = mrReqTitle;
+    }
+
+    public String getPlant() {
+        return plant;
+    }
+
+    public void setPlant(String plant) {
+        this.plant = plant;
+    }
+
+    public String getPlantNm() {
+        return plantNm;
+    }
+
+    public void setPlantNm(String plantNm) {
+        this.plantNm = plantNm;
+    }
+
+    public String getReqClCd() {
+        return reqClCd;
+    }
+
+    public void setReqClCd(String reqClCd) {
+        this.reqClCd = reqClCd;
+    }
+
+    public String getReqClCdNm() {
+        return reqClCdNm;
+    }
+
+    public void setReqClCdNm(String reqClCdNm) {
+        this.reqClCdNm = reqClCdNm;
+    }
+
+    public String getReqClDtlCd() {
+        return reqClDtlCd;
+    }
+
+    public void setReqClDtlCd(String reqClDtlCd) {
+        this.reqClDtlCd = reqClDtlCd;
+    }
+
+    public String getReqClDtlCdNm() {
+        return reqClDtlCdNm;
+    }
+
+    public void setReqClDtlCdNm(String reqClDtlCdNm) {
+        this.reqClDtlCdNm = reqClDtlCdNm;
+    }
+
+    public String getWorkPsblClCd() {
+        return workPsblClCd;
+    }
+
+    public void setWorkPsblClCd(String workPsblClCd) {
+        this.workPsblClCd = workPsblClCd;
+    }
+
+    public String getWorkPsblClCdNm() {
+        return workPsblClCdNm;
+    }
+
+    public void setWorkPsblClCdNm(String workPsblClCdNm) {
+        this.workPsblClCdNm = workPsblClCdNm;
+    }
+
+    public Date getWorkPsblDt() {
+        return workPsblDt;
+    }
+
+    public void setWorkPsblDt(Date workPsblDt) {
+        this.workPsblDt = workPsblDt;
+    }
+
+    public String getQualEptEftCtt() {
+        return qualEptEftCtt;
+    }
+
+    public void setQualEptEftCtt(String qualEptEftCtt) {
+        this.qualEptEftCtt = qualEptEftCtt;
+    }
+
+    public String getQuanEptEftCtt() {
+        return quanEptEftCtt;
+    }
+
+    public void setQuanEptEftCtt(String quanEptEftCtt) {
+        this.quanEptEftCtt = quanEptEftCtt;
+    }
+
+    public String getQuanEptEftCd() {
+        return quanEptEftCd;
+    }
+
+    public void setQuanEptEftCd(String quanEptEftCd) {
+        this.quanEptEftCd = quanEptEftCd;
+    }
+
+    public String getQuanEptEftCdNm() {
+        return quanEptEftCdNm;
+    }
+
+    public void setQuanEptEftCdNm(String quanEptEftCdNm) {
+        this.quanEptEftCdNm = quanEptEftCdNm;
+    }
+
+    public String getHazopActYn() {
+        return hazopActYn;
+    }
+
+    public void setHazopActYn(String hazopActYn) {
+        this.hazopActYn = hazopActYn;
+    }
+
+    public String getPorcActYn() {
+        return porcActYn;
+    }
+
+    public void setPorcActYn(String porcActYn) {
+        this.porcActYn = porcActYn;
+    }
+
+    public List<MrReqEquipVO> getEquips() {
+        return equips;
+    }
+
+    public void setEquips(List<MrReqEquipVO> equips) {
+        this.equips = equips;
+    }
+
+    public List<MrReqProcVO> getProcs() {
+        return procs;
+    }
+
+    public void setProcs(List<MrReqProcVO> procs) {
+        this.procs = procs;
+    }
+
+    public List<ChrgrChgHist> getAppLine() {
+        return appLine;
+    }
+
+    public void setAppLine(List<ChrgrChgHist> appLine) {
+        this.appLine = appLine;
+    }
+
+    public List<MrRvRstVO> getRvRsts() {
+        return rvRsts;
+    }
+
+    public void setRvRsts(List<MrRvRstVO> rvRsts) {
+        this.rvRsts = rvRsts;
+    }
+
+    public List<ChrgrChgHist> getJobs() {
+        return jobs;
+    }
+
+    public void setJobs(List<ChrgrChgHist> jobs) {
+        this.jobs = jobs;
+    }
+
+    public int getDelYn() {
+        return delYn;
+    }
+
+    public void setDelYn(int delYn) {
+        this.delYn = delYn;
+    }
+
+    public Date getFstRgstDt() {
+        return fstRgstDt;
+    }
+
+    public void setFstRgstDt(Date fstRgstDt) {
+        this.fstRgstDt = fstRgstDt;
+    }
+
+    public String getFstRgstr() {
+        return fstRgstr;
+    }
+
+    public void setFstRgstr(String fstRgstr) {
+        this.fstRgstr = fstRgstr;
+    }
+
+    public Date getLastChgDt() {
+        return lastChgDt;
+    }
+
+    public void setLastChgDt(Date lastChgDt) {
+        this.lastChgDt = lastChgDt;
+    }
+
+    public String getLastChgr() {
+        return lastChgr;
+    }
+
+    public void setLastChgr(String lastChgr) {
+        this.lastChgr = lastChgr;
+    }
+
+    public List<MrAtchFile> getMrAtchFiles() {
+        return mrAtchFiles;
+    }
+
+    public void setMrAtchFiles(List<MrAtchFile> mrAtchFiles) {
+        this.mrAtchFiles = mrAtchFiles;
+    }
+
+    public List<MrAtchFile> getMrJobAtchFiles() {
+        return mrJobAtchFiles;
+    }
+
+    public void setMrJobAtchFiles(List<MrAtchFile> mrJobAtchFiles) {
+        this.mrJobAtchFiles = mrJobAtchFiles;
+    }
+
+	@Override
+	public String toString() {
+		return "JobsReviewVO [mrReqNo=" + mrReqNo + ", mrReqProcStepDetNo="
+				+ mrReqProcStepDetNo + ", isPorcDisagree=" + isPorcDisagree
+				+ ", isJobsComplete=" + isJobsComplete + ", mrNo=" + mrNo
+				+ ", mrReqTitle=" + mrReqTitle + ", plant=" + plant
+				+ ", plantNm=" + plantNm + ", reqClCd=" + reqClCd
+				+ ", reqClCdNm=" + reqClCdNm + ", reqClDtlCd=" + reqClDtlCd
+				+ ", reqClDtlCdNm=" + reqClDtlCdNm + ", workPsblClCd="
+				+ workPsblClCd + ", workPsblClCdNm=" + workPsblClCdNm
+				+ ", workPsblDt=" + workPsblDt + ", qualEptEftCtt="
+				+ qualEptEftCtt + ", quanEptEftCtt=" + quanEptEftCtt
+				+ ", quanEptEftCd=" + quanEptEftCd + ", quanEptEftCdNm="
+				+ quanEptEftCdNm + ", hazopActYn=" + hazopActYn
+				+ ", porcActYn=" + porcActYn + ", equips=" + equips
+				+ ", procs=" + procs + ", appLine=" + appLine + ", rvRsts="
+				+ rvRsts + ", jobs=" + jobs + ", delYn=" + delYn
+				+ ", fstRgstDt=" + fstRgstDt + ", fstRgstr=" + fstRgstr
+				+ ", lastChgDt=" + lastChgDt + ", lastChgr=" + lastChgr
+				+ ", mrAtchFiles=" + mrAtchFiles + ", mrJobAtchFiles="
+				+ mrJobAtchFiles + ", mrStepCd=" + mrStepCd + "]";
+	}
+    
+    
+
+}

@@ -1,0 +1,80 @@
+package com.mr.main.repository;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.mr.common.domain.EmpInfoVo;
+import com.mr.main.domain.MrListVO;
+import com.mr.main.domain.MrSummary;
+/**
+ * 메인화면 DB 처리
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * </pre>
+ */
+@Repository
+public class MainDAO  extends BaseSqlMapRepository {
+
+    /**
+     * 로그인 사용자의 MR Summary
+     * @param empInfoVo
+     * @return MR Summary
+     */
+    public List<MrSummary> selectMrSummary(EmpInfoVo empInfoVo){
+        return selectList("mr.main.selectSummary", empInfoVo);
+    }
+
+    /**
+     * 로그인 사용자가 결재라인에 포함된 MR Summary
+     * @param empInfoVo
+     * @return
+     */
+    public List<MrSummary> selectAppSummary(EmpInfoVo empInfoVo){
+        return selectList("mr.main.selectAppSummary", empInfoVo);
+    }
+
+    /**
+     * 로그인 사용자의 임시변경 Summary
+     * @param empInfoVo
+     * @return
+     */
+    public MrSummary selectTempMrSummary(EmpInfoVo empInfoVo){
+        return selectOne("mr.main.selectTempSummary", empInfoVo);
+    }
+
+    /**
+     * 로그인 사용자의 MR 상세리스트
+     * @param empInfoVo
+     * @return MR Summary
+     */
+    public List<MrListVO> selectMrList(MrListVO mrListVO){
+        /*        Map<String, String> param = new HashMap<String, String>();
+        param.put("mrStepCd", mrStepCd);
+        param.put("procStCd", procStCd);*/
+        return selectList("mr.main.selectMrList", mrListVO);
+    }
+
+    /**
+     * 로그인 사용자가 포함된 MR상세 리스트
+     * @param mrListVO
+     * @return
+     */
+    public List<MrListVO> selectAppMrList(MrListVO mrListVO){
+        return selectList("mr.main.selectAppMrList", mrListVO);
+    }
+
+	public int getTechInvestCnt(EmpInfoVo empInfoVo) {
+        return selectInt("mr.main.getTechInvestCnt", empInfoVo);
+	}
+
+
+
+}

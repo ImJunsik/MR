@@ -1,0 +1,968 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.step">
+    <resultMap id="chrgrChgHistMap" type="com.mr.step.domain.ChrgrChgHist">
+        <id property="mrReqProcStepDetNo" column="MR_REQ_PROC_STEP_DET_NO" />
+        <result property="mrReqProcStepNo" column="MR_REQ_PROC_STEP_NO" />
+        <result property="chrgrClCd" column="CHRGR_CL_CD" />
+        <result property="effEndDtm" column="EFF_END_DTM" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="fstProcTrmDt" column="FST_PROC_TRM_DT" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="empEmail" column="EMP_EMAIL" />
+        <result property="chrgTeamNo" column="CHRG_TEAM_NO" />
+        <result property="chrgEmpNo" column="CHRG_EMP_NO" />
+        <result property="chrgEmpName" column="CHRG_EMP_NAME" />
+        <result property="aprvChgYn" column="APRV_CHG_YN" />
+        <result property="thdayTeam" column="THDAY_TEAM" />
+        <result property="thdayPos" column="THDAY_POS" />
+        <result property="jobRvCd" column="JOB_RV_CD" />
+        <result property="sugg" column="SUGG" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <collection property="rvRsts" ofType="com.mr.common.domain.MrRvRstVO" column="MR_REQ_PROC_STEP_DET_NO" select="mr.rvRst.selectMrRvRstDetNo" />
+    </resultMap>
+
+    <resultMap id="appLineMap" type="com.mr.step.domain.ChrgrChgHist">
+        <id property="mrReqProcStepDetNo" column="MR_REQ_PROC_STEP_DET_NO" />
+        <result property="mrReqProcStepNo" column="MR_REQ_PROC_STEP_NO" />
+        <result property="chrgrClCd" column="CHRGR_CL_CD" />
+        <result property="effEndDtm" column="EFF_END_DTM" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="fstProcTrmDt" column="FST_PROC_TRM_DT" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="empEmail" column="EMP_EMAIL" />
+        <result property="chrgTeamNo" column="CHRG_TEAM_NO" />
+        <result property="chrgEmpNo" column="CHRG_EMP_NO" />
+        <result property="chrgEmpName" column="CHRG_EMP_NAME" />
+        <result property="aprvChgYn" column="APRV_CHG_YN" />
+        <result property="thdayTeam" column="THDAY_TEAM" />
+        <result property="thdayPos" column="THDAY_POS" />
+        <result property="jobRvCd" column="JOB_RV_CD" />
+        <result property="sugg" column="SUGG" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <result property="ifName" column="IF_NAME" />
+        <result property="ifStatCd" column="IF_STAT_CD" />
+        <result property="ifStatNm" column="IF_STAT_NM" />
+    </resultMap>
+
+    <select id="selectChrgrChgHist" resultMap="appLineMap">
+        SELECT HIST.MR_REQ_PROC_STEP_DET_NO,
+               HIST.CHRG_TEAM_NO,
+               EMP.EMP_NAME AS CHRG_EMP_NAME,
+               HIST.CHRG_EMP_NO,
+               HIST.THDAY_TEAM,
+               HIST.THDAY_POS
+          FROM MR_REQ_CHRGR_CHG_HIST HIST,
+               EDM_EMP EMP
+         WHERE HIST.CHRG_EMP_NO = EMP.EMP_ID
+           AND HIST.MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND HIST.DEL_YN=0
+    </select>
+
+    <update id="updateChrgrChgHist" parameterType="map">
+    --mr정보:담당자변경(chrgrChgHist.getEmpChange().equals("true"))
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET THDAY_TEAM = #{thdayTeam},
+               THDAY_POS = #{thdayPos},
+               CHRG_TEAM_NO = #{chrgTeamNo},
+               CHRG_EMP_NO = #{chrgEmpNo},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN = 0
+    </update>
+    
+   
+
+<update id="updateChrgrChgHist90" parameterType="map">
+    --mr정보:담당자변경(chrgrChgHist.getEmpChange().equals("true"))
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET THDAY_TEAM = #{thdayTeam},
+               THDAY_POS = #{thdayPos},
+               CHRG_TEAM_NO = #{chrgTeamNo},
+               CHRG_EMP_NO = #{chrgEmpNo},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND MR_REQ_NO = #{mrReqNo}
+           AND CHRGR_CL_CD = 'Z02C'
+           AND DEL_YN = 0
+    </update>
+    
+     <update id="updateChrgrChgHist20" parameterType="map">
+    --mr정보:담당자변경updateChrgrChgHist20
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET THDAY_TEAM = #{thdayTeam},
+               THDAY_POS = #{thdayPos},
+               CHRG_TEAM_NO = #{chrgTeamNo},
+               CHRG_EMP_NO = #{chrgEmpNo},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND CHRGR_CL_CD =  #{chrgrClCd}
+           AND DEL_YN = 0
+           AND CHRGR_CL_CD LIKE 'Z02H%' 
+	</update>
+    
+    <update id="updateChrgrChgHistClCd" parameterType="map">
+    --mr정보: 담당자 변경(Z02D,Z02G)
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET THDAY_TEAM = #{thdayTeam},
+               THDAY_POS = #{thdayPos},
+               CHRG_TEAM_NO = #{chrgTeamNo},
+               CHRG_EMP_NO = #{chrgEmpNo},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE CHRGR_CL_CD = #{chrgrClCd}
+           AND MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN = 0
+    </update>
+
+
+    <update id="updateChrgrChgHistMrStepCd" parameterType="map">
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET THDAY_TEAM = #{thdayTeam},
+               THDAY_POS = #{thdayPos},
+               CHRG_TEAM_NO = #{chrgTeamNo},
+               CHRG_EMP_NO = #{chrgEmpNo},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN
+                (SELECT DET.MR_REQ_PROC_STEP_DET_NO
+                   FROM MR_REQ_PROC_STEP_DET DET,
+                        MR_REQ_CHRGR_CHG_HIST HIST
+                  WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                    AND DET.MR_REQ_NO =  #{mrReqNo}
+                    AND DET.MR_STEP_CD = (SELECT MR_STEP_CD FROM MR_REQ_PROC_STEP_DET WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo})
+                    AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+                    AND HIST.DEL_YN=0
+                    AND DET.DEL_YN=0)
+    </update>
+
+
+    <update id="updateChrgrChgHistZ02G1" parameterType="map">
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET THDAY_TEAM = #{thdayTeam},
+               THDAY_POS = #{thdayPos},
+               CHRG_TEAM_NO = #{chrgTeamNo},
+               CHRG_EMP_NO = #{chrgEmpNo},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN
+                (SELECT DET.MR_REQ_PROC_STEP_DET_NO
+                   FROM MR_REQ_PROC_STEP_DET DET,
+                        MR_REQ_CHRGR_CHG_HIST HIST
+                  WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                    AND DET.MR_REQ_NO =  #{mrReqNo}
+                    AND HIST.CHRG_EMP_NO = (SELECT CHRG_EMP_NO FROM MR_REQ_CHRGR_CHG_HIST WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo})
+                    AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+                    AND HIST.DEL_YN=0
+                    AND DET.DEL_YN=0)
+    </update>
+
+    <insert id="insertChrgrChgHist" parameterType="com.mr.step.domain.ChrgrChgHist">
+    	--insertChrgrChgHist(결재라인생성)
+        INSERT INTO MR_REQ_CHRGR_CHG_HIST (
+                    MR_REQ_PROC_STEP_DET_NO,
+                    CHRGR_CL_CD,
+                    EFF_END_DTM,
+                    EFF_STA_DTM,
+                    MR_REQ_NO,
+                    PROC_ST_CD,
+                    CHRG_TEAM_NO,
+                    CHRG_EMP_NO,
+                    APRV_CHG_YN,
+                    THDAY_TEAM,
+                    THDAY_POS,
+                    SUGG,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqProcStepDetNo},
+                        #{chrgrClCd},
+                        '99991231235959',
+                        TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+                        #{mrReqNo},
+                        <if test="procStCd==null">
+                        'Z0110',
+                        </if>
+                        <if test="procStCd!=null">
+                        #{procStCd},
+                        </if>
+                        #{chrgTeamNo},
+                        #{chrgEmpNo},
+                        #{aprvChgYn},
+                        #{thdayTeam},
+                        #{thdayPos},
+                        #{sugg},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <update id="updateAppLineDelYn" parameterType="map">
+    	--결재라인 논리삭제(updateAppLineDelYn)
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET DEL_YN = 1,
+               EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN
+        (SELECT MR_REQ_PROC_STEP_DET_NO
+           FROM MR_REQ_PROC_STEP_DET
+          WHERE MR_REQ_NO = #{mrReqNo}
+            AND MR_STEP_CD = #{mrStepCd}
+            AND EFF_END_DTM = '99991231235959'
+            AND DEL_YN=0)
+           <if test="chrgrClCd!=null and chrgrClCds !=null">
+            AND CHRGR_CL_CD IN
+                 <foreach item="chrgrClCd" index="index" collection="chrgrClCds" open="(" separator="," close=")">
+                    #{chrgrClCd}
+                 </foreach>
+           </if>
+    </update>
+
+    <update id="updateTechEmpDelYn" parameterType="map">
+    	--updateTechEmpDelYn(특정 직무검토자 논리삭제)
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET DEL_YN = 1,
+               EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN
+        (SELECT MR_REQ_PROC_STEP_DET_NO
+           FROM MR_REQ_PROC_STEP_DET
+          WHERE MR_REQ_NO = #{mrReqNo}
+            AND MR_STEP_CD = #{mrStepCd}
+            AND EFF_END_DTM = '99991231235959'
+            AND DEL_YN=0)
+            AND CHRGR_CL_CD LIKE 'Z02H%'
+    </update>
+
+    <update id="updatePorcEmpDelYn" parameterType="map">
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET DEL_YN = 1,
+               EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN
+        (SELECT MR_REQ_PROC_STEP_DET_NO
+           FROM MR_REQ_PROC_STEP_DET
+          WHERE MR_REQ_NO = #{mrReqNo}
+            AND MR_STEP_CD = #{mrStepCd}
+            AND DEL_YN=0)
+            AND CHRGR_CL_CD LIKE 'Z02L%'
+    </update>
+
+    <update id="updateAppLineEffEnd" parameterType="map">
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateAppLineAllEffEnd" parameterType="map">
+       --updateAppLineAllEffEnd
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN
+        (SELECT MR_REQ_PROC_STEP_DET_NO
+           FROM MR_REQ_PROC_STEP_DET
+          WHERE MR_REQ_NO = #{mrReqNo}
+            AND MR_STEP_CD = #{mrStepCd}
+            AND EFF_END_DTM = '99991231235959'
+            AND DEL_YN=0)
+    </update>
+
+
+    <select id="selectTechStepDetNo" resultType="int">
+        SELECT MR_REQ_PROC_STEP_DET_NO
+          FROM MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST
+         WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND DET.MR_REQ_NO = #{mrReqNo}
+           AND DET.MR_STEP_CD = 'Z0020'
+           AND HIST.CHRGR_CL_CD ='Z02D'
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND HIST.DEL_YN=0
+           AND DET.DEL_YN=0
+    </select>
+
+    <select id="selectMrAllAppLine" resultMap="appLineMap">
+    SELECT DET.MR_STEP_CD,
+           DET.PROC_ST_CD,
+           HIST.CHRGR_CL_CD,
+           HIST.CHRG_EMP_NO,
+           HIST.CHRG_TEAM_NO,
+           HIST.THDAY_TEAM,
+           HIST.THDAY_POS
+      FROM MR_REQ_PROC_STEP_DET DET,
+           MR_REQ_CHRGR_CHG_HIST HIST
+     WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+       AND DET.MR_REQ_NO = #{mrReqNo}
+       AND (
+            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02A') OR --요청자
+            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02D') OR --기술검토자
+            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02G') OR --수행팀장
+            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0133' AND HIST.CHRGR_CL_CD = 'Z02F') OR --기술검토팀장
+            (DET.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD ='Z0133' AND HIST.CHRGR_CL_CD = 'Z02I')    --PROJECT ENG
+            )
+       AND HIST.DEL_YN=0
+       AND DET.DEL_YN=0
+      ORDER BY det.MR_REQ_PROC_STEP_DET_NO DESC
+    </select>
+
+    <select id="selectAppLine" resultMap="appLineMap">
+    --selectAppLine 결재라인 조회 (mr.step.selectAppLine)(직책과장조회)
+        SELECT 
+        	   DET.MR_REQ_NO,
+               DET.MR_REQ_PROC_STEP_NO,
+               DET.MR_REQ_PROC_STEP_DET_NO,
+               HIST.CHRGR_CL_CD,
+               HIST.PROC_ST_CD,
+               DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+               EMP.EMP_NAME AS CHRG_EMP_NAME,
+               HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+               DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+               HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO,
+               DET.FST_PROC_TRM_DT,
+               DECODE(DET.FST_PROC_TRM_DT, NULL, HIST.LAST_CHG_DT, '') AS LAST_CHG_DT,
+               HIST.IF_NAME,
+               HIST.IF_STAT_CD,
+               HIST.IF_STAT_NM
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST,
+               EDM_EMP EMP,
+               EDM_ORG TEAM,
+               EDM_DUTY DUTY
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+           AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+)
+           AND EMP.DUTY_ID = DUTY.DUTY_ID
+           AND STEP.MR_REQ_NO = #{mrReqNo}
+           AND DET.MR_STEP_CD = #{mrStepCd}
+           <!--if test="procStCd != null">
+			       AND HIST.PROC_ST_CD =  #{procStCd}
+		   </if-->
+            <if test="chrgrClCd!=null">
+           AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+           </if>
+           <if test="chrgrClCd==null">
+           AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+           </if>
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND HIST.DEL_YN=0
+           AND DET.DEL_YN=0
+           AND STEP.DEL_YN=0
+         ORDER BY DET.FST_PROC_TRM_DT nulls first, DET.MR_REQ_PROC_STEP_DET_NO ASC
+    </select>
+
+<select id="selectAppLine2" resultMap="appLineMap">
+    --selectAppLine2 결재라인 조회 (mr.step.selectAppLine)(직책과장조회)
+        SELECT 
+        	   DET.MR_REQ_NO,
+               DET.MR_REQ_PROC_STEP_NO,
+               DET.MR_REQ_PROC_STEP_DET_NO,
+               HIST.CHRGR_CL_CD,
+               HIST.PROC_ST_CD,
+               DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+               EMP.EMP_NAME AS CHRG_EMP_NAME,
+               HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+               DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+               HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO,
+               DET.FST_PROC_TRM_DT,
+               DECODE(DET.FST_PROC_TRM_DT, NULL, HIST.LAST_CHG_DT, '') AS LAST_CHG_DT,
+               HIST.IF_NAME,
+               HIST.IF_STAT_CD,
+               HIST.IF_STAT_NM
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST,
+               EDM_EMP EMP,
+               EDM_ORG TEAM,
+               EDM_DUTY DUTY
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+           AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+)
+           AND EMP.DUTY_ID = DUTY.DUTY_ID
+           AND STEP.MR_REQ_NO = #{mrReqNo}
+           AND DET.MR_STEP_CD = #{mrStepCd}
+           <if test="procStCd != null">
+		   AND HIST.PROC_ST_CD =  #{procStCd}
+		   </if>
+            <if test="chrgrClCd!=null">
+           AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+           </if>
+           <if test="chrgrClCd==null">
+           AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+           </if>
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND HIST.DEL_YN=0
+           AND DET.DEL_YN=0
+           AND STEP.DEL_YN=0
+         ORDER BY DET.FST_PROC_TRM_DT nulls first, DET.MR_REQ_PROC_STEP_DET_NO ASC
+    </select>
+
+    <select id="selectAppLineRvRst" resultMap="chrgrChgHistMap">
+    --selectAppLineRvRst
+        SELECT DET.MR_REQ_NO,
+               DET.MR_REQ_PROC_STEP_NO,
+               DET.MR_REQ_PROC_STEP_DET_NO,
+               HIST.CHRGR_CL_CD,
+               HIST.PROC_ST_CD,
+               DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+               EMP.EMP_NAME AS CHRG_EMP_NAME,
+               HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+               DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+               HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO,
+               DET.FST_PROC_TRM_DT,
+               DECODE(DET.FST_PROC_TRM_DT, NULL, HIST.LAST_CHG_DT, '') AS LAST_CHG_DT
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST,
+               EDM_EMP EMP,
+               EDM_ORG TEAM,
+               EDM_DUTY DUTY
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+           AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+)
+           AND EMP.DUTY_ID = DUTY.DUTY_ID
+           AND STEP.MR_REQ_NO = #{mrReqNo}
+           AND DET.MR_STEP_CD = #{mrStepCd}
+            <if test="chrgrClCd!=null">
+           AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+           </if>
+           <if test="chrgrClCd==null">
+           AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+           </if>
+
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND HIST.DEL_YN=0
+           AND DET.DEL_YN=0
+           AND STEP.DEL_YN=0
+    </select>
+
+    <select id="selectJobLine" resultMap="chrgrChgHistMap">
+    --selectJobLine 직무검토자 정보
+        SELECT DET.MR_REQ_NO,
+               DET.MR_REQ_PROC_STEP_NO,
+               DET.MR_REQ_PROC_STEP_DET_NO,
+               DET.JOB_RV_CD,
+               HIST.CHRGR_CL_CD,
+               HIST.PROC_ST_CD,
+               DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+               EMP.EMP_NAME AS CHRG_EMP_NAME,
+               HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+               DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+               HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO,
+               HIST.SUGG,
+               DET.FST_PROC_TRM_DT,
+               DECODE(DET.FST_PROC_TRM_DT, NULL, HIST.LAST_CHG_DT, '') AS LAST_CHG_DT
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST,
+               EDM_EMP EMP,
+               EDM_ORG TEAM,
+               EDM_DUTY DUTY
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+           AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+)
+           AND EMP.DUTY_ID = DUTY.DUTY_ID
+           AND STEP.MR_REQ_NO = #{mrReqNo}
+           AND DET.MR_STEP_CD = #{mrStepCd}
+           <if test="mrStepCd=='Z0025'">
+           --2025-05-07 검사관점 검토자 추가
+           AND HIST.CHRGR_CL_CD IN ('Z02H2','Z02H9','Z02H4','Z02H11','Z02H6','Z02H10')
+           </if>
+           <if test="mrStepCd!='Z0025'">
+           AND HIST.CHRGR_CL_CD LIKE 'Z02H%'
+           </if>
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND HIST.DEL_YN=0
+           AND DET.DEL_YN=0
+           AND STEP.DEL_YN=0
+    </select>
+
+
+    <select id="selectPorcLine" resultMap="chrgrChgHistMap">
+        SELECT DET.MR_REQ_NO,
+               DET.MR_REQ_PROC_STEP_NO,
+               DET.MR_REQ_PROC_STEP_DET_NO,
+               HIST.CHRGR_CL_CD,
+               HIST.PROC_ST_CD,
+               DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+               EMP.EMP_NAME AS CHRG_EMP_NAME,
+               HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+               DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+               HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO,
+               DET.FST_PROC_TRM_DT,
+               DECODE(DET.FST_PROC_TRM_DT, NULL, HIST.LAST_CHG_DT, '') AS LAST_CHG_DT
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST,
+               EDM_EMP EMP,
+               EDM_ORG TEAM,
+               EDM_DUTY DUTY
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+           AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+)
+           AND EMP.DUTY_ID = DUTY.DUTY_ID
+           AND STEP.MR_REQ_NO = #{mrReqNo}
+           AND DET.MR_STEP_CD = #{mrStepCd}
+           AND HIST.CHRGR_CL_CD LIKE 'Z02L%'
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND HIST.DEL_YN=0
+           AND DET.DEL_YN=0
+           AND STEP.DEL_YN=0
+    </select>
+
+    <select id="selectAppStepEmp" resultMap="appLineMap">
+            --권한체크(selectAppStepEmp1)
+            SELECT distinct   DET.MR_REQ_PROC_STEP_DET_NO, DET.MR_REQ_NO,
+                   DET.MR_REQ_PROC_STEP_NO,
+                   STEP.MR_STEP_CD,
+                   STEP.PROC_ST_CD,
+                   HIST.CHRGR_CL_CD,
+                   DUTY.DUTY_NAME AS THDAY_POS,
+                   ORG.ORG_ID AS CHRG_TEAM_NO,
+                   ORG.ORG_NAME AS THDAY_TEAM,
+                   HIST.CHRG_EMP_NO,
+                   EMP.EMP_NAME AS CHRG_EMP_NAME,
+                   EMP.EMP_EMAIL,
+                   DET.FST_PROC_TRM_DT
+              FROM MR_REQ_PROC_STEP STEP,
+                   MR_REQ_CHRGR_CHG_HIST HIST,
+                   MR_REQ_PROC_STEP_DET DET,
+                   EDM_EMP EMP,
+                   EDM_ORG ORG,
+                   EDM_DUTY DUTY
+             WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+               AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+               AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+               AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+               AND EMP.ORG_ID = ORG.ORG_ID
+               AND EMP.DUTY_ID = DUTY.DUTY_ID
+               <if test="chrgrClCd!=null">
+               AND DET.MR_REQ_NO = #{mrReqNo}
+               AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+               AND HIST.EFF_END_DTM = '99991231235959'
+               AND STEP.EFF_END_DTM = '99991231235959'
+               AND HIST.DEL_YN = 0
+               AND DET.DEL_YN=0
+               AND STEP.DEL_YN=0
+               </if>
+               <if test="chrgrClCd==null">
+               AND DET.MR_REQ_PROC_STEP_DET_NO =
+                   (SELECT MIN(DET.MR_REQ_PROC_STEP_DET_NO)
+                      FROM MR_REQ_PROC_STEP STEP,
+                           MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                       AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       AND STEP.EFF_END_DTM = '99991231235959'
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND STEP.DEL_YN = 0  /*2025-07-17 IJS 조건 추가*/
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0)
+              </if>
+    </select>
+<!-- yoo 20230811 위험성 검토 PORC단계 담당자 조회 (미사용) -->    
+    <select id="selectAppStepEmpR0" resultMap="appLineMap">
+            --권한체크(selectAppStepEmp2)
+            SELECT distinct   DET.MR_REQ_PROC_STEP_DET_NO, DET.MR_REQ_NO,
+                   DET.MR_REQ_PROC_STEP_NO,
+                   STEP.MR_STEP_CD,
+                   STEP.PROC_ST_CD,
+                   HIST.CHRGR_CL_CD,
+                   DUTY.DUTY_NAME AS THDAY_POS,
+                   ORG.ORG_ID AS CHRG_TEAM_NO,
+                   ORG.ORG_NAME AS THDAY_TEAM,
+                   HIST.CHRG_EMP_NO,
+                   EMP.EMP_NAME AS CHRG_EMP_NAME,
+                   EMP.EMP_EMAIL,
+                   DET.FST_PROC_TRM_DT
+              FROM MR_REQ_PROC_STEP STEP,
+                   MR_REQ_CHRGR_CHG_HIST HIST,
+                   MR_REQ_PROC_STEP_DET DET,
+                   EDM_EMP EMP,
+                   EDM_ORG ORG,
+                   EDM_DUTY DUTY
+             WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+               AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+               AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+               AND EMP.ORG_ID = ORG.ORG_ID
+               AND EMP.DUTY_ID = DUTY.DUTY_ID
+               AND DET.MR_REQ_PROC_STEP_DET_NO =
+                  (SELECT MIN(DET.MR_REQ_PROC_STEP_DET_NO)
+                      FROM MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                       AND DET.MR_REQ_NO    = #{mrReqNo} /**P*/
+                       AND DET.MR_STEP_CD   = 'Z00R0'
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN =0
+                       AND HIST.DEL_YN=0)
+    </select>
+  
+    <select id="selectAppStepEmp60" resultMap="appLineMap">
+            --권한체크(selectAppStepEmp3)
+            SELECT distinct   DET.MR_REQ_PROC_STEP_DET_NO, DET.MR_REQ_NO,
+                   DET.MR_REQ_PROC_STEP_NO,
+                   STEP.MR_STEP_CD,
+                   STEP.PROC_ST_CD,
+                   HIST.CHRGR_CL_CD,
+                   DUTY.DUTY_NAME AS THDAY_POS,
+                   ORG.ORG_ID AS CHRG_TEAM_NO,
+                   ORG.ORG_NAME AS THDAY_TEAM,
+                   HIST.CHRG_EMP_NO,
+                   EMP.EMP_NAME AS CHRG_EMP_NAME,
+                   EMP.EMP_EMAIL,
+                   DET.FST_PROC_TRM_DT
+              FROM MR_REQ_PROC_STEP STEP,
+                   MR_REQ_CHRGR_CHG_HIST HIST,
+                   MR_REQ_PROC_STEP_DET DET,
+                   EDM_EMP EMP,
+                   EDM_ORG ORG,
+                   EDM_DUTY DUTY
+             WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+               AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+               AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+               AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+               AND EMP.ORG_ID = ORG.ORG_ID
+               AND EMP.DUTY_ID = DUTY.DUTY_ID
+               AND DET.MR_REQ_PROC_STEP_DET_NO IN
+                   (SELECT MIN(DET.MR_REQ_PROC_STEP_DET_NO)
+                      FROM MR_REQ_PROC_STEP STEP,
+                           MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                       AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       AND STEP.MR_STEP_CD = 'Z0060'
+                       AND HIST.CHRGR_CL_CD IN (SELECT CASE WHEN PNID_DT IS NULL THEN 'Z02D' ELSE
+                       CASE WHEN MR_PRFM_DT IS NULL THEN 'Z02I' ELSE
+                       'Z02A'
+                       END 
+                       END CHRGR_CL_CD FROM MR_REQ_MST where MR_REQ_NO =  #{mrReqNo})
+                       --AND STEP.EFF_END_DTM = '99991231235959'
+                       --AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0)
+    </select>
+<select id="selectAppStepEmpDev" resultMap="appLineMap">
+            --변경(selectAppStepEmpDev)
+            SELECT distinct   DET.MR_REQ_PROC_STEP_DET_NO, DET.MR_REQ_NO,
+                   (SELECT MAX(MR_REQ_PROC_STEP_NO) FROM MR_REQ_PROC_STEP WHERE MR_REQ_NO =  4111 ) AS MR_REQ_PROC_STEP_NO,
+                   (SELECT MAX(MR_STEP_CD) FROM MR_REQ_PROC_STEP WHERE MR_REQ_NO =  4111 ) AS MR_STEP_CD,
+                   STEP.PROC_ST_CD,
+                   HIST.CHRGR_CL_CD,
+                   DUTY.DUTY_NAME AS THDAY_POS,
+                   ORG.ORG_ID AS CHRG_TEAM_NO,
+                   ORG.ORG_NAME AS THDAY_TEAM,
+                   HIST.CHRG_EMP_NO,
+                   EMP.EMP_NAME AS CHRG_EMP_NAME,
+                   EMP.EMP_EMAIL,
+                   DET.FST_PROC_TRM_DT
+              FROM MR_REQ_PROC_STEP STEP,
+                   MR_REQ_CHRGR_CHG_HIST HIST,
+                   MR_REQ_PROC_STEP_DET DET,
+                   EDM_EMP EMP,
+                   EDM_ORG ORG,
+                   EDM_DUTY DUTY
+             WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+               AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+               AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+               AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+               AND EMP.ORG_ID = ORG.ORG_ID
+               AND EMP.DUTY_ID = DUTY.DUTY_ID
+               <if test="chrgrClCd!=null">
+               AND DET.MR_REQ_NO = #{mrReqNo}
+               AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+               --AND HIST.EFF_END_DTM = '99991231235959'
+               --AND STEP.EFF_END_DTM = '99991231235959'
+               AND HIST.DEL_YN = 0
+               AND DET.DEL_YN=0
+               AND STEP.DEL_YN=0
+               AND DET.MR_REQ_PROC_STEP_DET_NO =
+                   (SELECT MAX(DET.MR_REQ_PROC_STEP_DET_NO)
+                      FROM MR_REQ_PROC_STEP STEP,
+                           MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                       AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+                       --AND STEP.EFF_END_DTM = '99991231235959'
+                       --AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0)
+               </if>
+    </select>
+    
+    <select id="selectAppIsolationStepEmp" resultMap="appLineMap">
+            --권한체크11 (selectAppIsolationStepEmp)
+            SELECT DET.MR_REQ_NO,
+                   DET.MR_REQ_PROC_STEP_NO,
+                   DET.MR_REQ_PROC_STEP_DET_NO,
+                   DET.MR_STEP_CD,
+                   DET.PROC_ST_CD,
+                   HIST.CHRGR_CL_CD,
+                   DUTY.DUTY_NAME AS THDAY_POS,
+                   ORG.ORG_ID AS CHRG_TEAM_NO,
+                   ORG.ORG_NAME AS THDAY_TEAM,
+                   HIST.CHRG_EMP_NO,
+                   DET.FST_PROC_TRM_DT
+              FROM MR_REQ_CHRGR_CHG_HIST HIST,
+                   MR_REQ_PROC_STEP_DET DET,
+                   EDM_EMP EMP,
+                   EDM_ORG ORG,
+                   EDM_DUTY DUTY
+             WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+               AND DET.DEL_YN = 0
+               AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+               AND HIST.EFF_END_DTM = '99991231235959'
+               AND HIST.DEL_YN = 0
+               AND EMP.ORG_ID = ORG.ORG_ID
+               AND EMP.DUTY_ID = DUTY.DUTY_ID
+               AND DET.MR_REQ_PROC_STEP_DET_NO =
+                   (SELECT MIN(DET.MR_REQ_PROC_STEP_DET_NO)
+                      FROM MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.MR_STEP_CD = #{mrStepCd}
+                       <if test="chrgrClCd==null">
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                       </if>
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       <if test="chrgrClCd!=null">
+                       AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+                       </if>
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0)
+    </select>
+
+       <select id="selectAppStepEmpMulti" resultMap="appLineMap">
+            --selectAppStepEmpMulti(결재자 여러명이 동시에 처리시 결재자정보 조회)
+            SELECT DET.MR_REQ_NO,
+                   DET.MR_REQ_PROC_STEP_NO,
+                   DET.MR_REQ_PROC_STEP_DET_NO,
+                   STEP.MR_STEP_CD,
+                   STEP.PROC_ST_CD,
+                   HIST.CHRGR_CL_CD,
+                   DUTY.DUTY_NAME AS THDAY_POS,
+                   ORG.ORG_ID AS CHRG_TEAM_NO,
+                   ORG.ORG_NAME AS THDAY_TEAM,
+                   HIST.CHRG_EMP_NO,
+                   EMP.EMP_NAME AS CHRG_EMP_NAME,
+                   EMP.EMP_EMAIL,
+                   DET.FST_PROC_TRM_DT,
+                   DET.JOB_RV_CD
+              FROM MR_REQ_PROC_STEP STEP,
+                   MR_REQ_CHRGR_CHG_HIST HIST,
+                   MR_REQ_PROC_STEP_DET DET,
+                   EDM_EMP EMP,
+                   EDM_ORG ORG,
+                   EDM_DUTY DUTY
+             WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+               AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+               AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+               AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+               AND EMP.ORG_ID = ORG.ORG_ID
+               AND EMP.DUTY_ID = DUTY.DUTY_ID
+               AND DET.MR_REQ_PROC_STEP_DET_NO IN
+                   (SELECT DET.MR_REQ_PROC_STEP_DET_NO
+                      FROM MR_REQ_PROC_STEP STEP,
+                           MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                       AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       AND STEP.EFF_END_DTM = '99991231235959'
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0)
+    </select>
+
+	<select id="selectInvestSearchTeam" resultMap="appLineMap">
+            --selectInvestSearchTeam(결재자 승인자 팀 조회)
+             SELECT H.CHRGR_CL_CD, H.MR_REQ_NO , H.PROC_ST_CD, H.CHRG_TEAM_NO, H.CHRG_EMP_NO, H.THDAY_POS, E.EMP_NAME AS CHRG_EMP_NAME, E.ORG_ID AS THDAY_TEAM
+             FROM MR_REQ_PROC_STEP_DET D, MR_REQ_CHRGR_CHG_HIST H, EDM_EMP E 
+               WHERE D.MR_REQ_PROC_STEP_DET_NO = H.MR_REQ_PROC_STEP_DET_NO
+                 AND H.CHRG_EMP_NO = E.EMP_ID
+                 AND D.DEL_YN = '0'
+                 AND MR_REQ_PROC_STEP_NO IN (
+                 SELECT MR_REQ_PROC_STEP_NO FROM MR_REQ_PROC_STEP
+                 WHERE MR_REQ_NO = #{mrReqNo}
+                 AND MR_STEP_CD IN ('Z0020'))
+                 AND H.CHRGR_CL_CD IN ('Z02G','Z02I')
+                 ORDER BY H.CHRGR_CL_CD
+    </select>
+    
+    <select id="selectIsolationAppStepEmpMulti" resultMap="appLineMap">
+            --권한체크(selectIsolationAppStepEmpMulti)
+            --이메일 받는사람조회
+            SELECT DET.MR_REQ_NO,
+                   DET.MR_REQ_PROC_STEP_NO,
+                   DET.MR_REQ_PROC_STEP_DET_NO,
+                   STEP.MR_STEP_CD,
+                   STEP.PROC_ST_CD,
+                   HIST.CHRGR_CL_CD,
+                   DUTY.DUTY_NAME AS THDAY_POS,
+                   ORG.ORG_ID AS CHRG_TEAM_NO,
+                   ORG.ORG_NAME AS THDAY_TEAM,
+                   HIST.CHRG_EMP_NO,
+                   EMP.EMP_NAME AS CHRG_EMP_NAME,
+                   EMP.EMP_EMAIL,
+                   DET.FST_PROC_TRM_DT,
+                   DET.JOB_RV_CD
+              FROM MR_REQ_PROC_STEP STEP,
+                   MR_REQ_CHRGR_CHG_HIST HIST,
+                   MR_REQ_PROC_STEP_DET DET,
+                   EDM_EMP EMP,
+                   EDM_ORG ORG,
+                   EDM_DUTY DUTY
+             WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+               AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+               AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+               AND EMP.ORG_ID = ORG.ORG_ID
+               AND EMP.DUTY_ID = DUTY.DUTY_ID
+               AND DET.MR_REQ_PROC_STEP_DET_NO IN
+                   (SELECT DET.MR_REQ_PROC_STEP_DET_NO
+                      FROM MR_REQ_PROC_STEP STEP,
+                           MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                    <if test="mrStepCd != 'Z00P0' or chrgrClCd != 'Z02L'">
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                    </if>
+                    <if test="chrgrClCd != null">
+                       AND HIST.CHRGR_CL_CD LIKE #{chrgrClCd} || '%'
+                    </if>
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       --AND STEP.EFF_END_DTM = '99991231235959' 독립권한처리를 위해 주석처리
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0)
+    </select>
+    
+    <select id="getMrReqTechEmpInfo" resultMap="chrgrChgHistMap" parameterType="map">
+    	--스텝별 담당자를 조회
+	    SELECT HIST.MR_REQ_PROC_STEP_DET_NO
+	          ,HIST.MR_REQ_NO
+	          ,HIST.CHRGR_CL_CD
+		  FROM MR_REQ_MST MR
+		  JOIN MR_REQ_PROC_STEP STEP
+		    ON MR.MR_REQ_NO = STEP.MR_REQ_NO
+		   AND STEP.DEL_YN = 0
+		  JOIN MR_REQ_PROC_STEP_DET DET
+		   ON STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_sTEP_NO
+		  AND DET.DEL_YN = 0 
+		  AND STEP.MR_REQ_NO = DET.MR_REQ_NO
+          <if test="mrStepCds != null">
+            AND DET.MR_STEP_CD IN
+               <foreach item="mrStepCd" index="index" collection="mrStepCds" open="(" separator="," close=")">
+                  #{mrStepCd}
+               </foreach>
+          </if>
+		  JOIN MR_REQ_CHRGR_CHG_HIST HIST
+		    ON DET.MR_REQ_PROC_STEP_DET_NO =  HIST.MR_REQ_PROC_STEP_DET_NO
+           <if test="chrgrClCds !=null">
+            AND HIST.CHRGR_CL_CD IN
+                 <foreach item="chrgrClCd" index="index" collection="chrgrClCds" open="(" separator="," close=")">
+                    #{chrgrClCd}
+                 </foreach>
+           </if>
+		   AND HIST.EFF_END_DTM = '99991231235959'
+		   AND HIST.DEL_YN = 0
+		  WHERE MR.MR_REQ_NO = #{mrReqNo}
+		  order by hist.mr_req_proc_step_det_no desc
+    </select>
+    
+    <update id="updateReqTechEmpDelYn" parameterType="map">
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET DEL_YN = 1,
+               EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO =#{mrReqProcStepDetNo}
+    </update>
+    
+    <update id="updateDetHistDel90" parameterType="map">
+    {call 
+    declare
+    begin
+    -- chrgrChg-Sql.updateDetHistDel
+		   UPDATE MR_REQ_PROC_STEP_DET SET DEL_YN = 1 ,LAST_CHG_DT = SYSDATE ,LAST_CHGR = #{loginEmpNo}
+                 WHERE MR_REQ_NO = #{mrReqNo}
+                   AND MR_REQ_PROC_STEP_DET_NO IN (SELECT D.MR_REQ_PROC_STEP_DET_NO
+                                                     FROM MR_REQ_PROC_STEP S, MR_REQ_PROC_STEP_DET D, MR_REQ_CHRGR_CHG_HIST H
+                                                    WHERE S.MR_REQ_NO   = #{mrReqNo}
+                                                      AND S.MR_STEP_CD  = #{stepCd}
+                                                      AND H.CHRGR_CL_CD = #{chrgrClCd}
+                                                      AND H.EFF_END_DTM = '99991231235959'
+                                                      AND D.MR_REQ_PROC_STEP_NO = S.MR_REQ_PROC_STEP_NO
+                                                      AND D.MR_REQ_PROC_STEP_DET_NO = H.MR_REQ_PROC_STEP_DET_NO 
+                                                      AND D.MR_REQ_PROC_STEP_DET_NO <![CDATA[<>]]> #{mrReqProcStepDetNo}
+                                                      AND D.DEL_YN = '0');
+
+
+                UPDATE  MR_REQ_CHRGR_CHG_HIST SET EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS')
+                      , LAST_CHG_DT = SYSDATE 
+                      , LAST_CHGR   = #{loginEmpNo} 
+                      , DEL_YN = 1 
+                 WHERE 1=1 
+                   AND MR_REQ_PROC_STEP_DET_NO IN (SELECT D.MR_REQ_PROC_STEP_DET_NO
+                                                     FROM MR_REQ_PROC_STEP S, MR_REQ_PROC_STEP_DET D, MR_REQ_CHRGR_CHG_HIST H
+                                                    WHERE S.MR_REQ_NO   = #{mrReqNo}
+                                                      AND S.MR_STEP_CD  = #{stepCd}
+                                                      AND H.CHRGR_CL_CD = #{chrgrClCd}
+                                                      AND H.EFF_END_DTM = '99991231235959'
+                                                      AND D.MR_REQ_PROC_STEP_NO = S.MR_REQ_PROC_STEP_NO
+                                                      AND D.MR_REQ_PROC_STEP_DET_NO = H.MR_REQ_PROC_STEP_DET_NO 
+                                                      AND D.MR_REQ_PROC_STEP_DET_NO <![CDATA[<>]]> #{mrReqProcStepDetNo}
+                                                      AND H.DEL_YN = '0');
+	end
+    }           
+    </update>
+    
+</mapper>

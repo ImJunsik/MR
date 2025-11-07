@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+     <default>
+        <url>http://edims.oilbank.co.kr/mr/</url>
+        <attach-path>D:\files\attach</attach-path>
+        <term>7</term>
+    </default>
+    
+    <!--<default>
+        <url>http://172.17.21.72:7777/mr/</url>
+        <attach-path>D:\files\attach</attach-path>
+        <term>7</term>
+    </default>-->
+
+    <attach-path>
+        <temp>${default.attach-path}\temp</temp>
+        <example>${default.attach-path}\example</example>
+    </attach-path>
+
+    <edims-path>
+        <file>D:\files\attach</file>
+    </edims-path>
+
+    <edims>
+        <login-minute>2</login-minute>
+    </edims>
+
+    <mail>
+        <from>mrsys@oilbank.co.kr</from>
+        <login>false</login>
+        <login-limit>false</login-limit>
+        <login-day>5</login-day>
+    </mail>
+
+    <mime>
+        <mime-mapping>
+            <extension>xls</extension>
+            <mime-type>application/vnd.ms-excel</mime-type>
+        </mime-mapping>
+        <mime-mapping>
+            <extension>xlsx</extension>
+            <mime-type>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</mime-type>
+        </mime-mapping>
+        <mime-mapping>
+            <extension>ppt</extension>
+            <mime-type>application/vnd.ms-powerpoint</mime-type>
+        </mime-mapping>
+        <mime-mapping>
+            <extension>pptx</extension>
+            <mime-type>application/vnd.openxmlformats-officedocument.presentationml.presentation</mime-type>
+        </mime-mapping>
+        <mime-mapping>
+            <extension>doc</extension>
+            <mime-type>application/vnd.ms-word</mime-type>
+        </mime-mapping>
+        <mime-mapping>
+            <extension>docx</extension>
+            <mime-type>application/vnd.openxmlformats-officedocument.wordprocessingml.document</mime-type>
+        </mime-mapping>
+    </mime>
+</config>

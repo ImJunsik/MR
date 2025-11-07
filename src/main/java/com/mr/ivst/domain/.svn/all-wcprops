@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/ivst/domain
+END
+IvstReqEquipVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/ivst/domain/IvstReqEquipVO.java
+END
+IvstReqProcVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/ivst/domain/IvstReqProcVO.java
+END
+IvstCostRegisterVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/93/trunk/src/mr/src/main/java/com/mr/ivst/domain/IvstCostRegisterVO.java
+END
+IvstCostRptVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/93/trunk/src/mr/src/main/java/com/mr/ivst/domain/IvstCostRptVO.java
+END
+IvstCostItemSendVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/80/trunk/src/mr/src/main/java/com/mr/ivst/domain/IvstCostItemSendVO.java
+END
+IvstCostSendVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/76/trunk/src/mr/src/main/java/com/mr/ivst/domain/IvstCostSendVO.java
+END

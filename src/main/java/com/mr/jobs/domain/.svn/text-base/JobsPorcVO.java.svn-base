@@ -1,0 +1,148 @@
+package com.mr.jobs.domain;
+
+import java.util.List;
+
+import com.base.domain.Domain;
+import com.mr.common.domain.MrRvRstVO;
+import com.mr.step.domain.ChrgrChgHist;
+/**
+ * PORC용 도메인
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.16 박성룡 최초 작성
+ * </pre>
+ */
+public class JobsPorcVO extends Domain {
+    private int mrReqNo;
+    private String mrNo;
+    private String porcNo;
+    private String mrReqTitle;
+    private String porcYn;
+    private int mrReqProcStepNo;
+    private List<ChrgrChgHist> appLine;
+    private List<ChrgrChgHist> techs;
+    private List<ChrgrChgHist> checks;
+    private List<ChrgrChgHist> drives;
+    private List<ChrgrChgHist> safetys;
+    private List<ChrgrChgHist> builds;
+    private List<ChrgrChgHist> etcs;
+    private List<MrRvRstVO> rvRsts;
+
+    public int getMrReqNo() {
+        return mrReqNo;
+    }
+
+    public void setMrReqNo(int mrReqNo) {
+        this.mrReqNo = mrReqNo;
+    }
+
+    public String getMrNo() {
+        return mrNo;
+    }
+
+    public void setMrNo(String mrNo) {
+        this.mrNo = mrNo;
+    }
+
+    public String getPorcNo() {
+        return porcNo;
+    }
+
+    public void setPorcNo(String porcNo) {
+        this.porcNo = porcNo;
+    }
+
+    public String getMrReqTitle() {
+		return mrReqTitle;
+	}
+
+	public void setMrReqTitle(String mrReqTitle) {
+		this.mrReqTitle = mrReqTitle;
+	}
+
+	public String getPorcYn() {
+        return porcYn;
+    }
+
+    public void setPorcYn(String porcYn) {
+        this.porcYn = porcYn;
+    }
+
+    public int getMrReqProcStepNo() {
+        return mrReqProcStepNo;
+    }
+
+    public void setMrReqProcStepNo(int mrReqProcStepNo) {
+        this.mrReqProcStepNo = mrReqProcStepNo;
+    }
+
+    public List<ChrgrChgHist> getAppLine() {
+        return appLine;
+    }
+
+    public void setAppLine(List<ChrgrChgHist> appLine) {
+        this.appLine = appLine;
+    }
+
+    public List<ChrgrChgHist> getTechs() {
+        return techs;
+    }
+
+    public void setTechs(List<ChrgrChgHist> techs) {
+        this.techs = techs;
+    }
+
+    public List<ChrgrChgHist> getChecks() {
+        return checks;
+    }
+
+    public void setChecks(List<ChrgrChgHist> checks) {
+        this.checks = checks;
+    }
+
+    public List<ChrgrChgHist> getDrives() {
+        return drives;
+    }
+
+    public void setDrives(List<ChrgrChgHist> drives) {
+        this.drives = drives;
+    }
+
+    public List<ChrgrChgHist> getSafetys() {
+        return safetys;
+    }
+
+    public void setSafetys(List<ChrgrChgHist> safetys) {
+        this.safetys = safetys;
+    }
+
+    public List<ChrgrChgHist> getBuilds() {
+        return builds;
+    }
+
+    public void setBuilds(List<ChrgrChgHist> builds) {
+        this.builds = builds;
+    }
+
+    public List<ChrgrChgHist> getEtcs() {
+        return etcs;
+    }
+
+    public void setEtcs(List<ChrgrChgHist> etcs) {
+        this.etcs = etcs;
+    }
+
+    public List<MrRvRstVO> getRvRsts() {
+        return rvRsts;
+    }
+
+    public void setRvRsts(List<MrRvRstVO> rvRsts) {
+        this.rvRsts = rvRsts;
+    }
+
+}

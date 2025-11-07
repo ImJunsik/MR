@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/common/file/exception
+END
+AttachFileException.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/common/file/exception/AttachFileException.java
+END
+TemporaryFileDeleteException.java
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/common/file/exception/TemporaryFileDeleteException.java
+END
+AttachedFileNotFoundException.java
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/common/file/exception/AttachedFileNotFoundException.java
+END

@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/resources/sqlmap/mapper/mr/jobs
+END
+JobsCheckMaster-sql.xml
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/repos_edims/!svn/ver/205/trunk/src/mr/src/main/resources/sqlmap/mapper/mr/jobs/JobsCheckMaster-sql.xml
+END
+JobsReview-sql.xml
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/repos_edims/!svn/ver/188/trunk/src/mr/src/main/resources/sqlmap/mapper/mr/jobs/JobsReview-sql.xml
+END

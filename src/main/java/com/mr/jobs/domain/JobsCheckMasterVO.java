@@ -1,0 +1,281 @@
+package com.mr.jobs.domain;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.base.domain.Domain;
+import com.common.file.domain.MrAtchFile;
+/**
+ * CHECK LIST 마스터 도메인
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.16 박성룡 최초 작성
+ * </pre>
+ */
+public class JobsCheckMasterVO extends Domain {
+
+    private Integer mrHazopNo;
+    private Integer mrReqNo;
+    private String mrNo;
+    private String mrReqTitle;
+
+    private String rvTeamDt;
+    private String rvTeamId;
+    private String rvTeamName;
+    private String rvTeamSugg;
+    private String rvChkMtr;
+    private String rgstId;
+    private String rgstName;
+    private String confId;
+    private String confName;
+    private String peName;
+    private String peAddName;
+    private String rvEmpName;
+    private String rvEmpId;
+    private String peId;
+    private String rvDeptName;
+    
+    private List<MrAtchFile> mrAtchFiles;
+    private String itemCd;
+
+
+    private int delYn;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date fstRgstDt;
+    private String fstRgstr;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date lastChgDt;
+    private String lastChgr;
+
+    private List<JobsCheckVO> checks;
+
+    public Integer getMrHazopNo() {
+        return mrHazopNo;
+    }
+
+    public void setMrHazopNo(Integer mrHazopNo) {
+        this.mrHazopNo = mrHazopNo;
+    }
+
+    public Integer getMrReqNo() {
+        return mrReqNo;
+    }
+
+    public void setMrReqNo(Integer mrReqNo) {
+        this.mrReqNo = mrReqNo;
+    }
+
+    public String getMrNo() {
+        return mrNo;
+    }
+
+    public void setMrNo(String mrNo) {
+        this.mrNo = mrNo;
+    }
+
+    public String getMrReqTitle() {
+        return mrReqTitle;
+    }
+
+    public void setMrReqTitle(String mrReqTitle) {
+        this.mrReqTitle = mrReqTitle;
+    }
+
+    public String getRvTeamDt() {
+        return rvTeamDt;
+    }
+
+    public void setRvTeamDt(String rvTeamDt) {
+        this.rvTeamDt = rvTeamDt;
+    }
+
+    public String getRvTeamId() {
+        return rvTeamId;
+    }
+
+    public void setRvTeamId(String rvTeamId) {
+        this.rvTeamId = rvTeamId;
+    }
+
+    public String getRvTeamName() {
+        return rvTeamName;
+    }
+
+    public void setRvTeamName(String rvTeamName) {
+        this.rvTeamName = rvTeamName;
+    }
+
+    public String getRvTeamSugg() {
+        return rvTeamSugg;
+    }
+
+    public void setRvTeamSugg(String rvTeamSugg) {
+        this.rvTeamSugg = rvTeamSugg;
+    }
+
+    public String getRvChkMtr() {
+        return rvChkMtr;
+    }
+
+    public void setRvChkMtr(String rvChkMtr) {
+        this.rvChkMtr = rvChkMtr;
+    }
+
+    public String getRvDeptName() {    // 대문자 'R'로 시작
+        return rvDeptName;
+    }
+    
+    public void setRvDeptName(String rvDeptName) {    // 대문자 'R'로 시작
+        this.rvDeptName = rvDeptName;
+    }
+
+    public String getRgstId() {
+        return rgstId;
+    }
+
+    public void setRgstId(String rgstId) {
+        this.rgstId = rgstId;
+    }
+
+    public String getRgstName() {
+        return rgstName;
+    }
+
+    public void setRgstName(String rgstName) {
+        this.rgstName = rgstName;
+    }
+
+    public String getConfId() {
+        return confId;
+    }
+
+    public void setConfId(String confId) {
+        this.confId = confId;
+    }
+
+    public String getConfName() {
+        return confName;
+    }
+
+    public void setConfName(String confName) {
+        this.confName = confName;
+    }
+
+    public int getDelYn() {
+        return delYn;
+    }
+
+    public String getRvEmpName() {
+        return rvEmpName;
+    }
+    
+    public void setRvEmpName(String rvEmpName) {
+        this.rvEmpName = rvEmpName;
+    }
+    
+    public String getRvEmpId() {
+        return rvEmpId;
+    }
+    
+    public void setRvEmpId(String rvEmpId) {
+        this.rvEmpId = rvEmpId;
+    }
+
+    public String getPeName() {
+        return peName;
+    }
+
+    public void setPeName(String peName) {
+        this.peName = peName;
+    }
+
+    public String getPeAddName() {
+        return peAddName;
+    }
+
+    public void setPeAddName(String peAddName) {
+        this.peAddName = peAddName;
+    }
+    
+    public String getPeId() {
+        return peId;
+    }
+    
+    
+    public void setPeId(String peId) {
+        this.peId = peId;
+    }
+    
+    public Date getFstRgstDt() {
+        return fstRgstDt;
+    }
+
+    public void setFstRgstDt(Date fstRgstDt) {
+        this.fstRgstDt = fstRgstDt;
+    }
+
+    public String getFstRgstr() {
+        return fstRgstr;
+    }
+
+    public void setFstRgstr(String fstRgstr) {
+        this.fstRgstr = fstRgstr;
+    }
+
+    public Date getLastChgDt() {
+        return lastChgDt;
+    }
+
+    public void setLastChgDt(Date lastChgDt) {
+        this.lastChgDt = lastChgDt;
+    }
+
+    public String getLastChgr() {
+        return lastChgr;
+    }
+
+    public void setLastChgr(String lastChgr) {
+        this.lastChgr = lastChgr;
+    }
+
+    public List<JobsCheckVO> getChecks() {
+        return checks;
+    }
+
+    public void setChecks(List<JobsCheckVO> checks) {
+        this.checks = checks;
+    }
+    public List<MrAtchFile> getMrAtchFiles() {
+        return mrAtchFiles;
+    }
+
+    public void setMrAtchFiles(List<MrAtchFile> mrAtchFiles) {
+        this.mrAtchFiles = mrAtchFiles;
+    }
+
+    public String getItemCd() {
+        return itemCd;
+    }
+
+    public void setItemCd(String itemCd) {
+        this.itemCd = itemCd;
+    }
+    
+    private String mrStepCd;
+
+    public String getMrStepCd() {
+        return mrStepCd;
+    }
+
+    public void setMrStepCd(String mrStepCd) {
+        this.mrStepCd = mrStepCd;
+    }
+}

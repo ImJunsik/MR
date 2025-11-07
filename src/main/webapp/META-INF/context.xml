@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor 
+	license agreements. See the NOTICE file distributed with this work for additional 
+	information regarding copyright ownership. The ASF licenses this file to 
+	You under the Apache License, Version 2.0 (the "License"); you may not use 
+	this file except in compliance with the License. You may obtain a copy of 
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required 
+	by applicable law or agreed to in writing, software distributed under the 
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS 
+	OF ANY KIND, either express or implied. See the License for the specific 
+	language governing permissions and limitations under the License. -->
+<!-- The contents of this file will be loaded for each web application -->
+<Context docBase="mr" path="/mr">
+	<!-- <Resource name="jdbc/mrdb" auth="Container" type="javax.sql.DataSource" 
+		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="10" minIdle="1" 
+		maxWait="20000" initialSize="1" validationQuery="SELECT 1 FROM DUAL" defaultAutoCommit="false" 
+		driverClassName="oracle.jdbc.driver.OracleDriver" username="edims" password="edims" 
+		url="jdbc:oracle:thin:@//172.17.21.39/edims" /> -->
+	<!-- 배포시 주의점 1. context.xml 의 서버주소확인 (운영, 개발) 2. mail-sql.xml 자동메일발송 막기위해 
+		(interval '99' year) 추가 배포시 삭제해서 배포 3. MrMailServiceImpl 결제 메일발송 막기위해 mailSend 
+		메소드에 send 주석해지해서 배포, mailSendMulti 의 send 주석해지해서 배포 4. e-mail 컨텐츠 info 의 
+		send 주석해제 5. context.xml driverClassName 변경 - (기존) oracle.jdbc.driver.OracleDriver 
+		> (log4jSql) core.log.jdbc.driver.OracleDriver 6. <br>로 된 버튼 이벤트 삭제 jsp파일 
+		"이벤트테스트" 검색 7. 각종 alert 창 확인위해 개발내역 최종 조회 필 8. D:\EDIMS_Development\source\mr 
+		폴더 삭제금지 9. devhdep.oilbank.co.kr 검색하여 hdep.oilbank.co.kr로 변경 mrrqRegister.jsp 
+		899, 921 line 운영으로 변경 -->
+
+	<!-- 개발서버 (신) -->
+	<Resource name="jdbc/mrdb" 
+			  auth="Container" 
+			  type="javax.sql.DataSource"
+			  factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" 
+			  maxActive="50"
+			  minIdle="20" 
+			  maxWait="20000" 
+			  initialSize="1" 
+			  validationQuery="SELECT 1 FROM DUAL"
+			  defaultAutoCommit="false" 
+			  
+			  driverClassName="oracle.jdbc.driver.OracleDriver"
+			  username="hdoedims" 
+			  password="hdoedims"
+			  url="jdbc:oracle:thin:@//172.17.25.101/HDCDBDEV" />
+			  />
+			  <!-- driverClassName="oracle.jdbc.driver.OracleDriver"
+			       url="jdbc:oracle:thin:@//172.17.25.101/HDCDBDEV"  -->
+	<!-- 운영 현재 (서버이전) -->
+	<Resource name="jdbc/mrdb__" auth="Container" type="javax.sql.DataSource"
+		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="50"
+		minIdle="20" maxWait="20000" initialSize="1" validationQuery="SELECT 1 FROM DUAL"
+		defaultAutoCommit="false" driverClassName="core.log.jdbc.driver.OracleDriver"
+		username="hdoedims" password="hdoedims" url="jdbc:oracle:thin:@//172.17.21.60/EAMDB" />
+
+	<!-- 개발서버 (구) -->
+	<!-- Resource name="jdbc/mrdb" auth="Container" type="javax.sql.DataSource" 
+		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="50" minIdle="20" 
+		maxWait="20000" initialSize="1" validationQuery="SELECT 1 FROM DUAL" defaultAutoCommit="false" 
+		driverClassName="oracle.jdbc.driver.OracleDriver" username="edims" password="edims" 
+		url="jdbc:oracle:thin:@//172.17.25.101/HDCDBDEV" / -->
+
+	<!-- 운영 (신) -->
+	<!-- Resource name="jdbc/mrdb" auth="Container" type="javax.sql.DataSource" 
+		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="50" minIdle="20" 
+		maxWait="20000" initialSize="1" validationQuery="SELECT 1 FROM DUAL" defaultAutoCommit="false" 
+		driverClassName="core.log.jdbc.driver.OracleDriver" username="hdoedims" password="hdoedims" 
+		url="jdbc:oracle:thin:@//172.17.10.10/EDIMS" / -->
+
+	<!-- 개발계(구) 2017/08/16 일자로 해당 개발서버 사용 -->
+	<!--Resource name="jdbc/mrdb__" auth="Container" type="javax.sql.DataSource" 
+		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="50" minIdle="20" 
+		maxWait="20000" initialSize="1" validationQuery="SELECT 1 FROM DUAL" defaultAutoCommit="false" 
+		driverClassName="core.log.jdbc.driver.OracleDriver" username="edims" password="edims" 
+		url="jdbc:oracle:thin:@//172.17.21.39/edims" / -->
+
+	<!-- 개발계(신) -->
+	<!-- Resource name="jdbc/mrdb" auth="Container" type="javax.sql.DataSource" 
+		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="50" minIdle="20" 
+		maxWait="20000" initialSize="1" validationQuery="SELECT 1 FROM DUAL" defaultAutoCommit="false" 
+		driverClassName="core.log.jdbc.driver.OracleDriver" username="edims" password="edims" 
+		url="jdbc:oracle:thin:@//172.17.25.101:1521/HDCDBDEV" / -->
+
+	<!-- ... -->
+	<!-- <Resource name="jdbc/mrdb" auth="Container" type="javax.sql.DataSource" 
+		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="2" minIdle="1" 
+		maxWait="20000" initialSize="1" validationQuery="SELECT 1 FROM DUAL" defaultAutoCommit="false" 
+		driverClassName="core.log.jdbc.driver.OracleDriver" username="edims" password="edims" 
+		url="jdbc:oracle:thin:@//172.17.10.10/EDIMS" /> <Resource name="jdbc/mrdb" 
+		auth="Container" type="javax.sql.DataSource" factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" 
+		maxActive="2" minIdle="1" maxWait="20000" initialSize="1" validationQuery="SELECT 
+		1 FROM DUAL" defaultAutoCommit="false" driverClassName="core.log.jdbc.driver.OracleDriver" 
+		username="edims" password="edims" url="jdbc:oracle:thin:@//EDIMSDev/edimsdev" 
+		/> <Resource name="jdbc/mrdb" auth="Container" type="javax.sql.DataSource" 
+		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" maxActive="2" minIdle="1" 
+		maxWait="20000" initialSize="1" validationQuery="SELECT 1 FROM DUAL" defaultAutoCommit="false" 
+		driverClassName="core.log.jdbc.driver.OracleDriver" username="edims" password="edims" 
+		url="jdbc:oracle:thin:@//EDIMSDev/EDIMSDev" /> <Resource name="jdbc/mrdb" 
+		auth="Container" type="javax.sql.DataSource" factory="org.apache.tomcat.jdbc.pool.DataSourceFactory" 
+		maxActive="2" minIdle="1" maxWait="20000" initialSize="1" validationQuery="SELECT 
+		1 FROM DUAL" defaultAutoCommit="false" driverClassName="core.log.jdbc.driver.OracleDriver" 
+		username="esr" password="esr" url="jdbc:oracle:thin:@//192.168.79.183/orcl" 
+		/> -->
+</Context>

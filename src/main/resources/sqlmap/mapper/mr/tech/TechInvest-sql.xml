@@ -1,0 +1,517 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.techInvest">
+    <resultMap id="mrTechInvestMap" type="com.mr.tech.domain.TechInvestVO">
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="plant" column="PLANT" />
+        <result property="plantNm" column="PLANT_NM" />
+        <result property="reqClCd" column="REQ_CL_CD" />
+        <result property="reqClCdNm" column="REQ_CL_CD_NM" />
+        <result property="reqClDtlCd" column="REQ_CL_DTL_CD" />
+        <result property="reqClDtlCdNm" column="REQ_CL_DTL_CD_NM" />
+        <result property="workPsblClCd" column="WORK_PSBL_CL_CD" />
+        <result property="workPsblClCdNm" column="WORK_PSBL_CL_CD_NM" />
+        <result property="workPsblDt" column="WORK_PSBL_DT" />
+
+        <result property="qualEptEftCtt" column="QUAL_EPT_EFT_CTT" />
+        <result property="quanEptEftCtt" column="QUAN_EPT_EFT_CTT" />
+        <result property="quanEptEftCd" column="QUAN_EPT_EFT_CD" />
+        <result property="quanEptEftCdNm" column="QUAN_EPT_EFT_CD_NM" />
+
+        <result property="costSumC01" column="COST_SUM_C01" />
+        <result property="costSumC02" column="COST_SUM_C02" />
+        <result property="costSumC03" column="COST_SUM_C03" />
+        <result property="costSumC04" column="COST_SUM_C04" />
+        <result property="costSumC05" column="COST_SUM_C05" />
+        <result property="costSumC06" column="COST_SUM_C06" />
+        <result property="costTotalSum" column="COST_TOTAL_SUM" />
+        <result property="totRvSugg" column="TOT_RV_SUGG" />
+        <result property="engYn" column="ENG_YN" />
+        <collection property="rvRsts" ofType="com.mr.common.domain.MrRvRstVO" column="{mrReqNo=MR_REQ_NO, itemCd=ITEM_CD" select="mr.rvRst.selectMrRvRst" />
+        <collection property="equips" ofType="com.mr.mrrq.domain.MrReqEquipVO" column="MR_REQ_NO" select="mr.mrReq.selectMrReqEquip" />
+        <collection property="procs" ofType="com.mr.mrrq.domain.MrReqProcVO" column="MR_REQ_NO" select="mr.mrReq.selectMrReqProc" />
+        <collection property="appLine" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD}" select="mr.step.selectAppLine" />
+        <collection property="techInvests" ofType="com.mr.tech.domain.TechInvestVO" column="MR_REQ_NO" select="selectMrTechInvestMst" />
+    </resultMap>
+
+    <select id="selectMrTechInvest" resultMap="mrTechInvestMap">
+    --selectMrTechInvest (초기투자비산정조회)
+        SELECT MR.MR_NO,
+               MR.MR_REQ_NO,
+               MR.MR_REQ_TITLE,
+               MR.PLANT,
+               'COST' AS ITEM_CD,
+               'Z0030' AS MR_STEP_CD,
+               DECODE(ENG.MR_REQ_PROC_STEP_DET_NO,null,'N','Y') AS ENG_YN,
+               PLANT.MR_COMM_NM AS PLANT_NM,
+               MR.REQ_CL_CD,
+               REQ_CD.MR_COMM_NM AS REQ_CL_CD_NM,
+               MR.REQ_CL_DTL_CD,
+               REQ_DTL_CD.MR_COMM_NM AS REQ_CL_DTL_CD_NM,
+               MR.WORK_PSBL_CL_CD,
+               WORK_CD.MR_COMM_NM AS WORK_PSBL_CL_CD_NM, 
+               MR.WORK_PSBL_DT,
+               MR.QUAL_EPT_EFT_CTT,
+               MR.QUAN_EPT_EFT_CTT,
+               MR.QUAN_EPT_EFT_CD,
+               QUAN_CD.MR_COMM_NM AS QUAN_EPT_EFT_CD_NM,
+               INVST_COST.MR_INVST_COST_NO,
+               INVST_COST.COST_SUM_C01,
+               INVST_COST.COST_SUM_C02,
+               INVST_COST.COST_SUM_C03,
+               INVST_COST.COST_SUM_C04,
+               INVST_COST.COST_SUM_C05,
+               INVST_COST.COST_SUM_C06,
+               INVST_COST.COST_TOTAL_SUM,
+               <!-- SUGG.TOT_RV_SUGG, TOT_RV_SUGG, yoo 241106 홑따음표 , 개행 문자 처리를 위해 아래 처럼 변경 -->
+               REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(SUGG.TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'"','˝'), CHR(34), '¶'), CHR(39),'¶') AS TOT_RV_SUGG, 
+               <!--직책과장 조회   wj:직책과장조회 2개 이상일때 top1만 처음에 보여줌-->
+                (SELECT min(A.MR_REQ_PROC_STEP_DET_NO)
+                   FROM MR_REQ_PROC_STEP_DET A INNER JOIN  MR_REQ_CHRGR_CHG_HIST B
+                     ON a.MR_REQ_PROC_STEP_DET_NO = b.MR_REQ_PROC_STEP_DET_NO
+                  WHERE a.MR_REQ_NO  = #{mrReqNo}
+                    AND a.MR_STEP_CD = 'Z0030'
+                    AND b.CHRGR_CL_CD = 'Z02G1'
+					AND a.DEL_YN = 0
+					AND b.DEL_YN = 0
+                    AND a.FST_PROC_TRM_DT is not null
+                ) as chrgDetNo, 
+			   <!-- 작성일 조회 -->
+				ENG.fstRgstDtText
+          FROM MR_REQ_MST MR,
+               (SELECT MR_REQ_NO,
+                       MAX(MR_INVST_COST_NO) AS MR_INVST_COST_NO,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C01' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C01,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C02' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C02,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C03' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C03,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C04' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C04,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C05' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C05,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C06' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C06,
+                       SUM(COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12) AS COST_TOTAL_SUM
+                  FROM MR_INVST_COST
+                 WHERE DEL_YN=0
+                 GROUP BY MR_REQ_NO)INVST_COST,
+               (SELECT MAX(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                       DET.MR_REQ_NO AS MR_REQ_NO, DET.MR_REQ_PROC_STEP_NO AS STEP_NO, MAX(TO_CHAR(DET.FST_RGST_DT,'YYYY-MM-DD')) AS fstRgstDtText
+                  FROM MR_REQ_PROC_STEP STEP,
+                       MR_REQ_PROC_STEP_DET DET,
+                       MR_REQ_CHRGR_CHG_HIST HIST
+                 WHERE STEP.MR_REQ_PROC_STEP_NO        = DET.MR_REQ_PROC_STEP_NO
+                       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND STEP.MR_STEP_CD =  'Z0030'
+                       AND HIST.CHRGR_CL_CD =  'Z02I'
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0
+                     GROUP BY DET.MR_REQ_NO, DET.MR_REQ_PROC_STEP_NO) ENG,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'PLANT')PLANT,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'REQ')REQ_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'REQ_DET')REQ_DTL_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'WORK')WORK_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'QN_UNIT')QUAN_CD,
+               (SELECT MR_REQ.MR_REQ_NO,
+                       RST.TOT_RV_SUGG
+                  FROM MR_REQ_MST MR_REQ,
+                       MR_RV_RST RST
+                 WHERE MR_REQ.MR_REQ_NO = RST.MR_REQ_NO(+)
+                   AND RST.ITEM_CD = 'COST06'
+                   AND MR_REQ.DEL_YN=0
+                   AND RST.DEL_YN=0) SUGG
+         WHERE MR.REQ_CL_CD = REQ_CD.MR_COMM_CD(+)
+           AND INVST_COST.MR_REQ_NO(+) = MR.MR_REQ_NO
+           AND ENG.MR_REQ_NO(+) = MR.MR_REQ_NO
+           AND SUGG.MR_REQ_NO(+) = MR.MR_REQ_NO
+           AND MR.REQ_CL_DTL_CD = REQ_DTL_CD.MR_COMM_CD(+)
+           AND MR.WORK_PSBL_CL_CD = WORK_CD.MR_COMM_CD(+)
+           AND MR.QUAN_EPT_EFT_CD = QUAN_CD.MR_COMM_CD(+)
+           AND MR.PLANT = PLANT.MR_COMM_CD(+)
+           AND MR.MR_REQ_NO = #{mrReqNo}
+           AND MR.DEL_YN=0
+    </select>
+
+
+    <resultMap id="mrTechInvestModifyMap" type="com.mr.tech.domain.TechInvestVO">
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="plant" column="PLANT" />
+        <result property="plantNm" column="PLANT_NM" />
+        <result property="reqClCd" column="REQ_CL_CD" />
+        <result property="reqClCdNm" column="REQ_CL_CD_NM" />
+        <result property="reqClDtlCd" column="REQ_CL_DTL_CD" />
+        <result property="reqClDtlCdNm" column="REQ_CL_DTL_CD_NM" />
+        <result property="workPsblClCd" column="WORK_PSBL_CL_CD" />
+        <result property="workPsblClCdNm" column="WORK_PSBL_CL_CD_NM" />
+        <result property="workPsblDt" column="WORK_PSBL_DT" />
+
+        <result property="qualEptEftCtt" column="QUAL_EPT_EFT_CTT" />
+        <result property="quanEptEftCtt" column="QUAN_EPT_EFT_CTT" />
+        <result property="quanEptEftCd" column="QUAN_EPT_EFT_CD" />
+        <result property="quanEptEftCdNm" column="QUAN_EPT_EFT_CD_NM" />
+
+        <result property="costSumC01" column="COST_SUM_C01" />
+        <result property="costSumC02" column="COST_SUM_C02" />
+        <result property="costSumC03" column="COST_SUM_C03" />
+        <result property="costSumC04" column="COST_SUM_C04" />
+        <result property="costSumC05" column="COST_SUM_C05" />
+        <result property="costSumC06" column="COST_SUM_C06" />
+        <result property="costTotalSum" column="COST_TOTAL_SUM" />
+        <result property="engYn" column="ENG_YN" />
+        <collection property="rvRsts" ofType="com.mr.common.domain.MrRvRstVO" column="{mrReqNo=MR_REQ_NO, itemCd=ITEM_CD" select="mr.rvRst.selectMrRvRst" />
+        <collection property="equips" ofType="com.mr.mrrq.domain.MrReqEquipVO" column="MR_REQ_NO" select="mr.mrReq.selectMrReqEquip" />
+        <collection property="procs" ofType="com.mr.mrrq.domain.MrReqProcVO" column="MR_REQ_NO" select="mr.mrReq.selectMrReqProc" />
+        <collection property="appLine" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD}" select="mr.step.selectAppLine" />
+        <collection property="techInvests" ofType="com.mr.tech.domain.TechInvestVO" column="MR_REQ_NO" select="selectMrTechInvestMst" />
+    </resultMap>
+
+    <select id="selectMrTechInvestModify" resultMap="mrTechInvestModifyMap">
+        SELECT MR.MR_NO,
+               MR.MR_REQ_NO,
+               MR.MR_REQ_TITLE,
+               MR.PLANT,
+               'COST' AS ITEM_CD,
+               'Z00I0' AS MR_STEP_CD,
+               DECODE(ENG.MR_REQ_PROC_STEP_DET_NO,null,'N','Y') AS ENG_YN,
+               PLANT.MR_COMM_NM AS PLANT_NM,
+               MR.REQ_CL_CD,
+               REQ_CD.MR_COMM_NM AS REQ_CL_CD_NM,
+               MR.REQ_CL_DTL_CD,
+               REQ_DTL_CD.MR_COMM_NM AS REQ_CL_DTL_CD_NM,
+               MR.WORK_PSBL_CL_CD,
+               WORK_CD.MR_COMM_NM AS WORK_PSBL_CL_CD_NM,
+               MR.WORK_PSBL_DT,
+               MR.QUAL_EPT_EFT_CTT,
+               MR.QUAN_EPT_EFT_CTT,
+               MR.QUAN_EPT_EFT_CD,
+               QUAN_CD.MR_COMM_NM AS QUAN_EPT_EFT_CD_NM,
+               INVST_COST.MR_INVST_COST_NO,
+               INVST_COST.COST_SUM_C01,
+               INVST_COST.COST_SUM_C02,
+               INVST_COST.COST_SUM_C03,
+               INVST_COST.COST_SUM_C04,
+               INVST_COST.COST_SUM_C05,
+               INVST_COST.COST_SUM_C06,
+               INVST_COST.COST_TOTAL_SUM
+          FROM MR_REQ_MST MR,
+               (SELECT MR_REQ_NO,
+                       MAX(MR_INVST_COST_NO) AS MR_INVST_COST_NO,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C01' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C01,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C02' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C02,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C03' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C03,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C04' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C04,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C05' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C05,
+                       SUM(CASE WHEN COST_ITEM_CD= 'C06' THEN COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12 ELSE 0 END) AS COST_SUM_C06,
+                       SUM(COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12) AS COST_TOTAL_SUM
+                  FROM MR_INVST_COST
+                 WHERE DEL_YN=0
+                 GROUP BY MR_REQ_NO)INVST_COST,
+               (SELECT MAX(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                       DET.MR_REQ_NO AS MR_REQ_NO
+                  FROM MR_REQ_PROC_STEP_DET DET,
+                       MR_REQ_CHRGR_CHG_HIST HIST
+                 WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND HIST.CHRGR_CL_CD =  'Z02I'
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0
+                     GROUP BY DET.MR_REQ_NO) ENG,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'PLANT')PLANT,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'REQ')REQ_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'REQ_DET')REQ_DTL_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'WORK')WORK_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'QN_UNIT')QUAN_CD
+         WHERE MR.REQ_CL_CD = REQ_CD.MR_COMM_CD(+)
+           AND INVST_COST.MR_REQ_NO(+) = MR.MR_REQ_NO
+           AND ENG.MR_REQ_NO(+) = MR.MR_REQ_NO
+           AND MR.REQ_CL_DTL_CD = REQ_DTL_CD.MR_COMM_CD(+)
+           AND MR.WORK_PSBL_CL_CD = WORK_CD.MR_COMM_CD(+)
+           AND MR.QUAN_EPT_EFT_CD = QUAN_CD.MR_COMM_CD(+)
+           AND MR.PLANT = PLANT.MR_COMM_CD(+)
+           AND MR.MR_REQ_NO = #{mrReqNo}
+           AND MR.DEL_YN=0
+    </select>
+
+
+    <resultMap id="mrTechInvestMstMap" type="com.mr.tech.domain.TechInvestVO">
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="invstYear" column="INVST_YEAR" />
+        <collection property="investCosts" ofType="com.mr.tech.domain.TechInvestVO" column="{mrReqNo=MR_REQ_NO, invstYear=INVST_YEAR}" select="selectMrTechInvestCost" />
+    </resultMap>
+    <select id="selectMrTechInvestMst" resultMap="mrTechInvestMstMap">
+        SELECT MR_REQ_NO,
+               INVST_YEAR
+          FROM MR_INVST_COST
+         WHERE MR_REQ_NO =  #{mrReqNo}
+           AND DEL_YN = 0
+         GROUP BY MR_REQ_NO, INVST_YEAR
+         ORDER BY INVST_YEAR
+    </select>
+
+    <resultMap id="mrTechInvestCostMap" type="com.mr.tech.domain.TechInvestVO">
+        <id property="mrInvstCostNo" column="MR_INVST_COST_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="invstYear" column="INVST_YEAR" />
+        <result property="costItemCd" column="COST_ITEM_CD" />
+        <result property="costItemNm" column="COST_ITEM_NM" />
+        <result property="costItemCtt" column="COST_ITEM_CTT" />
+        <result property="costTot" column="COST_TOT" />
+        <result property="cost01" column="COST_01" />
+        <result property="cost02" column="COST_02" />
+        <result property="cost03" column="COST_03" />
+        <result property="cost04" column="COST_04" />
+        <result property="cost05" column="COST_05" />
+        <result property="cost06" column="COST_06" />
+        <result property="cost07" column="COST_07" />
+        <result property="cost08" column="COST_08" />
+        <result property="cost09" column="COST_09" />
+        <result property="cost10" column="COST_10" />
+        <result property="cost11" column="COST_11" />
+        <result property="cost12" column="COST_12" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+    <select id="selectMrTechInvestCost" resultMap="mrTechInvestCostMap">
+        SELECT COST.MR_INVST_COST_NO,
+               COST.MR_REQ_NO,
+               COST.INVST_YEAR,
+               COST.COST_ITEM_CD,
+               CD.MR_COMM_NM AS COST_ITEM_NM,
+               COST.COST_ITEM_CTT,
+               COST.COST_TOT,
+               COST.COST_01,
+               COST.COST_02,
+               COST.COST_03,
+               COST.COST_04,
+               COST.COST_05,
+               COST.COST_06,
+               COST.COST_07,
+               COST.COST_08,
+               COST.COST_09,
+               COST.COST_10,
+               COST.COST_11,
+               COST.COST_12,
+               COST.DEL_YN,
+               COST.FST_RGST_DT,
+               COST.FST_RGSTR,
+               COST.LAST_CHG_DT,
+               COST.LAST_CHGR
+          FROM MR_INVST_COST COST,
+               MR_COMM_COD CD
+         WHERE COST.COST_ITEM_CD = CD.MR_COMM_CD
+           AND COST.MR_REQ_NO = #{mrReqNo}
+           AND COST.INVST_YEAR = #{invstYear}
+           AND COST.DEL_YN = 0
+
+    </select>
+
+		<!-- 초기 투자비 산정 저장 -->
+        <insert id="insertMrTechInvest" parameterType="com.mr.tech.domain.TechReviewVO">
+        <selectKey keyProperty="mrInvstCostNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_INVST_COST_NO),0)+1
+              FROM MR_INVST_COST
+        </selectKey>
+        INSERT INTO MR_INVST_COST(
+                    MR_INVST_COST_NO,
+                    MR_REQ_NO,
+                    INVST_YEAR,
+                    COST_ITEM_CD,
+                    COST_ITEM_CTT,
+                    COST_TOT,
+                    COST_01,
+                    COST_02,
+                    COST_03,
+                    COST_04,
+                    COST_05,
+                    COST_06,
+                    COST_07,
+                    COST_08,
+                    COST_09,
+                    COST_10,
+                    COST_11,
+                    COST_12,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrInvstCostNo},
+                        #{mrReqNo},
+                        #{invstYear},
+                        #{costItemCd},
+                        #{costItemCtt},
+                        (#{cost01}+#{cost02}+#{cost03}+#{cost04}+#{cost05}+#{cost06}+#{cost07}+#{cost08}+#{cost09}+#{cost10}+#{cost11}+#{cost12}),
+                        #{cost01},
+                        #{cost02},
+                        #{cost03},
+                        #{cost04},
+                        #{cost05},
+                        #{cost06},
+                        #{cost07},
+                        #{cost08},
+                        #{cost09},
+                        #{cost10},
+                        #{cost11},
+                        #{cost12},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <update id="updateMrTechInvestDelYn" parameterType="map">
+        UPDATE MR_INVST_COST
+           SET DEL_YN=1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+	<!-- wj: 초기투자비 산정 직책과장  저장-->
+    <update id="updateMrTechChrgNo" parameterType="map">
+    --초기투자비 산정 직책과장 저장(updateMrTechChrgNo)
+    <!-- 
+ 	개발변경: MR_REQ_CHRGR_CHG_HIST 테이블에서 삭제여부 컬럼 및 날짜 컬럼을 변경하는 방법으로 직책과장을 결정했으나
+ 	20171218 기준안으로 MR_REQ_PROC_STEP_DET 테이블의 날짜 컬럼 FST_PROC_TRM_DT 의 데이터를 변경하는 방법으로
+ 	직책과장을 결정하게 됨
+ 	
+ 	결론: 직책과장일 경우 FST_PROC_TRM_DT 컬럼의 값이 NULL 이 되며, DEL_YN = 0 이 된다
+ 	--> 	
+	UPDATE MR_REQ_PROC_STEP_DET A
+	   SET A.FST_PROC_TRM_DT = (CASE WHEN MR_REQ_PROC_STEP_DET_NO != #{chrgDetNo} THEN NULL 
+                                ELSE TO_CHAR(SYSDATE,'YYYY-MM-DD') END)
+	WHERE EXISTS (SELECT B.MR_REQ_PROC_STEP_DET_NO 
+                    FROM MR_REQ_CHRGR_CHG_HIST B
+                   WHERE A.MR_REQ_PROC_STEP_DET_NO = B.MR_REQ_PROC_STEP_DET_NO
+                     AND A.MR_REQ_NO = #{mrReqNo}
+                     AND A.MR_STEP_CD = 'Z0030'
+                     AND B.CHRGR_CL_CD = 'Z02G1')
+                     
+ 	<!--
+	UPDATE MR_REQ_PROC_STEP_DET A
+	   SET A.DEL_YN = (CASE WHEN MR_REQ_PROC_STEP_DET_NO = #{chrgDetNo} THEN '0' 
+                                ELSE '1' END)
+	WHERE EXISTS (SELECT B.MR_REQ_PROC_STEP_DET_NO 
+                    FROM MR_REQ_CHRGR_CHG_HIST B
+                   WHERE A.MR_REQ_PROC_STEP_DET_NO = B.MR_REQ_PROC_STEP_DET_NO
+                     AND A.MR_REQ_NO = #{mrReqNo}
+                     AND A.MR_STEP_CD = 'Z0030'
+                     AND B.CHRGR_CL_CD = 'Z02G1')	
+ 	-->
+    </update>
+        
+    <update id="updateMrTechInvestBack" parameterType="map">    
+    {call 
+    declare
+    begin
+		UPDATE MR_REQ_CHRGR_CHG_HIST
+		   SET EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS')
+		       ,LAST_CHG_DT = SYSDATE
+		       ,LAST_CHGR = #{loginEmpNo}
+		       ,DEL_YN = 1
+		 WHERE 1=1		   
+		   AND DEL_YN = '0'
+		   AND MR_REQ_PROC_STEP_DET_NO IN (SELECT MR_REQ_PROC_STEP_DET_NO FROM MR_REQ_PROC_STEP_DET
+		                                    WHERE DEL_YN = '0'
+		                                      AND MR_REQ_PROC_STEP_NO IN (SELECT MR_REQ_PROC_STEP_NO 
+		                                                                    FROM MR_REQ_PROC_STEP
+		                                                                   WHERE MR_REQ_NO = #{mrReqNo}
+		                                                                     AND MR_STEP_CD IN ('Z0030')
+		                                                                     AND DEL_YN = '0')
+		                                   )
+        ;
+		UPDATE MR_REQ_PROC_STEP_DET
+		   SET DEL_YN = 1
+		       ,LAST_CHG_DT = SYSDATE
+		       ,LAST_CHGR = #{loginEmpNo}
+		 WHERE DEL_YN = 0
+		   AND MR_REQ_PROC_STEP_NO IN (SELECT MR_REQ_PROC_STEP_NO 
+		                                 FROM MR_REQ_PROC_STEP
+		                                WHERE MR_REQ_NO = #{mrReqNo}
+		                                  AND MR_STEP_CD IN ('Z0030')         
+		                                  AND DEL_YN = '0')
+		;	     
+	    UPDATE MR_REQ_PROC_STEP_DET   
+	       SET FST_PROC_TRM_DT= to_date('99/12/31','RR/MM/DD')
+		 WHERE DEL_YN = 0
+	       AND PROC_ST_CD = 'Z0133'
+	       AND MR_REQ_PROC_STEP_NO IN (SELECT MR_REQ_PROC_STEP_NO 
+		                                 FROM MR_REQ_PROC_STEP
+		                                WHERE MR_REQ_NO =  #{mrReqNo}
+		                                  AND MR_STEP_CD IN ('Z0020')			                                         
+		                                  AND DEL_YN = '0')
+		;
+        UPDATE MR_REQ_PROC_STEP
+           SET DEL_YN = 1
+               ,EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS')
+               ,LAST_CHG_DT = SYSDATE
+               ,LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND MR_STEP_CD IN ('Z0030')
+           AND DEL_YN=0
+       ;
+        UPDATE MR_REQ_PROC_STEP
+           SET EFF_END_DTM = '99991231235959'
+               ,PROC_ST_CD = 'Z0110'
+               ,LAST_CHG_DT = SYSDATE 
+               ,LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND MR_STEP_CD IN ('Z0020')   
+           AND DEL_YN=0
+       ;
+        UPDATE MR_REQ_MST
+           SET MR_STEP_CD = 'Z0020'
+               ,PROC_ST_CD = 'Z0110'
+               ,LAST_CHG_DT = SYSDATE
+               ,LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN = 0
+       ;
+       <!-- 202007 반송이 완료된 후 담당자 지정을 하기위한 업데이트 -->
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET EFF_END_DTM = '99991231235959'
+               , LAST_CHG_DT = SYSDATE
+               , LAST_CHGR = #{loginEmpNo} 
+         WHERE MR_REQ_PROC_STEP_DET_NO IN (SELECT MR_REQ_PROC_STEP_DET_NO
+                                                  <!--, proc_st_cd,  fst_proc_trm_dt 중요컬럼-->
+                                             FROM MR_REQ_PROC_STEP_DET
+                                            WHERE MR_REQ_PROC_STEP_NO IN (SELECT MR_REQ_PROC_STEP_NO 
+                                                                            FROM MR_REQ_PROC_STEP
+                                                                           WHERE MR_REQ_NO =  #{mrReqNo} 
+                                                                             AND MR_STEP_CD IN ('Z0020') 
+                                                                             AND DEL_YN = '0')
+                                              AND DEL_YN = 0               
+                                              AND FST_PROC_TRM_DT IS NOT NULL <!--null이 아닌항목이 살아있는데이터-->
+                                           )
+           AND CHRGR_CL_CD = 'Z02D' <!-- 기술검토자(반송시 기술검토자를 현재 작성자로 업데이트)-->
+        ;       
+       end
+       }
+    </update>
+</mapper>

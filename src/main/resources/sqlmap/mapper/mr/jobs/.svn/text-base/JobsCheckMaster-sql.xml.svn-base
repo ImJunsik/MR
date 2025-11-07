@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.jobs">
+    <resultMap id="mrCheckMasterMap" type="com.mr.jobs.domain.JobsCheckMasterVO">
+        <id property="mrHazopNo" column="MR_HAZOP_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="rvTeamDt" column="RV_TEAM_DT" />
+        <result property="rvTeamId" column="RV_TEAM_ID" />
+        <result property="rvTeamName" column="RV_TEAM_NAME" />
+        <result property="rvTeamSugg" column="RV_TEAM_SUGG" />
+        <result property="rvChkMtr" column="RV_CHK_MTR" />
+        <result property="rgstId" column="RGST_ID" />
+        <result property="rgstName" column="RGST_NAME" />
+        <result property="confId" column="CONF_ID" />
+        <result property="confName" column="CONF_NAME" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <collection property="checks" ofType="com.mr.jobs.domain.JobsCheckVO" column="MR_HAZOP_NO" select="selectMrCHeck" />
+    </resultMap>
+
+    <select id="selectMrCheckMaster" resultMap="mrCheckMasterMap">
+        SELECT HAZOP.MR_HAZOP_NO,
+               MR.MR_REQ_NO,
+               MR.MR_NO,
+               MR.MR_REQ_TITLE,
+               HAZOP.RV_TEAM_DT,
+               RV.ORG_NAME AS RV_TEAM_NAME,
+               HAZOP.RV_TEAM_ID,
+               HAZOP.RV_TEAM_SUGG,
+               HAZOP.RV_CHK_MTR,
+               HAZOP.RGST_ID,
+               RGST.EMP_NAME AS RGST_NAME,
+               HAZOP.CONF_ID,
+               CONF.EMP_NAME AS CONF_NAME,
+               HAZOP.DEL_YN,
+               HAZOP.FST_RGST_DT,
+               HAZOP.FST_RGSTR,
+               HAZOP.LAST_CHG_DT,
+               HAZOP.LAST_CHGR
+          FROM (SELECT *
+                  FROM MR_HAZOP
+                 WHERE DEL_YN=0) HAZOP,
+               MR_REQ_MST MR,
+               EDM_ORG RV,
+               EDM_EMP RGST,
+               EDM_EMP CONF
+         WHERE MR.MR_REQ_NO = HAZOP.MR_REQ_NO(+)
+           AND HAZOP.RV_TEAM_ID = RV.ORG_ID(+)
+           AND HAZOP.RGST_ID = RGST.EMP_ID(+)
+           AND HAZOP.CONF_ID = CONF.EMP_ID(+)
+           AND MR.MR_REQ_NO = #{mrReqNo}
+           AND MR.DEL_YN=0
+    </select>
+
+
+    <update id="updateMrCheckMasterDelYn" parameterType="map">
+        UPDATE MR_HAZOP
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateMrCheckMaster" parameterType="map">
+        UPDATE MR_HAZOP
+           SET RV_TEAM_DT = #{rvTeamDt},
+               RV_TEAM_ID = #{rvTeamId},
+               RV_TEAM_SUGG = #{rvTeamSugg},
+               RV_CHK_MTR = #{rvChkMtr},
+               RGST_ID = #{rgstId},
+               CONF_ID = #{confId},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+
+    <insert id="insertMrCheckMaster" parameterType="com.mr.jobs.domain.JobsCheckMasterVO">
+        <selectKey keyProperty="mrHazopNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_HAZOP_NO),0)+1
+              FROM MR_HAZOP
+        </selectKey>
+       INSERT INTO MR_HAZOP(
+                   MR_HAZOP_NO,
+                   MR_REQ_NO,
+                   RV_TEAM_DT,
+                   RV_TEAM_ID,
+                   RV_TEAM_SUGG,
+                   RV_CHK_MTR,
+                   RGST_ID,
+                   CONF_ID,
+                   DEL_YN,
+                   FST_RGST_DT,
+                   FST_RGSTR,
+                   LAST_CHG_DT,
+                   LAST_CHGR
+             ) VALUES ( #{mrHazopNo},
+                        #{mrReqNo},
+                        #{rvTeamDt},
+                        #{rvTeamId},
+                        #{rvTeamSugg},
+                        #{rvChkMtr},
+                        #{rgstId},
+                        #{confId},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <resultMap id="mrCheckMap" type="com.mr.jobs.domain.JobsCheckVO">
+        <id property="mrHazopDetNo" column="MR_HAZOP_DET_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrHazopNo" column="MR_HAZOP_NO" />
+        <result property="itemDiv" column="ITEM_DIV" />
+        <result property="itemCd" column="ITEM_CD" />
+        <result property="rstVal" column="RST_VAL" />
+        <result property="detDiv" column="DET_DIV" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMrCHeck" resultMap="mrCheckMap">
+        SELECT MR_HAZOP_DET_NO,
+               MR_REQ_NO,
+               MR_HAZOP_NO,
+               ITEM_DIV,
+               ITEM_CD,
+               RST_VAL,
+               DET_DIV,
+               DEL_YN,
+               FST_RGST_DT,
+               FST_RGSTR,
+               LAST_CHG_DT,
+               LAST_CHGR
+          FROM MR_HAZOP_DET
+         WHERE MR_HAZOP_NO = #{mrHazopNo}
+           AND DEL_YN=0
+    </select>
+
+    <select id="selectIsMrCHeck" resultType="string">
+        SELECT CASE WHEN NVL(COUNT(MR_HAZOP_DET_NO),0)>0 THEN 'TRUE' ELSE 'FALSE' END AS IS_CHECK
+          FROM MR_HAZOP_DET
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <update id="updateMrCHeckDelYn" parameterType="map">
+        UPDATE MR_HAZOP_DET
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+    <insert id="insertMrCheck" parameterType="com.mr.jobs.domain.JobsCheckVO">
+        <selectKey keyProperty="mrHazopDetNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_HAZOP_DET_NO),0)+1
+              FROM MR_HAZOP_DET
+        </selectKey>
+       INSERT INTO MR_HAZOP_DET(
+                   MR_HAZOP_DET_NO,
+                   MR_REQ_NO,
+                   MR_HAZOP_NO,
+                   ITEM_DIV,
+                   ITEM_CD,
+                   RST_VAL,
+                   DET_DIV,
+                   DEL_YN,
+                   FST_RGST_DT,
+                   FST_RGSTR,
+                   LAST_CHG_DT,
+                   LAST_CHGR
+             ) VALUES ( #{mrHazopDetNo},
+                        #{mrReqNo},
+                        #{mrHazopNo},
+                        #{itemDiv},
+                        #{itemCd},
+                        #{rstVal},
+                        #{detDiv},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>    
+    
+    <!-- MR_SHE_INTERFACE_INS -->
+     <insert id="insertMrSheInterface" parameterType="map">
+     	--she 인터페이스(하잡일경우 인서트)
+		INSERT INTO MR_INTERFACE_SHE (MR_REQ_NO, HAZOP_YN, REQ_DATE, REQ_TIME)
+		SELECT MR_REQ_NO, HAZOP_ACT_YN, TO_CHAR(SYSDATE,'YYYY-MM-DD'), TO_CHAR(SYSDATE,'hh24:mi:dd') FROM MR_REQ_MST 
+		WHERE MR_REQ_NO = #{mrReqNo}
+		AND HAZOP_ACT_YN = 'Y'
+    </insert>
+</mapper>

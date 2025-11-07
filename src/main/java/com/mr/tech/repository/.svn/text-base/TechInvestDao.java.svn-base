@@ -1,0 +1,79 @@
+package com.mr.tech.repository;
+
+import org.springframework.stereotype.Repository;
+
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.mr.tech.domain.TechInvestVO;
+
+/**
+ * 기술 및 타당성 검토 DB
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.07 박성룡 최초 작성
+ * </pre>
+ */
+
+@Repository
+public class TechInvestDao extends BaseSqlMapRepository{
+
+    /**
+     * 투자비 산정 조회
+     * @param mrReqNo
+     * @return
+     */
+    public TechInvestVO selectMrTechInvest(int mrReqNo) {
+        return selectOne("mr.techInvest.selectMrTechInvest", mrReqNo);
+    }
+
+    /**
+     * 투자비 재산정 조회
+     * @param mrReqNo
+     * @return
+     */
+    public TechInvestVO selectMrTechInvestModify(int mrReqNo) {
+        return selectOne("mr.techInvest.selectMrTechInvestModify", mrReqNo);
+    }
+
+
+    /**
+     * 투자비 산정 내용 저장
+     * @param techInvestVO
+     * @return
+     */
+    public int insertMrTechInvest(TechInvestVO techInvestVO) {
+        return insert("mr.techInvest.insertMrTechInvest", techInvestVO);
+    }
+
+    /**
+     * 투자비 산정 논리 삭제
+     * @param techInvestVO
+     * @return
+     */
+    public int updateMrTechInvestDelYn(TechInvestVO techInvestVO) {
+        return update("mr.techInvest.updateMrTechInvestDelYn", techInvestVO);
+    }
+    
+    /**
+     * wj:초기투자비 산정 직책과장 저장
+     * @param techInvestVO
+     * @return
+     */
+    public int updateMrTechChrgNo(TechInvestVO techInvestVO) {
+        return update("mr.techInvest.updateMrTechChrgNo", techInvestVO);
+    }
+    
+    /**
+     * 201904 반송기능추가
+     * @param techInvestVO
+     * @return
+     */
+    public int updateMrTechInvestBack(TechInvestVO techInvestVO) {
+        return update("mr.techInvest.updateMrTechInvestBack", techInvestVO);
+    }
+
+}

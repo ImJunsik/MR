@@ -1,0 +1,307 @@
+package com.mr.ivst.domain;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.base.domain.Domain;
+import com.common.file.domain.MrAtchFile;
+
+/**
+ * 투자지출 품의서 도메인
+ *
+ * @author 조상욱
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.07 조상욱 최초 작성
+ * </pre>
+ */
+
+public class IvstCostRptVO extends Domain {
+    private Integer mrInvstCostRptNo;
+    private Integer mrReqNo;
+    private String bizPurpSurr;
+    private String imprvPlan;
+    private String eptEft;
+    private String mngAnalEmpNo;
+    private String respTeamCd;
+    private String costTeamCd;
+    private String propClass;
+    private String propClassNm;
+    private String greenhouseGas;
+    private String greenhouseGasMemo;
+    private String invstStaDt;
+    private String invstEndDt;
+    private String invstManNo;
+    private String sapSender;
+    private String sapSendDt;
+    private String sapInvstCostRptNo;
+    private String sapInvstCostRptDt;
+    private String invstYear;
+    //yoo 온실가스 추가
+    private String zoutqty;
+    private String zoutamt;
+
+    private int delYn;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date fstRgstDt;
+    private String fstRgstr;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date lastChgDt;
+    private String lastChgr;
+
+    private String mngAnalEmpNm;
+    private String respTeamNm;
+    private String costTeamNm;
+    private String sapSenderNm;
+
+    private String cnclEmpId;
+    private String cnclDt;
+    private String cnclRsnCtt;
+
+    private double invstCostTotal;
+    
+    private String pRtnCode;
+    private String pRtnMsg;
+       
+    private List<MrAtchFile> mrAtchFiles;
+
+
+    public Integer getMrInvstCostRptNo() {
+        return mrInvstCostRptNo;
+    }
+    public void setMrInvstCostRptNo(Integer mrInvstCostRptNo) {
+        this.mrInvstCostRptNo = mrInvstCostRptNo;
+    }
+    public Integer getMrReqNo() {
+        return mrReqNo;
+    }
+    public void setMrReqNo(Integer mrReqNo) {
+        this.mrReqNo = mrReqNo;
+    }
+    public String getBizPurpSurr() {
+        return bizPurpSurr;
+    }
+    public void setBizPurpSurr(String bizPurpSurr) {
+        this.bizPurpSurr = bizPurpSurr;
+    }
+    public String getImprvPlan() {
+        return imprvPlan;
+    }
+    public void setImprvPlan(String imprvPlan) {
+        this.imprvPlan = imprvPlan;
+    }
+    public String getEptEft() {
+        return eptEft;
+    }
+    public void setEptEft(String eptEft) {
+        this.eptEft = eptEft;
+    }
+    public String getMngAnalEmpNo() {
+        return mngAnalEmpNo;
+    }
+    public void setMngAnalEmpNo(String mngAnalEmpNo) {
+        this.mngAnalEmpNo = mngAnalEmpNo;
+    }
+    public String getRespTeamCd() {
+        return respTeamCd;
+    }
+    public void setRespTeamCd(String respTeamCd) {
+        this.respTeamCd = respTeamCd;
+    }
+    public String getCostTeamCd() {
+        return costTeamCd;
+    }
+    public void setCostTeamCd(String costTeamCd) {
+        this.costTeamCd = costTeamCd;
+    }
+    public String getPropClass() {
+        return propClass;
+    }
+    public void setPropClass(String propClass) {
+        this.propClass = propClass;
+    }
+    public String getPropClassNm() {
+        return propClassNm;
+    }
+    public void setPropClassNm(String propClassNm) {
+        this.propClassNm = propClassNm;
+    }
+    public String getInvstStaDt() {
+        return invstStaDt;
+    }
+    public void setInvstStaDt(String invstStaDt) {
+        this.invstStaDt = invstStaDt;
+    }
+    public String getInvstEndDt() {
+        return invstEndDt;
+    }
+    public void setInvstEndDt(String invstEndDt) {
+        this.invstEndDt = invstEndDt;
+    }
+    public String getInvstManNo() {
+        return invstManNo;
+    }
+    public void setInvstManNo(String invstManNo) {
+        this.invstManNo = invstManNo;
+    }
+    public String getSapSender() {
+        return sapSender;
+    }
+    public void setSapSender(String sapSender) {
+        this.sapSender = sapSender;
+    }
+    public String getSapSendDt() {
+        return sapSendDt;
+    }
+    public void setSapSendDt(String sapSendDt) {
+        this.sapSendDt = sapSendDt;
+    }
+    public String getSapInvstCostRptNo() {
+        return sapInvstCostRptNo;
+    }
+    public void setSapInvstCostRptNo(String sapInvstCostRptNo) {
+        this.sapInvstCostRptNo = sapInvstCostRptNo;
+    }
+    public String getSapInvstCostRptDt() {
+        return sapInvstCostRptDt;
+    }
+    public void setSapInvstCostRptDt(String sapInvstCostRptDt) {
+        this.sapInvstCostRptDt = sapInvstCostRptDt;
+    }
+    public String getInvstYear() {
+        return invstYear;
+    }
+    public void setInvstYear(String invstYear) {
+        this.invstYear = invstYear;
+    }
+    public int getDelYn() {
+        return delYn;
+    }
+    public void setDelYn(int delYn) {
+        this.delYn = delYn;
+    }
+    public Date getFstRgstDt() {
+        return fstRgstDt;
+    }
+    public void setFstRgstDt(Date fstRgstDt) {
+        this.fstRgstDt = fstRgstDt;
+    }
+    public String getFstRgstr() {
+        return fstRgstr;
+    }
+    public void setFstRgstr(String fstRgstr) {
+        this.fstRgstr = fstRgstr;
+    }
+    public Date getLastChgDt() {
+        return lastChgDt;
+    }
+    public void setLastChgDt(Date lastChgDt) {
+        this.lastChgDt = lastChgDt;
+    }
+    public String getLastChgr() {
+        return lastChgr;
+    }
+    public void setLastChgr(String lastChgr) {
+        this.lastChgr = lastChgr;
+    }
+
+    public String getMngAnalEmpNm() {
+        return mngAnalEmpNm;
+    }
+    public void setMngAnalEmpNm(String mngAnalEmpNm) {
+        this.mngAnalEmpNm = mngAnalEmpNm;
+    }
+    public String getRespTeamNm() {
+        return respTeamNm;
+    }
+    public void setRespTeamNm(String respTeamNm) {
+        this.respTeamNm = respTeamNm;
+    }
+    public String getCostTeamNm() {
+        return costTeamNm;
+    }
+    public void setCostTeamNm(String costTeamNm) {
+        this.costTeamNm = costTeamNm;
+    }
+    public String getSapSenderNm() {
+        return sapSenderNm;
+    }
+    public void setSapSenderNm(String sapSenderNm) {
+        this.sapSenderNm = sapSenderNm;
+    }
+    public String getCnclEmpId() {
+        return cnclEmpId;
+    }
+    public void setCnclEmpId(String cnclEmpId) {
+        this.cnclEmpId = cnclEmpId;
+    }
+    public String getCnclDt() {
+        return cnclDt;
+    }
+    public void setCnclDt(String cnclDt) {
+        this.cnclDt = cnclDt;
+    }
+    public String getCnclRsnCtt() {
+        return cnclRsnCtt;
+    }
+    public void setCnclRsnCtt(String cnclRsnCtt) {
+        this.cnclRsnCtt = cnclRsnCtt;
+    }
+    public double getInvstCostTotal() {
+        return invstCostTotal;
+    }
+    public void setInvstCostTotal(double invstCostTotal) {
+        this.invstCostTotal = invstCostTotal;
+    }
+    public String getpRtnCode() {
+        return pRtnCode;
+    }
+    public void setpRtnCode(String pRtnCode) {
+        this.pRtnCode = pRtnCode;
+    }
+    public String getpRtnMsg() {
+        return pRtnMsg;
+    }
+    public void setpRtnMsg(String pRtnMsg) {
+        this.pRtnMsg = pRtnMsg;
+    }
+    public List<MrAtchFile> getMrAtchFiles() {
+        return mrAtchFiles;
+    }
+    public void setMrAtchFiles(List<MrAtchFile> mrAtchFiles) {
+        this.mrAtchFiles = mrAtchFiles;
+    }
+	public String getGreenhouseGas() {
+		return greenhouseGas;
+	}
+	public void setGreenhouseGas(String greenhouseGas) {
+		this.greenhouseGas = greenhouseGas;
+	}
+	public String getGreenhouseGasMemo() {
+		return greenhouseGasMemo;
+	}
+	public void setGreenhouseGasMemo(String greenhouseGasMemo) {
+		this.greenhouseGasMemo = greenhouseGasMemo;
+	}
+	public String getZoutqty() {
+		return zoutqty;
+	}
+	public void setZoutqty(String zoutqty) {
+		this.zoutqty = zoutqty;
+	}
+	public String getZoutamt() {
+		return zoutamt;
+	}
+	public void setZoutamt(String zoutamt) {
+		this.zoutamt = zoutamt;
+	}
+
+
+}

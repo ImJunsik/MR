@@ -1,0 +1,980 @@
+package com.mr.step.service.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
+import org.apache.commons.configuration.XMLConfiguration;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.base.domain.Domain;
+import com.base.service.BaseService;
+import com.base.util.IsOperDistinc;
+import com.base.util.Mailer;
+import com.mr.common.domain.EmpInfoVo;
+import com.mr.common.repository.EmpAndTeamDAO;
+import com.mr.common.service.LoginService;
+import com.mr.mngr.repository.MngrDAO;
+import com.mr.step.domain.ChrgrChgHist;
+import com.mr.step.domain.MailToInfoVo;
+import com.mr.step.domain.MrMailVO;
+import com.mr.step.repository.MrMailDao;
+import com.mr.step.repository.MrStepRepository;
+import com.mr.step.service.MrMailService;
+import com.mr.step.service.MrStepService;
+
+@Service
+public class MrMailServiceImpl extends BaseService implements MrMailService{
+    private final Logger logger = Logger.getLogger(this.getClass());
+
+
+    @Autowired
+    MrStepService mrStepService;
+
+    @Autowired
+    LoginService loginService;
+
+    @Autowired
+    MrMailDao mrMailDao;
+
+    @Autowired
+    Mailer mailer;
+
+    @Autowired
+    MrStepRepository mrStepRepository;
+
+    @Autowired
+    MngrDAO  mngrDAO;
+
+    @Autowired
+    EmpAndTeamDAO empAndTeamDAO;
+
+
+    @Autowired
+    private XMLConfiguration appConfig;
+
+
+    private List<String[]> ccChgr = new ArrayList<String[]>();
+
+
+    @Override
+    public boolean mailSend(int mrReqNo) {
+
+    	if(IsOperDistinc.m_bOper)		// Yoo 운영서버일때만 동작 한다
+    	{
+	        //보내는 사람 정보 셋팅
+	        MrMailVO mrMailVO = getMailInfo(mrReqNo, null, null);
+	
+	        //받는 사람 정보 셋팅
+	        ChrgrChgHist appInfo = mrStepRepository.selectAppStepEmp(mrReqNo,null);
+	        mrMailVO.setFstProcTrmDt(appInfo.getFstProcTrmDt());
+	        mrMailVO.setToNm(appInfo.getChrgEmpName());
+	        mrMailVO.setTo(appInfo.getEmpEmail());
+	        mrMailVO.setChrgrClCd(appInfo.getChrgrClCd());
+	
+	        //메일내용 셋팅
+	        generateMailContent(mrMailVO);
+	
+	        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+	        send(mrMailVO);
+    	}
+    	
+        return false;
+    }
+
+    @Override
+    public boolean mailSendMulti(int mrReqNo) {
+        //보내는 사람 정보 셋팅
+        MrMailVO mrMailVO = getMailInfo(mrReqNo, null, null);
+
+        List<MailToInfoVo> toInfos = new ArrayList<MailToInfoVo>();
+
+        //받는 사람 정보 셋팅
+        List<ChrgrChgHist> appInfoList = mrStepRepository.selectAppStepEmpMulti(mrReqNo);
+        for(ChrgrChgHist chrgrChgHist : appInfoList) {
+            MailToInfoVo toInfo = new MailToInfoVo();
+            toInfo.setToMailAddress(chrgrChgHist.getEmpEmail());
+            toInfo.setToName(chrgrChgHist.getChrgEmpName());
+            toInfo.setToEmpNo(chrgrChgHist.getEmpEmail());
+            toInfos.add(toInfo);
+        }
+
+        mrMailVO.setToInfos(toInfos);
+
+        generateMailContent(mrMailVO);
+
+        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+        send(mrMailVO);
+
+
+        return false;
+    }
+
+    @Override
+    public boolean mailSend(int mrReqNo, String mrStepCd, String procStepCd) {
+
+        //보내는 사람 정보 셋팅
+        MrMailVO mrMailVO = getMailInfo(mrReqNo, mrStepCd, procStepCd);
+
+        //받는 사람 정보 셋팅
+        ChrgrChgHist appInfo = mrStepRepository.selectAppIsolationStepEmp(mrReqNo, mrStepCd, null);
+
+        mrMailVO.setFstProcTrmDt(appInfo.getFstProcTrmDt());
+        mrMailVO.setFromNm(appInfo.getChrgEmpName());
+        return false;
+    }
+
+    @Override
+    public boolean mailSendMulti(int mrReqNo, String mrStepCd, String procStepCd, String chrgrClCd) {
+
+        List<MailToInfoVo> toInfos = new ArrayList<MailToInfoVo>();
+
+        //보내는 사람 정보 셋팅
+        System.out.println("e-mail 보내는사람정보1   :: " + mrReqNo + "|"+ mrStepCd  + "|"+ procStepCd);
+        MrMailVO mrMailVO = getMailInfo(mrReqNo, mrStepCd, procStepCd);
+        
+        //받는 사람 정보 셋팅
+        List<ChrgrChgHist> appInfoList = mrStepRepository.selectIsolationAppStepEmpMulti(mrReqNo, mrStepCd, chrgrClCd);
+        for(ChrgrChgHist chrgrChgHist : appInfoList) {
+            MailToInfoVo toInfo = new MailToInfoVo();
+            toInfo.setToMailAddress(chrgrChgHist.getEmpEmail());
+            toInfo.setToName(chrgrChgHist.getChrgEmpName());
+            toInfo.setToEmpNo(chrgrChgHist.getEmpEmail());
+            toInfos.add(toInfo);
+            System.out.println("e-mail 받는사람정보 for문  :: " + chrgrChgHist.getChrgEmpName());
+        }
+
+        mrMailVO.setToInfos(toInfos);
+
+        //메일컨텐츠 셋
+        generateMailContent(mrMailVO);
+
+        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+        send(mrMailVO);
+        
+        return false;
+    }
+    
+    @Override
+    public boolean selectMailSend(int mrReqNo, String mrStepCd, String procStepCd, String chrgrMrStepCd, String chrgrClCd) {
+        List<MailToInfoVo> toInfos = new ArrayList<MailToInfoVo>();
+        List<String> tos = new ArrayList<String> ();
+        //보내는 사람 정보 셋팅
+        MrMailVO mrMailVO = getMailInfo(mrReqNo, mrStepCd, procStepCd);
+
+        //받는 사람 정보 셋팅
+        List<ChrgrChgHist> appInfoList = mngrDAO.selectMngrChangeList(mrMailVO.getMrReqNo());
+        for(ChrgrChgHist chrgrChgHist : appInfoList) {
+            if(chrgrChgHist.getChrgrClCd().indexOf(chrgrClCd) > -1 && chrgrChgHist.getMrStepCd().equals(chrgrMrStepCd)) {
+                MailToInfoVo toInfo = new MailToInfoVo();
+                toInfo.setToMailAddress(chrgrChgHist.getEmpEmail());
+                toInfo.setToName(chrgrChgHist.getChrgEmpName());
+                toInfo.setToEmpNo(chrgrChgHist.getEmpEmail());
+                toInfos.add(toInfo);
+                tos.add(chrgrChgHist.getEmpEmail());
+            }
+        }
+
+        //리스트에서 중복되는 받는사람 변경
+        tos = uniqueList (tos);
+        for(String to : tos) {
+            int empCnt = 0;
+            for (MailToInfoVo toInfo : toInfos) {
+
+                if(to != null && toInfo != null && to.equals(toInfo.getToMailAddress())){
+                    empCnt ++;
+                }
+
+                if(empCnt > 1) {
+                    toInfos.remove(toInfo);
+                }
+            }
+        }
+
+        mrMailVO.setToInfos(toInfos);
+
+        generateMailContent(mrMailVO);
+
+        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+        send(mrMailVO);
+        
+        return false;
+    }
+
+
+    @Override
+    public boolean selectMailSend(int mrReqNo, String mrStepCd, String procStepCd, List<MailToInfoVo> toInfos) {
+
+
+        //보내는 사람 정보 셋팅
+        MrMailVO mrMailVO = getMailInfo(mrReqNo, mrStepCd, procStepCd);
+
+        mrMailVO.setToInfos(toInfos);
+
+        generateMailContent(mrMailVO);
+
+        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+        send(mrMailVO);
+        
+        return false;
+    }
+
+
+
+    /**
+     *
+     * @param mrStepCd
+     * @param chrgrClCd
+     */
+    @Override
+    public void addCc(String mrStepCd, String chrgrClCd) {
+        String[] cc = {mrStepCd, chrgrClCd};
+        ccChgr.add(cc);
+    }
+
+    /**
+     * 보내는 사람 정보 셋팅
+     * @param mrReqNo   MR_REQ 번호
+     * @param mrStepCd  MR 상태코드
+     * @param procStCd  상세상태코드
+     * @return
+     */
+    private MrMailVO getMailInfo (int mrReqNo, String mrStepCd, String procStCd) {
+
+        String mailTitle = null;
+        String url = "";
+        MrMailVO mrMailVO = mrMailDao.selectMrMailInfo(mrReqNo);
+
+        /**
+         * 별도 수행 프로세스같은 경우 STEP의 정보가 없기 때문에 NULL이 반환 됨
+         * MR REQ TITLE을 별도로 구해와야함.
+         */
+        if(mrMailVO == null || mrMailVO.getMrReqTitle()==null) {
+            mrMailVO = mrMailDao.selectMrTitle(mrReqNo);
+        }
+        if(mrStepCd!=null) {
+            switch (mrStepCd) {
+                case "Z00R0":
+                    mrMailVO.setMrStepCd("Z00R0");
+                    mrMailVO.setMrStepName("위험성검토");
+                    break;
+                case "Z00P0":
+                    mrMailVO.setMrStepCd("Z00P0");
+                    mrMailVO.setMrStepName("PORC");
+                    break;
+                case "Z00I0":
+                    mrMailVO.setMrStepCd("Z00I0");
+                    mrMailVO.setMrStepName("투자비재산정");
+                    break;
+            }
+        }
+
+        //발신자 셋팅 : 시스템
+        mrMailVO.setFrom(appConfig.getString("mail.from"));
+
+        //상세단계 셋팅 매개변수로 들어오는 값이 없으면 메일객체내부의 값 사용
+        if(procStCd==null) {
+            procStCd = mrMailVO.getProcStCd();
+
+        }
+        mrMailVO.setProcStCd(procStCd);
+
+
+
+        switch (mrMailVO.getMrStepCd()) {
+            case "Z0010":
+                url += "mrRqRegister";
+                break;
+            case "Z0020":
+                url += "mrTech";
+                break;
+            case "Z0030":
+                if(mrMailVO.getProcStCd().equals("Z0122") || mrMailVO.getProcStCd().equals("Z0131") || mrMailVO.getProcStCd().equals("Z0133")) {
+                    mrMailVO.setMrStepName("타당성검토확인");
+                    url += "mrComplete";
+                } else {
+                    url += "mrTechInvest";
+                }
+                break;
+            case "Z0040":
+                url += "mrJobsReview";
+                break;
+            case "Z0050":
+                url += "ivstCostRegister";
+                break;
+            case "Z0060":
+                url += "safeCheckExe";
+                break;
+            case "Z0070":
+                url += "safeCheckRegister";
+                break;
+            case "Z0080":
+                url += "compFileManage";
+                break;
+            case "Z0090":
+                url += "compRptRegister";
+                break;
+            case "Z00P0":
+                url += "mrRiskCheck";
+                break;
+            case "Z00R0":
+                url += "mrRiskCheck";
+                break;
+            case "Z00I0":
+                url += "mrJobsReview";
+                break;
+            default:
+                url += "mrRqRegister";
+                break;
+        }
+
+        url += ".do";
+        mrMailVO.setUrl(url);
+
+
+        //상세단계에 따른 메일제목셋팅
+        switch (procStCd) {
+            case "Z0121":
+                mailTitle = "[승인] 설비 변경 요청서 – ";
+                break;
+
+            case "Z0122":
+                mailTitle = "[승인] 설비 변경 요청서 – ";
+                break;
+
+            default:
+                mailTitle = "[통보] 설비 변경 요청서 승인요청 – ";
+                break;
+        }
+
+        //상세단계에 따른 상세단계명 셋팅
+        switch (procStCd) {
+            case "Z0110":
+                mrMailVO.setProcStName("작성요청");
+                break;
+
+            case "Z0121":
+                mrMailVO.setProcStName("승인요청");
+                break;
+
+            case "Z0122":
+                mrMailVO.setProcStName("승인요청");
+                break;
+
+            case "COMPLETE" :
+                mrMailVO.setProcStName("완료");
+
+            case "SKIP" :
+                mrMailVO.setProcStName("보류");
+                break;
+
+            case "Z0143" :
+                mrMailVO.setMrStepName("사업취소");
+                mrMailVO.setProcStName("");
+                break;
+
+        }
+
+        //메일제목 셋팅 (메일제목 + MR제목)
+        mrMailVO.setMailTitle(mailTitle + "["+mrMailVO.getMrNo()+"]"+ mrMailVO.getMrReqTitle());
+        return mrMailVO;
+    }
+
+    /**
+     * Generate mail content
+     * @param mrMailVO
+     */
+    private void generateMailContent(MrMailVO mrMailVO){
+
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String content = "";
+        content += "<table style='border:1p; width:700px;border-collapse: collapse;'>";
+        content += "<tr>";
+        content += "<td style='height:19px;padding:6px 4px;border-top:1px solid #d5e9fc;border-right:1px solid #d5e9fc;border-left:1px solid #d5e9fc;border-bottom:1px solid #d5e9fc;background-color:#C5CED8;font-size:12px;font-weight:600;vertical-align:middles'>";
+        content += mrMailVO.getMailTitle();
+        content += "</td>";
+        content += "</tr>";
+        content += "<tr>";
+        content += "<td style='vertical-align:top; height:200px;padding:6px 4px;border-top:1px solid #d5e9fc;border-right:1px solid #d5e9fc;border-left:1px solid #d5e9fc;border-bottom:1px solid #d5e9fc;font-size:12px;min-height:200px;'>";
+
+        if(mrMailVO.getToNm()!=null) {
+            content += mrMailVO.getToNm() + "님, <br>";
+
+        } else if(mrMailVO.getToInfos()!=null) {
+
+            for(MailToInfoVo toInfo : mrMailVO.getToInfos()) {
+                content += toInfo.getToName() + "님, ";
+            }
+
+            content += "<br>";
+        }
+
+        if(mrMailVO.getChrgrClCd()!=null && mrMailVO.getMrStepCd().equals("Z0030") && mrMailVO.getChrgrClCd().equals("Z02I")) {
+            content += mrMailVO.getMrReqTitle() + " 설비변경건에 Project Engineer로 지정되셨습니다. <br>";
+
+        } else if (mrMailVO.getMrStepCd().equals("Z00P0")) {
+            content += mrMailVO.getMrReqTitle() + " PORC위원으로 지정되셨습니다. <br>";
+
+        } else if (mrMailVO.getMrStepCd().equals("Z0040") && mrMailVO.getProcStCd().equals("COMPLETE")) {
+            content += mrMailVO.getMrReqTitle() + "의 직무검토 작성이 완료되었습니다. <br>";
+            content += "직무검토 완료처리 하시기 바랍니다.<br>";
+        } else if (mrMailVO.getMrStepCd().equals("Z0040") && mrMailVO.getProcStCd().equals("SKIP")) {
+
+            content += mrMailVO.getMrReqTitle() + "의 보류하신 직무검토를 작성완료 해주시기 바랍니다. <br>";
+
+        } else if (mrMailVO.getMrStepCd().equals("Z0050") && mrMailVO.getProcStCd().equals("Z0110")) {
+            content += "투자지출 품의 최종 단계에서 품의가 기각되었음을 알립니다. <br><br>기각 사유 : "+mrMailVO.getCnclRsnCtt();
+        } else if (mrMailVO.getMrStepCd().equals("Z0070") && mrMailVO.getProcStCd().equals("Z0121")) {
+            content += mrMailVO.getMrReqTitle()+" 설비변경 건의 가동 전 안전 점검 담당자로 지정되셨습니다.<br>사전 검토 후 점검에 참석하시어 안전 점검을 실시해 주시기 바랍니다.<br><br> - 일시 : "+mrMailVO.getSafetyChkDt()+"<br> - 장소 : "+mrMailVO.getSafetyChkLoc();
+        } else if (mrMailVO.getMrStepCd().equals("Z0080") && mrMailVO.getProcStCd().equals("Z0110")) {
+            content += "가동 전 안전점검이 모두 완료되었습니다.<br>설비변경 수행자료를 등록해 주시기 바랍니다.";
+        } else if (mrMailVO.getMrStepCd().equals("Z0080") && mrMailVO.getProcStCd().equals("Z0121")) {
+            content += mrMailVO.getLoginEmpName()+ "님 께서 MR자료 등록을 요청하셨습니다.<br>요청한 자료를 등록해 주시기 바랍니다.";
+        } else {
+            content += mrMailVO.getLoginEmpName()+ "님 께서 "+mrMailVO.getMrStepName() + " " + mrMailVO.getProcStName() + "하였습니다. <br>";
+        }
+
+        if(mrMailVO.getFstProcTrmDt()!=null && !mrMailVO.getProcStCd().equals("Z0141")
+                && !mrMailVO.getMrStepCd().equals("Z0050") && !mrMailVO.getMrStepCd().equals("Z0070") && !mrMailVO.getMrStepCd().equals("Z0080") && !mrMailVO.getMrStepCd().equals("Z0090") && !mrMailVO.getMrStepCd().equals("Z00Z0")
+                ) {
+            content +=  transFormat.format(mrMailVO.getFstProcTrmDt())+ " 까지 완료하시기 바랍니다.<br>";
+        }
+        
+        System.out.println("e-mail 컨텐츠 info   :: " + content);
+        
+        //mrMailVO.setContent(content);
+
+
+    }
+
+
+
+    private String getMailLink(MrMailVO mrMailVO, String empNo, boolean isCC){
+        /**
+         * 암호화키 생성
+         */
+        long mailDate = System.currentTimeMillis();
+
+        String content = "";
+
+        String enkey = loginService.encrypt(mrMailVO.getUrl()+mrReqNoEncryptionKeyGenerator(mrMailVO.getMrReqNo())+mailDate+empNo);
+
+        content += "</td>";
+        content += "</tr>";
+        content += "<tr>";
+        content += "<td style='vertical-align:top; padding:6px 4px;border-top:1px solid #d5e9fc;border-right:1px solid #d5e9fc;border-left:1px solid #d5e9fc;border-bottom:1px solid #d5e9fc;font-size:12px;min-height:200px;'>";
+        if(!isCC) {
+            content += "링크 : <a href='"+ appConfig.getString("default.url") + "mail.do?mrURL="+mrMailVO.getUrl() + "&empNo=" + empNo + "&mrReqNo=" + mrMailVO.getMrReqNo() + "&mailDate=" + mailDate + "&mailKey=" + enkey + "'> " + mrMailVO.getMrStepName() +"</a> ";
+        } else {
+            content += "링크 : <a href='"+ appConfig.getString("default.url") + mrMailVO.getUrl() + "?mrReqNo="+mrMailVO.getMrReqNo() + "'> "+mrMailVO.getMrStepName()+"</a> ";
+        }
+
+        content += "</td>";
+        content += "</tr>";
+        content += "</table>";
+
+        return content;
+    }
+
+    private void send(final MrMailVO mrMailVO){
+        //메일전송 일부 주석처리 
+        Thread thread = null;
+        try {
+            List<String> ccList = getCcs(mrMailVO);
+            final String[] ccs = ccList.toArray(new String[ccList.size()]);
+
+            thread = new Thread () {
+                @Override
+                public void run() {
+                    try { 
+                    	//201505 주석처리
+                    	/*
+                        if(mrMailVO.getTo()!=null) {
+                            String[] to = new String[1];
+                            to[0] = mrMailVO.getTo();
+                            mailer.sendHtml(mrMailVO.getFrom(), to, mrMailVO.getMailTitle(), mrMailVO.getContent() + getMailLink(mrMailVO, mrMailVO.getChrgEmpNo(), false));
+                        }else if(mrMailVO.getToInfos()!=null) {
+                            String[] to = new String[1];
+                            for (MailToInfoVo toInfo : mrMailVO.getToInfos()) {
+                                to[0] = toInfo.getToMailAddress();
+                                mailer.sendHtml(mrMailVO.getFrom(), to, mrMailVO.getMailTitle(), mrMailVO.getContent() + getMailLink(mrMailVO, toInfo.getToEmpNo(), false));
+                            }
+                        }
+
+                        if(ccs.length > 0) {
+                            mailer.sendHtml(mrMailVO.getFrom(), ccs, mrMailVO.getMailTitle(), mrMailVO.getContent()+getMailLink(mrMailVO, null, true));
+                        }        
+                        */                 
+
+                        if(mrMailVO.getTo()!=null) {
+                            String[] to = new String[1];
+                            to[0] = mrMailVO.getTo();
+
+                            mailer.sendHtml(mrMailVO.getFrom(), to, mrMailVO.getMailTitle(), mrMailVO.getContent()+getMailLink(mrMailVO, null, true), ccs, null);
+                        }else if(mrMailVO.getToInfos()!=null) {
+                            String[] to = new String[mrMailVO.getToInfos().size()];
+                            int i = 0;
+                            for(MailToInfoVo infoVos: mrMailVO.getToInfos()){
+                                to[i] = infoVos.getToMailAddress();
+                                i++;
+                            }
+                            mailer.sendHtml(mrMailVO.getFrom(), to, mrMailVO.getMailTitle(), mrMailVO.getContent()+getMailLink(mrMailVO, null, true), ccs, null);
+                        }
+                        
+                        /*
+                        if(ccs.length > 0) {
+                            mailer.sendHtml(mrMailVO.getFrom(), ccs, mrMailVO.getMailTitle(), mrMailVO.getContent()+getMailLink(mrMailVO, null, true));
+                        }
+                        */
+                        
+                        System.out.println("e-mail esndhtml보내기   :: " + mrMailVO.getFrom()+ " :: " + mrMailVO.getMailTitle()+ " :: " + mrMailVO.getContent()+ "::"+ ccs);
+                    } catch (Exception e) {
+
+                        logger.error("#### 메일전송 에러 : ");
+                        System.out.println("####메일전송에러 : " + e.getStackTrace().toString());
+                        
+                        logger.error(e.getStackTrace().toString());
+
+                    } finally {
+                        if(this.isAlive()) {
+                            this.interrupt();
+                        }
+                    }
+                };
+            };
+
+            thread.start();
+        } catch (Exception e) {
+            logger.error("#### 메일전송 쓰레드 에러 : ");
+            logger.error(e.getStackTrace());
+            System.out.println("####메일전송 쓰레드 에러 : " + e.getStackTrace());
+        } finally {
+            if(thread.isAlive()) {
+                thread.interrupt();
+            }
+        }
+    }
+
+    private List<String> getCcs(MrMailVO mrMailVO) {
+        List<String> ccs = new ArrayList<String>();
+        List<ChrgrChgHist> appInfoList = mngrDAO.selectMngrChangeList(mrMailVO.getMrReqNo());
+
+        for(ChrgrChgHist chrgrChgHist : appInfoList) {
+            for (String[] ccInfo : ccChgr){
+                if(chrgrChgHist.getMrStepCd().equals(ccInfo[0]) && chrgrChgHist.getChrgrClCd().indexOf(ccInfo[1])>-1){
+                    ccs.add(chrgrChgHist.getEmpEmail());
+                    break;
+                }
+            }
+        }
+
+        //중복되는 참조자 제거
+        ccs = uniqueList(ccs);
+        return ccs;
+    }
+
+    /**
+     * 6자리 로그인 암호화키
+     * 첫자리 : 현재시간 홀 (마지막 숫자) / 짝 (0)
+     * 두번째 ~ 다섯번째 : mrReqNo * (홀수 일 경우 * 5000 , 짝수일 경우 * 7000) 값의 16진수 맨뒤 부터 4자리
+     * 여섯번째 : 시간 마지막 숫자 (1 : O, 2 : I, 3 : L, 4 : B, 5 : A, 6 : N, 7 : K, 8 : !, 9 : M, 0 : R) Oilbank!MR
+     * @param time
+     * @return
+     */
+    private String mrReqNoEncryptionKeyGenerator(int mrReqNo){
+        String encryptionKey = "";
+        String mrReqNoHex;
+        String strMrReqNo = mrReqNo+"";
+
+        int lastNo = Integer.parseInt(strMrReqNo.substring(strMrReqNo.length()-1));
+
+        if(mrReqNo % 2 == 0 ){
+            encryptionKey += "0";
+            mrReqNoHex= Long.toHexString(mrReqNo * 7000);
+        }else{
+            encryptionKey += lastNo+"";
+            mrReqNoHex= Long.toHexString(mrReqNo * 5000);
+        }
+
+        encryptionKey += mrReqNoHex.substring(mrReqNoHex.length()-4);
+
+        switch (lastNo) {
+            case 1:
+                encryptionKey +="O";
+                break;
+
+            case 2:
+                encryptionKey +="I";
+                break;
+
+            case 3:
+                encryptionKey +="L";
+                break;
+
+            case 4:
+                encryptionKey +="B";
+                break;
+
+            case 5:
+                encryptionKey +="A";
+                break;
+
+            case 6:
+                encryptionKey +="N";
+                break;
+
+            case 7:
+                encryptionKey +="K";
+                break;
+
+            case 8:
+                encryptionKey +="!";
+                break;
+
+            case 9:
+                encryptionKey +="M";
+                break;
+
+            case 0:
+                encryptionKey +="R";
+                break;
+        }
+        return encryptionKey;
+    }
+
+    @Override
+    public boolean allMrEmpMailSend(int mrReqNo, String mrStepCd, String procStCd) {
+        List<String> tos = new ArrayList<String>();
+        List<MailToInfoVo> toInfos = new ArrayList<MailToInfoVo>();
+
+        //보내는 사람 정보 셋팅
+        MrMailVO mrMailVO = getMailInfo(mrReqNo, mrStepCd, procStCd);
+
+        //받는 사람 정보 셋팅
+        List<ChrgrChgHist> appInfoList = mngrDAO.selectMngrChangeList(mrMailVO.getMrReqNo());
+        for(ChrgrChgHist chrgrChgHist : appInfoList) {
+        	
+        	System.out.println("setToMailAddress jewook  : "+chrgrChgHist.getEmpEmail());
+        	System.out.println("setToName jewook  : "+chrgrChgHist.getChrgEmpName());
+        	
+        	
+            MailToInfoVo toInfo = new MailToInfoVo();
+            toInfo.setToMailAddress(chrgrChgHist.getEmpEmail());
+            toInfo.setToName(chrgrChgHist.getChrgEmpName());
+            toInfo.setToEmpNo(chrgrChgHist.getEmpEmail());
+            toInfos.add(toInfo);
+            tos.add(chrgrChgHist.getEmpEmail());
+        }
+
+        //리스트에서 중복되는 받는사람 변경
+        /* hajewook 추가 
+         * 블럭 동기화 추가 
+         * */
+        synchronized (this){
+	        tos = uniqueList (tos);
+	        for(String to : tos) {
+	            int empCnt = 0;
+	            for (MailToInfoVo toInfo : toInfos) {
+	
+	                if(to.equals(toInfo.getToMailAddress())){
+	                    empCnt ++;
+	                }
+	
+	                if(empCnt > 1) {
+	                    toInfos.remove(toInfo);
+	                }
+	            }
+	        }
+        }
+
+        mrMailVO.setToInfos(toInfos);
+
+        generateMailContent(mrMailVO);
+
+        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+        send(mrMailVO);
+        return false;
+    }
+
+
+    private List<String> uniqueList (List<String> items) {
+        List<String> uniqueItems = new ArrayList<String>(new HashSet<String>(items));
+        return uniqueItems;
+    }
+
+    @Override
+    public void limitDateMrSendMail() {
+
+        //자동으로 메일전송 임시 주석
+        Thread thread = null;
+        try {
+
+            thread = new Thread () {
+                @Override
+                public void run() {
+
+                    try {
+                        String reqType;
+                        List<ChrgrChgHist> limitMailList = mrMailDao.selectLimitDateMail();
+                        for(ChrgrChgHist chrgrChgHist : limitMailList){
+                            reqType = "";
+                            MrMailVO mrMailVO = getMailInfo(chrgrChgHist.getMrReqNo(), chrgrChgHist.getMrStepCd(), chrgrChgHist.getProcStCd());
+
+                            SimpleDateFormat transFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            String content = "";
+                            content += "<table style='border:1p; width:700px;border-collapse: collapse;'>";
+                            content += "<tr>";
+                            content += "<td style='height:19px;padding:6px 4px;border-top:1px solid #d5e9fc;border-right:1px solid #d5e9fc;border-left:1px solid #d5e9fc;border-bottom:1px solid #d5e9fc;background-color:#C5CED8;color:#555;font-size:12px;font-weight:600;vertical-align:middles'>";
+                            content += mrMailVO.getMailTitle();
+                            content += "</td>";
+                            content += "</tr>";
+                            content += "<tr>";
+                            content += "<td style='vertical-align:top; height:200px;padding:6px 4px;border-top:1px solid #d5e9fc;border-right:1px solid #d5e9fc;border-left:1px solid #d5e9fc;border-bottom:1px solid #d5e9fc;font-size:12px;min-height:200px;'>";
+
+
+                            switch (mrMailVO.getProcStCd()) {
+                                case "Z0121":
+                                    reqType = " 승인";
+                                    break;
+
+                                case "Z0122":
+                                    reqType = " 승인";
+                                    break;
+
+                                default:
+                                    reqType = " 작성";
+                                    break;
+                            }
+
+                            if(mrMailVO.getToNm()!=null) {
+                                content += mrMailVO.getToNm() + "님, <br>";
+                            }
+                            
+                            content += "'" + mrMailVO.getMrReqTitle() + "'의 <br>";
+
+                            content +=  mrMailVO.getMrStepName()+" " +reqType+"이 " + "기한일(" + transFormat.format(chrgrChgHist.getFstProcTrmDt())+ ")까지 완료되지 않았습니다. <br>";
+                            content +=  "빠른시일내에 "+ reqType +"하여 주시기 바랍니다.<br>";
+                            mrMailVO.setContent(content);
+
+                            String[] to = new String[1];
+                            to[0] = chrgrChgHist.getEmpEmail();
+                            getMailLink(mrMailVO, chrgrChgHist.getChrgEmpNo(), false);
+                            mailer.sendHtml(mrMailVO.getFrom(), to, mrMailVO.getMailTitle(), mrMailVO.getContent());
+                        }
+                        
+                    } catch (Exception e) {
+
+                        logger.error("#### 기한일 지난 메일전송 에러 : ");
+                        logger.error(e.getStackTrace().toString());
+
+                    } finally {
+                        if(this.isAlive()) {
+                            this.interrupt();
+                        }
+                    }
+                };
+            };
+
+            thread.start();
+        } catch (Exception e) {
+            logger.error("#### 기한일 지난 메일전송 쓰레드 에러 : ");
+            logger.error(e.getStackTrace());
+        } finally {
+            if(thread.isAlive()) {
+                thread.interrupt();
+            }
+        }
+    }
+
+    @Override
+    public boolean mailDocuSend(int mrReqNo) {
+
+        //보내는 사람 정보 셋팅
+        MrMailVO mrMailVO = getMailInfo(mrReqNo, null, null);
+
+        //받는 사람 정보 셋팅
+        ChrgrChgHist appInfo = mrStepRepository.selectAppStepEmp(mrReqNo,"Z02Q");
+        mrMailVO.setFstProcTrmDt(appInfo.getFstProcTrmDt());
+        mrMailVO.setToNm(appInfo.getChrgEmpName());
+        mrMailVO.setTo(appInfo.getEmpEmail());
+        mrMailVO.setChrgrClCd(appInfo.getChrgrClCd());
+
+        //메일내용 셋팅
+        generateMailContent(mrMailVO);
+
+        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+        send(mrMailVO);
+
+        return false;
+    }
+
+    @Override
+    public boolean managerChangeMailSend(int mrReqNo, List<String> inEmps) {
+
+        final MrMailVO mrMailVO = mrMailDao.selectMrMailInfo(mrReqNo);
+        final List<String> emps = inEmps;
+        mrMailVO.setFrom(appConfig.getString("mail.from"));
+        String url = appConfig.getString("default.url");
+        switch (mrMailVO.getMrStepCd()) {
+            case "Z0010":
+                url += "mrRqRegister";
+                break;
+            case "Z0020":
+                url += "mrTech";
+                break;
+            case "Z0030":
+                if(mrMailVO.getProcStCd().equals("Z0122") || mrMailVO.getProcStCd().equals("Z0131") || mrMailVO.getProcStCd().equals("Z0133")) {
+                    mrMailVO.setMrStepName("타당성검토확인");
+                    url += "mrComplete";
+                } else {
+                    url += "mrTechInvest";
+                }
+                break;
+            case "Z0040":
+                url += "mrJobsReview";
+                break;
+            case "Z0050":
+                url += "ivstCostRegister";
+                break;
+            case "Z0060":
+                url += "safeCheckExe";
+                break;
+            case "Z0070":
+                url += "safeCheckRegister";
+                break;
+            case "Z0080":
+                url += "compFileManage";
+                break;
+            case "Z0090":
+                url += "compRptRegister";
+                break;
+            case "Z00P0":
+                url += "mrRiskCheck";
+                break;
+            case "Z00R0":
+                url += "mrRiskCheck";
+                break;
+            case "Z00I0":
+                url += "mrJobsReview";
+                break;
+            default:
+                url += "mrRqRegister";
+                break;
+        }
+
+        url += ".do";
+        
+        // 결재중인 경우 결재 시스템 연결 업무는 EP로 URL 적용
+        if(mrMailVO.getProcStCd().equals("Z0121") || mrMailVO.getProcStCd().equals("Z0122")) {
+        	url = "http://ep.oilbank.co.kr";
+        	mrMailVO.setMrStepName("현대오일뱅크 Portal로 이동");
+        }
+        mrMailVO.setUrl(url);
+
+
+        Thread thread = null;
+        try {
+
+            thread = new Thread () {
+                @Override
+                public void run() {
+
+                    try {
+
+
+
+                        for(String empNo : emps){
+                            EmpInfoVo empInfo =  empAndTeamDAO.getEmp(empNo);
+
+
+                            String content = "";
+                            content += "<table style='border:1p; width:700px;border-collapse: collapse;'>";
+                            content += "<tr>";
+                            content += "<td style='height:19px;padding:6px 4px;border-top:1px solid #d5e9fc;border-right:1px solid #d5e9fc;border-left:1px solid #d5e9fc;border-bottom:1px solid #d5e9fc;background-color:#C5CED8;font-size:12px;font-weight:600;vertical-align:middles'>";
+                            content += "[통보] 담당자지정 : ["+mrMailVO.getMrNo()+"]" + mrMailVO.getMrReqTitle();
+                            content += "</td>";
+                            content += "</tr>";
+                            content += "<tr>";
+                            content += "<td style='vertical-align:top; height:200px;padding:6px 4px;border-top:1px solid #d5e9fc;border-right:1px solid #d5e9fc;border-left:1px solid #d5e9fc;border-bottom:1px solid #d5e9fc;font-size:12px;min-height:200px;'>";
+                            content += empInfo.getEmpName() +" 님,<br>";
+                            content += mrMailVO.getMrReqTitle() +" MR의 담당자로 지정 되었습니다. <br>";
+                            content += "자세한 사항은 아래 링크로 확인하여 처리하여주시기 바랍니다.";
+                            content += "</td>";
+                            content += "</tr>";
+                            content += "<tr>";
+                            content += "<td style='vertical-align:top; padding:6px 4px;border-top:1px solid #d5e9fc;border-right:1px solid #d5e9fc;border-left:1px solid #d5e9fc;border-bottom:1px solid #d5e9fc;font-size:12px;min-height:200px;'>";
+                            content += "링크 : <a href='"+ mrMailVO.getUrl() + "?mrReqNo="+mrMailVO.getMrReqNo() + "'> "+mrMailVO.getMrStepName()+"</a> ";
+                            content += "</td>";
+                            content += "</tr>";
+                            content += "</table>";
+
+                            send(mrMailVO);
+                            mailer.sendHtml(mrMailVO.getFrom(), empInfo.getEmpEmail(), "[통보] 담당자지정 : ["+mrMailVO.getMrNo()+"]" + mrMailVO.getMrReqTitle(), content);
+                        }
+
+                    } catch (Exception e) {
+
+                        logger.error("#### 기한일 지난 메일전송 에러 : ");
+                        logger.error(e.getStackTrace().toString());
+
+                    } finally {
+                        if(this.isAlive()) {
+                            this.interrupt();
+                        }
+                    }
+                };
+            };
+
+            thread.start();
+        } catch (Exception e) {
+            logger.error("#### 기한일 지난 메일전송 쓰레드 에러 : ");
+            logger.error(e.getStackTrace());
+        } finally {
+            if(thread.isAlive()) {
+                thread.interrupt();
+            }
+        }
+        return false;
+    }
+    
+    /**
+     * PORC위원 선정 완료 로직 수정 
+     * 기존로직에선 담당자에게만 메일 보냈으나 
+     * 추가로 porc 위원에게 메일 발송로직 추가
+     */
+    @Override
+    public boolean mailSendMultiProc(int mrReqNo, String mrStepCd, String procStepCd, String chrgrClCd) {
+
+        List<MailToInfoVo> toInfos = new ArrayList<MailToInfoVo>();
+
+        //보내는 사람 정보 셋팅
+        System.out.println("e-mail 보내는사람정보1   :: " + mrReqNo + "|"+ mrStepCd  + "|"+ procStepCd);
+        MrMailVO mrMailVO = getMailInfo(mrReqNo, mrStepCd, procStepCd);
+        
+        System.out.println("e-mail 보내는사람정보2   :: " + mrMailVO.getChrgEmpNo());
+        
+        //받는 사람 정보 셋팅
+        List<ChrgrChgHist> appInfoList = mrStepRepository.selectIsolationAppStepEmpMulti(mrReqNo, mrStepCd, chrgrClCd);
+        for(ChrgrChgHist chrgrChgHist : appInfoList) {
+            MailToInfoVo toInfo = new MailToInfoVo();
+            toInfo.setToMailAddress(chrgrChgHist.getEmpEmail());
+            toInfo.setToName(chrgrChgHist.getChrgEmpName());
+            toInfo.setToEmpNo(chrgrChgHist.getEmpEmail());
+            toInfos.add(toInfo);
+            System.out.println("e-mail 받는사람정보 for문  :: " + chrgrChgHist.getChrgEmpName());
+        }
+
+        mrMailVO.setToInfos(toInfos);
+
+        //메일컨텐츠 셋
+        generateMailContent(mrMailVO);
+
+        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+        send(mrMailVO);
+        
+        return false;
+    }
+}

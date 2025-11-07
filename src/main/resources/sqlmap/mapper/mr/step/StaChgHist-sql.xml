@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.step">
+    <resultMap id="staChgHistMap" type="com.mr.step.domain.MrReqProcStaChgHistVO">
+        <id property="mrReqProcStepDetNo" column="MR_REQ_PROC_STEP_DET_NO" />
+        <result property="chrgrClCd" column="CHRGR_CL_CD" />
+        <result property="effEndDtm" column="EFF_END_DTM" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <insert id="insertMrReqProcStaChgHist" parameterType="com.mr.step.domain.MrReqProcStaChgHistVO">
+        INSERT INTO MR_REQ_PROC_STA_CHG_HIST (
+                    MR_REQ_PROC_STEP_DET_NO,
+                    CHRGR_CL_CD,
+                    EFF_END_DTM,
+                    EFF_STA_DTM,
+                    MR_REQ_NO,
+                    PROC_ST_CD,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqProcStepDetNo},
+                        #{chrgrClCd},
+                        '99991231235959',
+                        TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS),
+                        #{mrReqNo},
+                        #{procStCd},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+</mapper>

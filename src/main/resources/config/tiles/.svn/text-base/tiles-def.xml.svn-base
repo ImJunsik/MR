@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.0//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition name="WILDCARD:default/**" template="/WEB-INF/layouts/defaultLayout.jsp">
+        <put-attribute name="content" value="{1}" />
+    </definition>
+
+    <definition name="WILDCARD:admin/**" template="/WEB-INF/layouts/adminLayout.jsp">
+        <put-attribute name="content" value="{1}" />
+    </definition>
+
+    <definition name="WILDCARD:popup/**" template="/WEB-INF/layouts/popupLayout.jsp">
+        <put-attribute name="content" value="{1}" />
+    </definition>
+
+    <definition name="WILDCARD:empty/**" template="/WEB-INF/layouts/emptyLayout.jsp">
+        <put-attribute name="content" value="{1}" />
+    </definition>
+
+    <definition name="WILDCARD:excel/**" template="/WEB-INF/layouts/excelLayout.jsp">
+        <put-attribute name="content" value="{1}" />
+    </definition>
+
+    <definition name="WILDCARD:print/**" template="/WEB-INF/layouts/printLayout.jsp">
+        <put-attribute name="content" value="{1}" />
+    </definition>
+</tiles-definitions>

@@ -1,0 +1,69 @@
+package com.mr.tech.service;
+
+import org.springframework.stereotype.Service;
+
+import com.mr.tech.domain.TechReviewVO;
+/**
+ * 기술 및 타당성 검토 서비스
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.07 박성룡 최초 작성
+ * </pre>
+ */
+
+@Service
+public interface MrCompleteService {
+
+    /**
+     * MR완료 처리를 위한 조회
+     * @param mrReqNo
+     * @return
+     */
+    TechReviewVO selectMrComplete(int mrReqNo);
+
+
+    /**
+     * 기술 및 타당성검토 수정
+     * @param techReviewVO
+     */
+
+    void updateMrTechReview(TechReviewVO techReviewVO);
+    
+    /**
+     * 기술 및 타당성검토 수정
+     * yoo 240910 타당성 검토에서 임시저장 시, 추가 담담자 및 직책과장을 삭제 플래그를 주는 로직이 있어 새로 생성 함
+     * @param techReviewVO
+     */
+
+    void updateMrTechReview2(TechReviewVO techReviewVO);
+    
+
+    /**
+     * 기술 및 타당성검토 승인요청
+     * @param techReviewVO
+     */
+    void insertMrCompleteAppReq(TechReviewVO techReviewVO);
+
+    /**
+     * 기술 및 타당성검토 승인
+     * @param mrReqNo
+     */
+    void insertMrCompleteAgree(int mrReqNo);
+
+    /**
+     * 기술 및 타당성검토 승인
+     * @param mrReqNo
+     */
+    void insertMrCompleteApp(TechReviewVO techReviewVO);
+
+    /**
+     * 기술 및 타당성검토 반려
+     * @param mrReqNo
+     */
+    void insertMrTechReturn(TechReviewVO techReviewVO);
+}

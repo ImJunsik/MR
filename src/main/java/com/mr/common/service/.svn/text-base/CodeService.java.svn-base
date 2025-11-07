@@ -1,0 +1,75 @@
+package com.mr.common.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.mr.common.domain.CommCdVO;
+import com.mr.common.domain.UnitVo;
+/**
+ * 코드서비스
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * 2014.07.01 박성룡 플랜트조회 추가
+ * 2014.08.04 박성룡 단일코드정보 조회 추가
+ * 2017.11.28 wj: 초기투자비 산정 직책과장 조회 추가
+ * </pre>
+ */
+@Service
+public interface CodeService{
+    /**
+     * 코드정보조회
+     * @param commCdVO
+     * @return 코드리스트
+     */
+    List<CommCdVO> selectCommCd(CommCdVO commCdVO);
+
+    /**
+     * 플랜트조회
+     * @param unitVo
+     * @return
+     */
+    UnitVo selectPlant(UnitVo unitVo);
+
+    /**
+     * 공정리스트
+     * @param
+     * @return 코드리스트
+     */
+    List<CommCdVO> selectAllUnit();
+
+    /**
+     * 설비리스트
+     * @param
+     * @return 코드리스트
+     */
+    List<CommCdVO> selectEquip(String mrProcNo);
+
+
+    /**
+     * 공정리스트
+     * @param
+     * @return 코드리스트
+     */
+    List<UnitVo> unitSearch(UnitVo unitVo);
+
+    /**
+     * 설비리스트
+     * @param
+     * @return 코드리스트
+     */
+    List<UnitVo> equipSearch(UnitVo unitVo);
+    
+    /**
+     * wj:직책과장조회
+     * @param
+     * @return 코드리스트
+     */    
+    //List<CommCdVO> techInvestEmp(String mrProcNo);	
+}

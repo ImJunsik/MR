@@ -1,0 +1,77 @@
+package com.mr.common.repository;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.mr.common.domain.MrRvRstVO;
+/**
+ * 검토 DAO
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.07 박성룡 신규작성
+ * </pre>
+ */
+@Repository
+public class MrRvRstDAO  extends BaseSqlMapRepository {
+
+    public void insertMrRvRst(MrRvRstVO mrRvRstVO) {
+        insert("mr.rvRst.insertMrRvRst",mrRvRstVO);
+    }
+
+    public MrRvRstVO selectMrRvRst(MrRvRstVO mrRvRstVO) {
+        return selectOne("mr.rvRst.selectMrRvRst",mrRvRstVO);
+    }
+
+    public MrRvRstVO selectMrRvRstRisk(MrRvRstVO mrRvRstVO) {
+        return selectOne("mr.rvRst.selectMrRvRstRisk",mrRvRstVO);
+    }
+
+    public List<MrRvRstVO> selectTechMrRvRst(int mrReqNo) {
+        return selectList("mr.rvRst.selectTechMrRvRst",mrReqNo);
+    }
+
+    public void updateMrRvRst(MrRvRstVO mrRvRstVO) {
+        update("mr.rvRst.updateMrRvRst",mrRvRstVO);
+    }
+
+    public void updateMrRvRstDelYnDet(MrRvRstVO mrRvRstVO) {
+        update("mr.rvRst.updateMrRvRstDelYnDet",mrRvRstVO);
+    }
+
+    public void updateMrRvRstDelYnItemCd(MrRvRstVO mrRvRstVO){
+        update("mr.rvRst.updateMrRvRstDelYnItemCd",mrRvRstVO);
+    }
+
+    public String selectRvRstIsCheck(MrRvRstVO mrRvRstVO) {
+        return selectOne("mr.rvRst.selectRvRstIsCheck",mrRvRstVO);
+    }
+
+    public int selectRvRstCount(MrRvRstVO mrRvRstVO) {
+        return selectOne("mr.rvRst.selectRvRstCount",mrRvRstVO);
+    }
+
+    public int selectRvRstCountDet(MrRvRstVO mrRvRstVO) {
+        return selectOne("mr.rvRst.selectRvRstCountDet",mrRvRstVO);
+    }
+
+    public String selectRvRstIsAppCheck(int mrReqNo, String itemCd) {
+        MrRvRstVO mrRvRstVO = new MrRvRstVO();
+        mrRvRstVO.setMrReqNo(mrReqNo);
+        mrRvRstVO.setItemCd(itemCd);
+        return selectOne("mr.rvRst.selectRvRstIsAppCheck",mrRvRstVO);
+    }
+
+    public void updateMrRvRstApp(int mrReqNo, String itemCd) {
+        MrRvRstVO mrRvRstVO = new MrRvRstVO();
+        mrRvRstVO.setMrReqNo(mrReqNo);
+        mrRvRstVO.setItemCd(itemCd);
+        update("mr.rvRst.updateMrRvRstApp",mrRvRstVO);
+    }
+}

@@ -1,0 +1,77 @@
+package com.mr.common.repository;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Repository;
+
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.mr.common.domain.CostCenterVO;
+import com.mr.common.domain.EmpInfoVo;
+import com.wm.util.Debug;
+/**
+ * 로그인 처리 DAO
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * </pre>
+ */
+@Repository
+public class EmpAndTeamDAO  extends BaseSqlMapRepository {
+
+    /**
+     * 로그인을 체크
+     * @param empInfoVo
+     * @return 사원정보
+     */
+    public EmpInfoVo loginCheck(EmpInfoVo empInfoVo){
+        return selectOne("common.empAndTeam.loginCheck" , empInfoVo);         
+    }
+
+    /**
+     * 로그인을 체크
+     * @param empInfoVo
+     * @return 사원정보
+     */
+    public EmpInfoVo getEmp(String empNo){
+        return selectOne("common.empAndTeam.getEmp" , empNo);
+    }
+
+
+    /**
+     * 사원정보 조회
+     * @param empInfoVo
+     * @return 사원정보 리스트
+     */
+    public List<EmpInfoVo> empSearch(EmpInfoVo empInfoVo){
+        return selectList("common.empAndTeam.empSearch" , empInfoVo);
+    }
+
+    /**
+     * 팀정보 조회
+     * @param empInfoVo
+     * @return 모든팀정보 리스트
+     */
+    public List<EmpInfoVo> teamSearch(EmpInfoVo empInfoVo){
+        return selectList("common.empAndTeam.teamSearch", empInfoVo);
+    }
+
+
+    /**
+     * 회계부서코드 조회
+     * @param
+     * @return 코드리스트
+     */
+    public List<CostCenterVO> selectCostCenter(String teamText) {
+        return selectList("common.empAndTeam.selectCostCenter" , teamText);
+    }
+
+	public List<CostCenterVO> selectCostCenterMap(Map map) {
+        return selectList("common.empAndTeam.selectCostCenterMap" , map);
+	}
+}

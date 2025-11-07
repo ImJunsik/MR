@@ -1,0 +1,1006 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+<!-- button -->
+<div class="pop_button_top">
+
+    <input type="image" src="../images/btn_save.png" style="display:none" class="cursor save IAD"/>
+    <c:if test="${modeClass!='PRINT'}"><input type="image" src="../images/btn_print.png" class="cursor print"/></c:if>
+</div>
+<form id="registerForm" method="post">
+<input type="hidden" id="mrReqNo" name="mrReqNo" value="<c:out value="${mrReqNo}"/>"/>
+<input type="hidden" name="mrHazopNo" value="<c:out value="${checkList.mrHazopNo}"/>"/>
+<div id="printArea">
+<table class="table_pop_row" border="1" cellspacing="0">
+    <caption class="blind">CHECKLIST 위험성평가 SHEET</caption>
+    <colgroup>
+    <col width="10%">
+    <col width="15%">
+    <col width="10%">
+    <col width="25%">
+    <col width="10%">
+    <col width="30%">
+    </colgroup>
+    <tbody>
+    <tr>
+        <th scope="row">MR번호</th>
+        <td><c:out value="${checkList.mrNo}"/></td>
+        <th scope="row">검토일자</th>
+        <td>
+            <div class="form_group">
+            <c:if test="${modeClass=='IAD'}">
+                <input type="text" name="rvTeamDt" class="i_input inputDate agreeEndDate" value="<c:out value="${checkList.rvTeamDt}"/>" readOnly/>
+            </c:if>
+            <c:if test="${modeClass!='IAD'}">
+                <c:out value="${checkList.rvTeamDt}"/>
+            </c:if>
+            </div>
+        </td>
+        <th scope="row">검토부서</th>
+        <td>
+              <div class="form_group">
+              <input type="text" class="i_input_125 rvTeamText"  value="<c:out value="${checkList.rvTeamName}"/>" readOnly/>
+              <input type="hidden" class="rvTeamValue" name="rvTeamId" value="<c:out value="${checkList.rvTeamId}"/>"/>
+              <img src="../images/icon_search.png" class="vam cursor teamSearch IAD" data-role="rvTeam" style="display:none"/>
+              </div>
+        </td>
+    </tr>
+    <tr>
+        <th scope="row">MR제목</th>
+        <td colspan="5"><c:out value="${checkList.mrReqTitle}"/></td>
+    </tr>
+    </tbody>
+</table>
+<!-- space non 10 -->
+<hr class="divider_none_10" />
+<table class="table_pop_col" border="1" cellspacing="0">
+    <caption class="blind">CHECKLIST 위험성평가 SHEET</caption>
+    <colgroup>
+    <col width="70%">
+    <col width="10%">
+    <col width="10%">
+    <col width="10%">
+    </colgroup>
+    <tbody>
+   <tr>
+        <th scope="col">온도/압력/반응 항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK01">
+        <td>
+                       현재의 Process Technology Design이 변경되는가?
+            <input type="hidden" name="checks[0].itemDiv" value="DIV01" />
+            <input type="hidden" name="checks[0].itemCd" value="CHECK01" />
+        </td>
+        <td><input type="radio" name="checks[0].rstVal" class="IAD CHECK01" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[0].rstVal" class="IAD CHECK01" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[0].rstVal" class="IAD CHECK01" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK02">
+        <td>
+            Start-up, Shutdown, 정상운전중 과열발생 가능성이 발생하는가?
+            <input type="hidden" name="checks[1].itemDiv" value="DIV01" />
+            <input type="hidden" name="checks[1].itemCd" value="CHECK02" />
+        </td>
+        <td><input type="radio" name="checks[1].rstVal" class="IAD CHECK02" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[1].rstVal" class="IAD CHECK02" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[1].rstVal" class="IAD CHECK02" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK03">
+        <td>
+                       인화물질 형성 가능성이 증가하는가?
+            <input type="hidden" name="checks[2].itemDiv" value="DIV01" />
+            <input type="hidden" name="checks[2].itemCd" value="CHECK03" />
+        </td>
+        <td><input type="radio" name="checks[2].rstVal" class="IAD CHECK03" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[2].rstVal" class="IAD CHECK03" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[2].rstVal" class="IAD CHECK03" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK04">
+        <td>
+                        이상반응, 분해반응, 급격한 상변화의 가능성이 증가하는가?
+            <input type="hidden" name="checks[3].itemDiv" value="DIV01" />
+            <input type="hidden" name="checks[3].itemCd" value="CHECK04" />
+        </td>
+        <td><input type="radio" name="checks[3].rstVal" class="IAD CHECK04" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[3].rstVal" class="IAD CHECK04" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[3].rstVal" class="IAD CHECK04" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">VALVE/ PIPING 항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK05">
+        <td>
+                       연결배관사이에 과압 또는 오염의 가능성이 변하는가?
+            <input type="hidden" name="checks[4].itemDiv" value="DIV02" />
+            <input type="hidden" name="checks[4].itemCd" value="CHECK05" />
+        </td>
+        <td><input type="radio" name="checks[4].rstVal" class="IAD CHECK05" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[4].rstVal" class="IAD CHECK05" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[4].rstVal" class="IAD CHECK05" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK06">
+        <td>
+            Back Flow의 가능성이 증가하는가?
+            <input type="hidden" name="checks[5].itemDiv" value="DIV02" />
+            <input type="hidden" name="checks[5].itemCd" value="CHECK06" />
+        </td>
+        <td><input type="radio" name="checks[5].rstVal" class="IAD CHECK06" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[5].rstVal" class="IAD CHECK06" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[5].rstVal" class="IAD CHECK06" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK07">
+        <td>
+                       사용하지 않는 배관 Branch가 생기는가?
+            <input type="hidden" name="checks[6].itemDiv" value="DIV02" />
+            <input type="hidden" name="checks[6].itemCd" value="CHECK07" />
+        </td>
+        <td><input type="radio" name="checks[6].rstVal" class="IAD CHECK07" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[6].rstVal" class="IAD CHECK07" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[6].rstVal" class="IAD CHECK07" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK08">
+        <td>
+            System을 연결하는데 있어 Spec.을 만족하지 못하는 사항?
+            <input type="hidden" name="checks[7].itemDiv" value="DIV02" />
+            <input type="hidden" name="checks[7].itemCd" value="CHECK08" />
+        </td>
+        <td><input type="radio" name="checks[7].rstVal" class="IAD CHECK08" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[7].rstVal" class="IAD CHECK08" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[7].rstVal" class="IAD CHECK08" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">계기항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK09">
+        <td>
+            Valve의 Fail Safe Position이 변경 또는 새로 설정되는가?
+            <input type="hidden" name="checks[8].itemDiv" value="DIV03" />
+            <input type="hidden" name="checks[8].itemCd" value="CHECK09" />
+        </td>
+        <td><input type="radio" name="checks[8].rstVal" class="IAD CHECK09" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[8].rstVal" class="IAD CHECK09" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[8].rstVal" class="IAD CHECK09" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK10">
+        <td>
+                       기존 Shut Down System이 변경되는가?
+            <input type="hidden" name="checks[9].itemDiv" value="DIV03" />
+            <input type="hidden" name="checks[9].itemCd" value="CHECK10" />
+        </td>
+        <td><input type="radio" name="checks[9].rstVal" class="IAD CHECK10" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[9].rstVal" class="IAD CHECK10" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[9].rstVal" class="IAD CHECK10" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK11">
+        <td>
+                       기존 Control System이 영향을 받거나 변경되는가?
+            <input type="hidden" name="checks[10].itemDiv" value="DIV03" />
+            <input type="hidden" name="checks[10].itemCd" value="CHECK11" />
+        </td>
+        <td><input type="radio" name="checks[10].rstVal" class="IAD CHECK11" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[10].rstVal" class="IAD CHECK11" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[10].rstVal" class="IAD CHECK11" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK12">
+        <td>
+            Process Alarm이 Setting 또는 변경되는가?
+            <input type="hidden" name="checks[11].itemDiv" value="DIV03" />
+            <input type="hidden" name="checks[11].itemCd" value="CHECK12" />
+        </td>
+        <td><input type="radio" name="checks[11].rstVal" class="IAD CHECK12" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[11].rstVal" class="IAD CHECK12" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[11].rstVal" class="IAD CHECK12" value="3" disabled="disabled"/></td>
+    </tr>	
+    <tr>
+        <th scope="col">전기항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK13">
+        <td>
+                       방폭지역 구분도에 영향을 미치는가?
+            <input type="hidden" name="checks[12].itemDiv" value="DIV04" />
+            <input type="hidden" name="checks[12].itemCd" value="CHECK13" />
+        </td>
+        <td><input type="radio" name="checks[12].rstVal" class="IAD CHECK13" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[12].rstVal" class="IAD CHECK13" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[12].rstVal" class="IAD CHECK13" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK14">
+        <td>
+                       기존 Interlock 및 Shutdown System이 변경되는가?
+            <input type="hidden" name="checks[13].itemDiv" value="DIV04" />
+            <input type="hidden" name="checks[13].itemCd" value="CHECK14" />
+        </td>
+        <td><input type="radio" name="checks[13].rstVal" class="IAD CHECK14" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[13].rstVal" class="IAD CHECK14" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[13].rstVal" class="IAD CHECK14" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK15">
+        <td>
+            Interlock 및 Shutdown System이 추가되는가?
+            <input type="hidden" name="checks[14].itemDiv" value="DIV04" />
+            <input type="hidden" name="checks[14].itemCd" value="CHECK15" />
+        </td>
+        <td><input type="radio" name="checks[14].rstVal" class="IAD CHECK15" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[14].rstVal" class="IAD CHECK15" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[14].rstVal" class="IAD CHECK15" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK16">
+        <td>
+                       새로 설치된 전기설비는?
+            <input type="hidden" name="checks[15].itemDiv" value="DIV04" />
+            <input type="hidden" name="checks[15].itemCd" value="CHECK16" />
+        </td>
+        <td><input type="radio" name="checks[15].rstVal" class="IAD CHECK16" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[15].rstVal" class="IAD CHECK16" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[15].rstVal" class="IAD CHECK16" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">회전장치 항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK17">
+        <td>
+                       안전한 Startup 및 Shutdown을 위한 특별 주의사항 추가 변경?
+            <input type="hidden" name="checks[16].itemDiv" value="DIV05" />
+            <input type="hidden" name="checks[16].itemCd" value="CHECK17" />
+        </td>
+        <td><input type="radio" name="checks[16].rstVal" class="IAD CHECK17" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[16].rstVal" class="IAD CHECK17" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[16].rstVal" class="IAD CHECK17" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK18">
+        <td>
+            Wetted Component 재질이 변경되는가?
+            <input type="hidden" name="checks[17].itemDiv" value="DIV05" />
+            <input type="hidden" name="checks[17].itemCd" value="CHECK18" />
+        </td>
+        <td><input type="radio" name="checks[17].rstVal" class="IAD CHECK18" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[17].rstVal" class="IAD CHECK18" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[17].rstVal" class="IAD CHECK18" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK19">
+        <td>
+            Shutdown System의 개정 또는 변경이 요구되는가?
+            <input type="hidden" name="checks[18].itemDiv" value="DIV05" />
+            <input type="hidden" name="checks[18].itemCd" value="CHECK19" />
+        </td>
+        <td><input type="radio" name="checks[18].rstVal" class="IAD CHECK19" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[18].rstVal" class="IAD CHECK19" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[18].rstVal" class="IAD CHECK19" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">MAINTENANCE항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK20">
+        <td>
+            Safety, Quality, Inventory Critical Equipment가 추가되거나 변경?
+            <input type="hidden" name="checks[19].itemDiv" value="DIV06" />
+            <input type="hidden" name="checks[19].itemCd" value="CHECK20" />
+        </td>
+        <td><input type="radio" name="checks[19].rstVal" class="IAD CHECK20" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[19].rstVal" class="IAD CHECK20" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[19].rstVal" class="IAD CHECK20" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK21">
+        <td>
+            Maintenance를 위한 Purging설비, Shutdown의 안전성이 변경?
+            <input type="hidden" name="checks[20].itemDiv" value="DIV06" />
+            <input type="hidden" name="checks[20].itemCd" value="CHECK21" />
+        </td>
+        <td><input type="radio" name="checks[20].rstVal" class="IAD CHECK21" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[20].rstVal" class="IAD CHECK21" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[20].rstVal" class="IAD CHECK21" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK22">
+        <td>
+                       새로운 특정 Material이 Stock으로 구매/보관되어야 하는가?
+            <input type="hidden" name="checks[21].itemDiv" value="DIV06" />
+            <input type="hidden" name="checks[21].itemCd" value="CHECK22" />
+        </td>
+        <td><input type="radio" name="checks[21].rstVal" class="IAD CHECK22" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[21].rstVal" class="IAD CHECK22" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[21].rstVal" class="IAD CHECK22" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK23">
+        <td>
+            Interlock 점검절차가 추가되거나 변경되는가?
+            <input type="hidden" name="checks[22].itemDiv" value="DIV06" />
+            <input type="hidden" name="checks[22].itemCd" value="CHECK23" />
+        </td>
+        <td><input type="radio" name="checks[22].rstVal" class="IAD CHECK23" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[22].rstVal" class="IAD CHECK23" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[22].rstVal" class="IAD CHECK23" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK24">
+        <td>
+                       대기로 방출되는 Waste Stream의 유량 및 특성 변경?
+            <input type="hidden" name="checks[23].itemDiv" value="DIV06" />
+            <input type="hidden" name="checks[23].itemCd" value="CHECK24" />
+        </td>
+        <td><input type="radio" name="checks[23].rstVal" class="IAD CHECK24" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[23].rstVal" class="IAD CHECK24" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[23].rstVal" class="IAD CHECK24" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK25">
+        <td>
+                       폐수처리 시설로 가는 Waste Stream 유량 및 특성이 변경되는가?
+            <input type="hidden" name="checks[24].itemDiv" value="DIV06" />
+            <input type="hidden" name="checks[24].itemCd" value="CHECK25" />
+        </td>
+        <td><input type="radio" name="checks[24].rstVal" class="IAD CHECK25" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[24].rstVal" class="IAD CHECK25" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[24].rstVal" class="IAD CHECK25" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK26">
+        <td>
+            Pollution Control Device로 가는 흐름이 추가, 제거, 변경되는가?
+            <input type="hidden" name="checks[25].itemDiv" value="DIV06" />
+            <input type="hidden" name="checks[25].itemCd" value="CHECK26" />
+        </td>
+        <td><input type="radio" name="checks[25].rstVal" class="IAD CHECK26" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[25].rstVal" class="IAD CHECK26" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[25].rstVal" class="IAD CHECK26" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK27">
+        <td>
+            Storage Tank를 신설, 철거 또는 저장물질을 변경하는가?
+            <input type="hidden" name="checks[26].itemDiv" value="DIV06" />
+            <input type="hidden" name="checks[26].itemCd" value="CHECK27" />
+        </td>
+        <td><input type="radio" name="checks[26].rstVal" class="IAD CHECK27" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[26].rstVal" class="IAD CHECK27" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[26].rstVal" class="IAD CHECK27" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">FIRE PROTECTION 항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK28">
+        <td>
+            Fire Protection 설비를 변경하거나 추가하는가?
+            <input type="hidden" name="checks[27].itemDiv" value="DIV07" />
+            <input type="hidden" name="checks[27].itemCd" value="CHECK28" />
+        </td>
+        <td><input type="radio" name="checks[27].rstVal" class="IAD CHECK28" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[27].rstVal" class="IAD CHECK28" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[27].rstVal" class="IAD CHECK28" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK29">
+        <td>
+                       신설된 소화기, 호스, 모니터, 폼 시스템의 위치가 부적절?
+            <input type="hidden" name="checks[28].itemDiv" value="DIV07" />
+            <input type="hidden" name="checks[28].itemCd" value="CHECK29" />
+        </td>
+        <td><input type="radio" name="checks[28].rstVal" class="IAD CHECK29" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[28].rstVal" class="IAD CHECK29" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[28].rstVal" class="IAD CHECK29" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK30">
+        <td>
+            Plant Fire Protection 설계기준이 변경되는가?
+            <input type="hidden" name="checks[29].itemDiv" value="DIV07" />
+            <input type="hidden" name="checks[29].itemCd" value="CHECK30" />
+        </td>
+        <td><input type="radio" name="checks[29].rstVal" class="IAD CHECK30" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[29].rstVal" class="IAD CHECK30" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[29].rstVal" class="IAD CHECK30" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK31">
+        <td>
+                       용기내부에 가연성 물질의 형성 가능성이 발생(변경) 되는가?
+            <input type="hidden" name="checks[30].itemDiv" value="DIV07" />
+            <input type="hidden" name="checks[30].itemCd" value="CHECK31" />
+        </td>
+        <td><input type="radio" name="checks[30].rstVal" class="IAD CHECK31" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[30].rstVal" class="IAD CHECK31" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[30].rstVal" class="IAD CHECK31" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">SITING 항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK32">
+        <td>
+                       위험물질 취급량이 증가하는가?
+            <input type="hidden" name="checks[31].itemDiv" value="DIV08" />
+            <input type="hidden" name="checks[31].itemCd" value="CHECK32" />
+        </td>
+        <td><input type="radio" name="checks[31].rstVal" class="IAD CHECK32" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[31].rstVal" class="IAD CHECK32" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[31].rstVal" class="IAD CHECK32" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK33">
+        <td>
+                       조정실에 새로운 위험이 발생하는가?
+            <input type="hidden" name="checks[32].itemDiv" value="DIV08" />
+            <input type="hidden" name="checks[32].itemCd" value="CHECK33" />
+        </td>
+        <td><input type="radio" name="checks[32].rstVal" class="IAD CHECK33" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[32].rstVal" class="IAD CHECK33" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[32].rstVal" class="IAD CHECK33" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK34">
+        <td>
+                       인접 시설 및 설비로부터 새로운 위험이 발생하는가?
+            <input type="hidden" name="checks[33].itemDiv" value="DIV08" />
+            <input type="hidden" name="checks[33].itemCd" value="CHECK34" />
+        </td>
+        <td><input type="radio" name="checks[33].rstVal" class="IAD CHECK34" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[33].rstVal" class="IAD CHECK34" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[33].rstVal" class="IAD CHECK34" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK35">
+        <td>
+                       신설 설비가 관련법규 기준을 미충족?
+            <input type="hidden" name="checks[34].itemDiv" value="DIV08" />
+            <input type="hidden" name="checks[34].itemCd" value="CHECK35" />
+        </td>
+        <td><input type="radio" name="checks[34].rstVal" class="IAD CHECK35" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[34].rstVal" class="IAD CHECK35" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[34].rstVal" class="IAD CHECK35" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">HUMAN FACTOR 항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK36">
+        <td>
+            Operator Response Time을 증가시키는가?
+            <input type="hidden" name="checks[35].itemDiv" value="DIV09" />
+            <input type="hidden" name="checks[35].itemCd" value="CHECK36" />
+        </td>
+        <td><input type="radio" name="checks[35].rstVal" class="IAD CHECK36" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[35].rstVal" class="IAD CHECK36" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[35].rstVal" class="IAD CHECK36" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK37">
+        <td>
+            Alarm 인식방법이 변경되는가?
+            <input type="hidden" name="checks[36].itemDiv" value="DIV09" />
+            <input type="hidden" name="checks[36].itemCd" value="CHECK37" />
+        </td>
+        <td><input type="radio" name="checks[36].rstVal" class="IAD CHECK37" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[36].rstVal" class="IAD CHECK37" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[36].rstVal" class="IAD CHECK37" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK38">
+        <td>
+                       운전시 운전원의 육체적 조건(힘,체격,인내심등)이 변경되는가?
+            <input type="hidden" name="checks[37].itemDiv" value="DIV09" />
+            <input type="hidden" name="checks[37].itemCd" value="CHECK38" />
+        </td>
+        <td><input type="radio" name="checks[37].rstVal" class="IAD CHECK38" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[37].rstVal" class="IAD CHECK38" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[37].rstVal" class="IAD CHECK38" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK39">
+        <td>
+            Communication 요건이 변경되는가?
+            <input type="hidden" name="checks[38].itemDiv" value="DIV09" />
+            <input type="hidden" name="checks[38].itemCd" value="CHECK39" />
+        </td>
+        <td><input type="radio" name="checks[38].rstVal" class="IAD CHECK39" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[38].rstVal" class="IAD CHECK39" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[38].rstVal" class="IAD CHECK39" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">INDUSTRIAL HYGIENE항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK40">
+        <td>
+                       공정 MSDS에 화학물질이 추가 또는 삭제되어야 하는가?
+            <input type="hidden" name="checks[39].itemDiv" value="DIV10" />
+            <input type="hidden" name="checks[39].itemCd" value="CHECK40" />
+        </td>
+        <td><input type="radio" name="checks[39].rstVal" class="IAD CHECK40" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[39].rstVal" class="IAD CHECK40" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[39].rstVal" class="IAD CHECK40" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK41">
+        <td>
+                       화학물질 공급자가 변경(추가/교체) 되는가?
+            <input type="hidden" name="checks[40].itemDiv" value="DIV10" />
+            <input type="hidden" name="checks[40].itemCd" value="CHECK41" />
+        </td>
+        <td><input type="radio" name="checks[40].rstVal" class="IAD CHECK41" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[40].rstVal" class="IAD CHECK41" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[40].rstVal" class="IAD CHECK41" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK42">
+        <td>
+                       방사성 물질을 사용하는 계기가 추가되거나 변경되는가?
+            <input type="hidden" name="checks[41].itemDiv" value="DIV10" />
+            <input type="hidden" name="checks[41].itemCd" value="CHECK42" />
+        </td>
+        <td><input type="radio" name="checks[41].rstVal" class="IAD CHECK42" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[41].rstVal" class="IAD CHECK42" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[41].rstVal" class="IAD CHECK42" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK43">
+        <td>
+                       평상시(Routine Basis) 특별보호장비를 입어야 하게 되는가?
+            <input type="hidden" name="checks[42].itemDiv" value="DIV10" />
+            <input type="hidden" name="checks[42].itemCd" value="CHECK43" />
+        </td>
+        <td><input type="radio" name="checks[42].rstVal" class="IAD CHECK43" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[42].rstVal" class="IAD CHECK43" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[42].rstVal" class="IAD CHECK43" value="3" disabled="disabled"/></td>
+    </tr>    
+    <tr>
+        <th scope="col">온도/압력/반응 항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+
+<!--   
+
+    <tr class="CHECK01">
+        <td>
+            현재의 Process Technology Design이 변경되는가?
+            <input type="hidden" name="checks[0].itemDiv" value="DIV01" />
+            <input type="hidden" name="checks[0].itemCd" value="CHECK01" />
+        </td>
+        <td><input type="radio" name="checks[0].rstVal" class="IAD CHECK01" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[0].rstVal" class="IAD CHECK01" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[0].rstVal" class="IAD CHECK01" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK02">
+        <td>
+            Start-up, Shutdown, 정상 운전 중 과열발생 가능성이 발생하는가?
+            <input type="hidden" name="checks[1].itemDiv" value="DIV01" />
+            <input type="hidden" name="checks[1].itemCd" value="CHECK02" />
+        </td>
+        <td><input type="radio" name="checks[1].rstVal" class="IAD CHECK02" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[1].rstVal" class="IAD CHECK02" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[1].rstVal" class="IAD CHECK02" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">VALVE/ PIPING 항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK03">
+        <td>
+            연결 배관 사이에 과압 또는 오염의 가능성이 변하는가?
+            <input type="hidden" name="checks[2].itemDiv" value="DIV01" />
+            <input type="hidden" name="checks[2].itemCd" value="CHECK03" />
+        </td>
+        <td><input type="radio" name="checks[2].rstVal" class="IAD CHECK03" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[2].rstVal" class="IAD CHECK03" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[2].rstVal" class="IAD CHECK03" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK04">
+        <td>
+            Back Flow의 가능성이 증가하는가?
+            <input type="hidden" name="checks[3].itemDiv" value="DIV01" />
+            <input type="hidden" name="checks[3].itemCd" value="CHECK04" />
+        </td>
+        <td><input type="radio" name="checks[3].rstVal" class="IAD CHECK04" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[3].rstVal" class="IAD CHECK04" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[3].rstVal" class="IAD CHECK04" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">계기항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK05">
+        <td>
+            Valve의 Fail Safe Position이 변경 또는 새로 설정되는가?
+            <input type="hidden" name="checks[4].itemDiv" value="DIV02" />
+            <input type="hidden" name="checks[4].itemCd" value="CHECK05" />
+        </td>
+        <td><input type="radio" name="checks[4].rstVal" class="IAD CHECK05" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[4].rstVal" class="IAD CHECK05" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[4].rstVal" class="IAD CHECK05" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK06">
+        <td>
+            기존 Shut Down System이 변경되는가?
+            <input type="hidden" name="checks[5].itemDiv" value="DIV02" />
+            <input type="hidden" name="checks[5].itemCd" value="CHECK06" />
+        </td>
+        <td><input type="radio" name="checks[5].rstVal" class="IAD CHECK06" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[5].rstVal" class="IAD CHECK06" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[5].rstVal" class="IAD CHECK06" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr>
+        <th scope="col">전기항목</th>
+        <th scope="col">YES</th>
+        <th scope="col">NO</th>
+        <th scope="col">N/A</th>
+    </tr>
+    <tr class="CHECK07">
+        <td>
+            방폭지역 구분도에 영향을 미치는가?
+            <input type="hidden" name="checks[6].itemDiv" value="DIV03" />
+            <input type="hidden" name="checks[6].itemCd" value="CHECK07" />
+        </td>
+        <td><input type="radio" name="checks[6].rstVal" class="IAD CHECK07" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[6].rstVal" class="IAD CHECK07" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[6].rstVal" class="IAD CHECK07" value="3" disabled="disabled"/></td>
+    </tr>
+    <tr class="CHECK08">
+        <td>
+            기존 Interlock 및 Shutdown System이 변경되는가?
+            <input type="hidden" name="checks[7].itemDiv" value="DIV03" />
+            <input type="hidden" name="checks[7].itemCd" value="CHECK08" />
+        </td>
+        <td><input type="radio" name="checks[7].rstVal" class="IAD CHECK08" value="1" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[7].rstVal" class="IAD CHECK08" value="2" disabled="disabled"/></td>
+        <td><input type="radio" name="checks[7].rstVal" class="IAD CHECK08" value="3" disabled="disabled"/></td>
+    </tr>
+-->    
+    </tbody>
+</table>
+<!-- space non 10 -->
+<hr class="divider_none_10" />
+
+<table class="table_pop_row" border="1" cellspacing="0">
+ <caption class="blind"></caption>
+     <colgroup>
+    <col width="15%">
+    <col width="20%">
+    <col width="20%">
+    <col width="15%">
+    <col width="12%">
+    <col width="12%">
+     </colgroup>
+     <tbody>
+     <tr>
+         <th rowspan=2 scope="row">관련부서의견</th>
+         <td rowspan=2 colspan="2">
+         	<div class="form_group">
+            	<textarea name="rvTeamSugg" class="i_text_full IAD" rows="" cols="" disabled="disabled"><c:out value="${checkList.rvTeamSugg}"/></textarea>
+            </div>
+		 </td>
+         <th scope="row">요청부서</th>
+         <td colspan="2">
+         	<div class="form_group">
+            	<input type="text" name="rvDeptName" class="i_input rvdeptText"  value="<c:out value="${checkList.rvDeptName}"/>" readOnly/>
+            	
+            	<img src="../images/icon_search.png" class="vam cursor teamSearch IAD" data-role="rvdept" style="display:none"/>
+            </div>
+		</td>
+     </tr>
+     <tr>
+         <th scope="row">정비팀</th>
+         <td colspan="2">
+         	<div class="form_group">
+	         	<input type="text" class="i_input rvempText"  value="<c:out value="${checkList.rvEmpName}"/>" readOnly/>
+	         	
+		        <input type="hidden" class="rvempValue" name="rvEmpId" value="<c:out value="${checkList.rvEmpId}"/>"/>
+	            <img src="../images/icon_search.png" class="vam cursor empSearch IAD" data-role="rvemp" style="display:none"/>
+            </div>
+		</td>
+     </tr>
+     <tr>
+         <th scope="row" >검토 및<br />조치사항<font style="color:red">*</font></th>
+         <td class="text-area" colspan="5">
+         	<div class="form_group">
+            	<textarea name="rvChkMtr" class="i_text_full IAD" rows="" cols="" disabled="disabled"><c:out value="${checkList.rvChkMtr}"/></textarea>
+            </div>
+         </td>
+     </tr>
+     <tr>
+         <th colspan="6" scope="row">위험성평가 팀 구성</th>
+     </tr>
+     <tr>
+         <th scope="row">담당공정 엔지니어</th>
+         <td colspan="2">
+         	<div class="form_group">  <!--직책과장  value 재설정 필요 DB 확인필요 -->
+              <input type="text" class="i_input_200 writerText"  value="<c:out value="${checkList.rgstName}"/>" readOnly/>
+              <input type="hidden" class="writerValue" name="rgstId" value="<c:out value="${checkList.rgstId}"/>"/>
+            </div>
+         	
+		 </td>  <!-- 담당공정 엔지니어 재설정 필요 DB 확인필요 -->
+         <th rowspan="3" scope="row">설계, 설비 담당자 중 추가 참석자<br>(필요 시)</th>
+         <td rowspan="3" colspan="2">
+		 	<div class="form_group">
+            	<textarea name="peAddName" class="i_text_full IAD" rows="" cols="" disabled="disabled"><c:out value="${checkList.peAddName}"/></textarea>
+            </div>
+		 </td>   <!--설계, 설비 담당자 value 재설정 필요 DB 확인필요 -->
+     </tr>
+     <tr>
+         <th rowspan="2" scope="row">공정 운전부서 <br>직책과장 및 G/F</th>
+         <th scope="row">직책과장<font style="color:red">*</font></th>
+         <th scope="row">G/F<font style="color:red">*</font></th>
+     </tr>
+     <tr>
+         <td><div class="form_group">
+	         	<input type="text" class="i_input_125 penameText"  value="<c:out value="${checkList.peName}"/>" readOnly/>
+		        <input type="hidden" class="penameValue" name="peId" value="<c:out value="${checkList.peId}"/>"/>
+	            <img src="../images/icon_search.png" class="vam cursor empSearch IAD" data-role="pename" style="display:none"/>	            
+            </div>         	
+         </td>
+         <td>
+         	<div class="form_group">  <!-- F/F  value 재설정 필요 DB 확인필요 -->
+	              <input type="text" class="i_input_125 checkText"  value="<c:out value="${checkList.confName}"/>" readOnly/>
+	              <input type="hidden" class="checkValue" name="confId" value="<c:out value="${checkList.confId}"/>"/>
+	              <img src="../images/icon_search.png" class="vam cursor empSearch IAD" data-role="check" style="display:none"/>
+              </div>
+         </td>
+     </tr>
+     <tr>
+        <th scope="row" class="vam fileAdd">첨부파일
+          <img id="addFile" src="../images/icon_s_plus.png" border="0" class="cursor IAD addFile" style="display:none"/>
+        </th>
+        <td class="section_text pl5 pt5 pb5" colspan="3">
+          <div class="form_group">  
+            <table id="fileList" class="table_default_margin" border="1" cellspacing="0">
+              <tr style="display:none"><td></td></tr>
+              <c:forEach var="mrAtchFiles" items="${checkList.mrAtchFiles}" varStatus="loop">
+              <tr>
+                 <td>
+                  <input type="text" class="i_input" value="${mrAtchFiles.fileCdNm}" readonly>
+                  <input type="text" class="i_input_300" value="${mrAtchFiles.fileNm}" readonly>
+                  <img src="../images/btn_inFile.png" class="cursor fileDown"/>
+                  <img class="cursor IAD removeDownFile" src="../images/icon_minus.png" style="display:none"/>
+                  <input type="hidden" value="${mrAtchFiles.fileCd}"/>
+                  <input type="hidden" class="delFlag" name="mrAtchFiles[${loop.index}].deleted" value="false"/>
+                  <input type="hidden" class="insFlag" name="mrAtchFiles[${loop.index}].inserted" value="false"/>
+                  <input type="hidden" name="mrAtchFiles[${loop.index}].mrAtchFileNo" value="${mrAtchFiles.mrAtchFileNo}"/>
+                  <input type="hidden" class="drawMngNo" name="mrAtchFiles[${loop.index}].drawMngNo" value="${mrAtchFiles.drawMngNo}"/>
+                </td>
+              </tr>
+              </c:forEach>
+            </table>
+          </div>
+        </td>
+        </tr>
+    </tbody>
+</table>
+
+<hr class="divider_none_10" />
+<hr class="divider_none_10" />
+
+<!-- 
+<table class="table_pop_row" border="1" cellspacing="0">
+    <caption class="blind"></caption>
+    <colgroup>
+    <col width="10%">
+    <col width="10%">
+    <col width="15%">
+    <col width="15%">
+    <col width="15%">
+    <col width="15%">
+    <col width="20%">
+    </colgroup>
+    <tbody>
+    <tr>
+        <th rowspan="2" colspan="2" scope="row">관련부서<br />의견</th>
+        <td rowspan="2" colspan="2">
+            <div class="form_group">
+            <textarea name="rvTeamSugg" class="i_text_full IAD" rows="" cols="" disabled="disabled"><c:out value="${checkList.rvTeamSugg}"/></textarea>
+            </div>
+        </td>
+        <th class="dep2" scope="row">요청부서</th>
+        <td rowspan="2" colspan="2">
+            <div class="form_group">
+            <textarea name="rvTeamSugg" class="i_text_full IAD" rows="" cols="" disabled="disabled"><c:out value="${checkList.rvTeamSugg}"/></textarea>
+            </div>
+        </td>
+    </tr>
+    <tr>
+        <th class="dep2" scope="row">정비팀</th>
+    </tr>
+    <tr>
+        <th colspan="2" scope="row">검토 및 조치사항</td>
+        <td colspan="5">
+            <div class="form_group">
+            <textarea name="rvChkMtr" class="i_text_full IAD" rows="" cols="" disabled="disabled"><c:out value="${checkList.rvChkMtr}"/></textarea>
+            </div>
+        </td>
+    </tr>
+    <tr>
+    	<th colspan="7" scope="row">위험성평가 팀 구성</th>
+    </tr>
+    <tr>
+        <th scope="row">담당공정 엔지니어(필수)</th>
+        <td colspan="2" class="dep2" scope="row">
+        	<div class="form_group">
+            	<textarea name="rvTeamSugg" class="i_text_full IAD" rows="" cols="" disabled="disabled"><c:out value="${checkList.rvTeamSugg}"/></textarea>
+            </div>
+        </td>
+        <td colspan="3">
+            <div class="form_group">
+            <textarea name="rvTeamSugg" class="i_text_full IAD" rows="" cols="" disabled="disabled"><c:out value="${checkList.rvTeamSugg}"/></textarea>
+            </div>
+        </td>
+    </tr>
+    
+    <tr>
+        <th colspan="2" scope="row">작성자(Job Engineer)</th>
+        <td>
+              <div class="form_group">
+              <input type="text" class="i_input writerText"  value="<c:out value="${checkList.rgstName}"/>" readOnly/>
+              <input type="hidden" class="writerValue" name="rgstId" value="<c:out value="${checkList.rgstId}"/>"/>
+              <img src="../images/icon_search.png" class="vam cursor empSearch IAD" data-role="writer" style="display:none"/>
+              </div>
+        </td>
+        <th scope="row">확인자(운전부서GF)</th>
+        <td>
+              <div class="form_group">
+              <input type="text" class="i_input checkText"  value="<c:out value="${checkList.confName}"/>" readOnly/>
+              <input type="hidden" class="checkValue" name="confId" value="<c:out value="${checkList.confId}"/>"/>
+              <img src="../images/icon_search.png" class="vam cursor empSearch IAD" data-role="check" style="display:none"/>
+              </div>
+        </td>
+    </tr>
+     -->
+    </tbody>
+</table>
+
+</div>
+</form>
+
+<script>
+
+
+
+$(window).ready(function() {
+    $.popupTitle("Check List");
+    if(opener){
+    	if(opener.checkListCnt){
+    		opener.checkListCnt.value =  "${checkList.checks.size()}"==""?0:"${checkList.checks.size()}"
+    	}
+    }
+    $.checkAction = function (itemDiv, itemCd, rstVal){
+        $("."+itemCd).children("td:eq("+rstVal+")").children("input").attr("checked",true);
+    };
+
+	"<c:forEach var='check' items='${checkList.checks}'>";
+       $.checkAction("${check.itemDiv}", "${check.itemCd}", "${check.rstVal}");
+    "</c:forEach>";
+
+    $(".checkList").click(function() {
+         $.popupPopup({url:"mrCheckList.do", width:"500", height:"500", targetName:$(this).attr("data-role")});
+    });
+
+    $(".save").click(function () {
+    	if($.validation())
+        if(confirm("저장 하시겠습니까?")) {
+            $.removeComma();
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "${saveURL}").submit();
+            //window.open("", "_self").close();
+        }
+    });
+
+
+    $(".teamSearch").click(function() {
+        $.popup({popupName:"newWindow",url:"teamSearch.do", width:"500", height:"500", targetName:$(this).attr("data-role")});
+   });
+    $(".print").click(function() {
+    	var isMSIE = false;
+    	  if( navigator.userAgent.indexOf("MSIE") > 0 ){
+    		  isMSIE = true;
+    	  }
+
+    	  if(!isMSIE) {
+    		  alert("Internet Explorer이외 브라우저는 인쇄미리보기를 지원하지 않을 수도 있습니다.");
+    	  }
+
+        $.popup({popupName:"newWindow",url:"../print/mrCheckList.do?mrReqNo="+$("#mrReqNo").val(), width:"800", height:"800", targetName:$(this).attr("data-role")});
+    });
+    $(".empSearch").click(function() {
+        $.popup({popupName:"newWindow",url:"empSearch.do", width:"500", height:"500", targetName:$(this).attr("data-role")});
+    });
+});
+
+$.validation = function(){
+    var isValid = false;
+    isValid = $.validator({
+    	agreeEndDate : {method:"class",type:"text", msg:"검토일을 입력하세요."},
+        rvTeamText: {method:"class",type:"text", msg:"검토부서를 입력하세요."},
+        CHECK01 : {method:"class",type:"check", msg:"현재의 Process Technology Design이 변경되는가?를 입력하세요."},
+        CHECK02 : {method:"class",type:"check", msg:"Start-up, Shutdown, 정상운전중 과열발생 가능성이 발생하는가?를 입력하세요."},
+        CHECK03 : {method:"class",type:"check", msg:"인화물질 형성 가능성이 증가하는가?를 입력하세요."},
+        CHECK04 : {method:"class",type:"check", msg:"이상반응, 분해반응, 급격한 상변화의 가능성이 증가하는가?를 입력하세요."},
+        CHECK05 : {method:"class",type:"check", msg:"연결배관사이에 과압 또는 오염의 가능성이 변하는가?를 입력하세요."},
+        CHECK06 : {method:"class",type:"check", msg:"Back Flow의 가능성이 증가하는가?를 입력하세요."},
+        CHECK07 : {method:"class",type:"check", msg:"사용하지 않는 배관 Branch가 생기는가?를 입력하세요."},
+        CHECK08 : {method:"class",type:"check", msg:"System을 연결하는데 있어 Spec.을 만족하지 못하는 사항?을 입력하세요."},
+        CHECK09 : {method:"class",type:"check", msg:"Valve의 Fail Safe Position이 변경 또는 새로 설정되는가?를 입력하세요."},
+        CHECK10 : {method:"class",type:"check", msg:"기존 Shut Down System이 변경되는가?를 입력하세요."},
+        CHECK11 : {method:"class",type:"check", msg:"기존 Control System이 영향을 받거나 변경되는가?를 입력하세요."},
+        CHECK12 : {method:"class",type:"check", msg:"Process Alarm이 Setting 또는 변경되는가?를 입력하세요."},
+        CHECK13 : {method:"class",type:"check", msg:"방폭지역 구분도에 영향을 미치는가?를 입력하세요."},
+        CHECK14 : {method:"class",type:"check", msg:"기존 Interlock 및 Shutdown System이 변경되는가?를 입력하세요."},
+        CHECK15 : {method:"class",type:"check", msg:"Interlock 및 Shutdown System이 추가되는가?를 입력하세요."},
+        CHECK16 : {method:"class",type:"check", msg:"새로 설치된 전기설비는?을 입력하세요."},
+        CHECK17 : {method:"class",type:"check", msg:"안전한 Startup 및 Shutdown을 위한 특별 주의사항 추가 변경?을 입력하세요."},
+        CHECK18 : {method:"class",type:"check", msg:"Wetted Component 재질이 변경되는가?를 입력하세요."},
+        CHECK19 : {method:"class",type:"check", msg:"Shutdown System의 개정 또는 변경이 요구되는가?를 입력하세요."},
+        CHECK20 : {method:"class",type:"check", msg:"Safety, Quality, Inventory Critical Equipment가 추가되거나 변경?을 입력하세요."},
+        CHECK21 : {method:"class",type:"check", msg:"Maintenance를 위한 Purging설비, Shutdown의 안전성이 변경?을 입력하세요."},
+        CHECK22 : {method:"class",type:"check", msg:"새로운 특정 Material이 Stock으로 구매/보관되어야 하는가?를 입력하세요."},
+        CHECK23 : {method:"class",type:"check", msg:"Interlock 점검절차가 추가되거나 변경되는가?를 입력하세요."},
+        CHECK24 : {method:"class",type:"check", msg:"대기로 방출되는 Waste Stream의 유량 및 특성 변경?을 입력하세요."},
+        CHECK25 : {method:"class",type:"check", msg:"폐수처리 시설로 가는 Waste Stream 유량 및 특성이 변경되는가?를 입력하세요."},
+        CHECK26 : {method:"class",type:"check", msg:"Pollution Control Device로 가는 흐름이 추가, 제거, 변경되는가?를 입력하세요."},
+        CHECK27 : {method:"class",type:"check", msg:"Storage Tank를 신설, 철거 또는 저장물질을 변경하는가?를 입력하세요."},
+        CHECK28 : {method:"class",type:"check", msg:"Fire Protection 설비를 변경하거나 추가하는가?를 입력하세요."},
+        CHECK29 : {method:"class",type:"check", msg:"신설된 소화기, 호스, 모니터, 폼 시스템의 위치가 부적절?을 입력하세요."},
+        CHECK30 : {method:"class",type:"check", msg:"Plant Fire Protection 설계기준이 변경되는가?를 입력하세요."},
+        CHECK31 : {method:"class",type:"check", msg:"용기내부에 가연성 물질의 형성 가능성이 발생(변경) 되는가?를 입력하세요."},
+        CHECK32 : {method:"class",type:"check", msg:"위험물질 취급량이 증가하는가?를 입력하세요."},
+        CHECK33 : {method:"class",type:"check", msg:"조정실에 새로운 위험이 발생하는가?를 입력하세요."},
+        CHECK34 : {method:"class",type:"check", msg:"인접 시설 및 설비로부터 새로운 위험이 발생하는가?를 입력하세요."},
+        CHECK35 : {method:"class",type:"check", msg:"신설 설비가 관련법규 기준을 미충족?을 입력하세요."},
+        CHECK36 : {method:"class",type:"check", msg:"Operator Response Time을 증가시키는가?를 입력하세요."},
+        CHECK37 : {method:"class",type:"check", msg:"Alarm 인식방법이 변경되는가?를 입력하세요."},
+        CHECK38 : {method:"class",type:"check", msg:"운전시 운전원의 육체적 조건(힘,체격,인내심등)이 변경되는가?를 입력하세요."},
+        CHECK39 : {method:"class",type:"check", msg:"Communication 요건이 변경되는가?를 입력하세요."},
+        CHECK40 : {method:"class",type:"check", msg:"공정 MSDS에 화학물질이 추가 또는 삭제되어야 하는가?를 입력하세요."},
+        CHECK41 : {method:"class",type:"check", msg:"화학물질 공급자가 변경(추가/교체) 되는가?를 입력하세요."},
+        CHECK42 : {method:"class",type:"check", msg:"방사성 물질을 사용하는 계기가 추가되거나 변경되는가?를 입력하세요."},
+        CHECK43 : {method:"class",type:"check", msg:"평상시(Routine Basis) 특별보호장비를 입어야 하게 되는가?를 입력하세요."},
+/*
+        CHECK01 : {method:"class",type:"check", msg:"현재의 Process Technology Design이 변경되는가?를 입력하세요."},
+    	CHECK02 : {method:"class",type:"check", msg:"Start-up, Shutdown, 정상 운전 중 과열발생 가능성이 발생하는가?를 입력하세요."},
+    	CHECK03 : {method:"class",type:"check", msg:"연결 배관 사이에 과압 또는 오염의 가능성이 변하는가?를 입력하세요."},
+    	CHECK04 : {method:"class",type:"check", msg:"Back Flow의 가능성이 증가하는가?를 입력하세요."},
+    	CHECK05 : {method:"class",type:"check", msg:"Valve의 Fail Safe Position이 변경 또는 새로 설정되는가?를 입력하세요."},
+    	CHECK06 : {method:"class",type:"check", msg:"기존 Shut Down System이 변경되는가?를 입력하세요."},
+    	CHECK07 : {method:"class",type:"check", msg:"방폭지역 구분도에 영향을 미치는가?를 입력하세요."},
+    	CHECK08 : {method:"class",type:"check", msg:"기존 Interlock 및 Shutdown System이 변경되는가?를 입력하세요."},
+*/    	
+		penameText : {method:"class",type:"text", msg:"직책과장을 입력하세요."},
+    	checkText : {method:"class",type:"text", msg:"확인자(G/F)를 입력하세요."}
+    	//, penameText : {method:"class",type:"text", msg:"담당공정 엔지니어를 입력하세요."}
+            });
+
+    if($(".writerValue").val() == $(".checkValue").val()){
+		alert("작성자와 확인자는 동일인 지정이 불가합니다.");
+	   	return false;    	
+    }
+    
+    // 라디오 버튼 값이 1(YES)인 항목이 1개 이상 있는지 체크
+    var yesCount = 0;
+    $("input[type='radio'][value='1']:checked").each(function() {
+        yesCount++;
+    });
+    
+    // YES가 1개 이상 선택된 경우 rvChkMtr 필수 입력 체크
+    if (yesCount > 0) {
+        var rvChkMtrValue = $("textarea[name='rvChkMtr']").val();
+        if (!rvChkMtrValue || rvChkMtrValue.trim() === "") {
+            alert("검토 및 조치사항을 반드시 입력하세요.");
+            $("textarea[name='rvChkMtr']").focus();
+            return false;
+        }
+    }
+    
+    return isValid;
+};
+
+</script>

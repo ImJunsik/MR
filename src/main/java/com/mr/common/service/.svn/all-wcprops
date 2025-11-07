@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/service
+END
+MrRvRstService.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/189/trunk/src/mr/src/main/java/com/mr/common/service/MrRvRstService.java
+END
+LoginService.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/service/LoginService.java
+END
+CodeService.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/repos_edims/!svn/ver/126/trunk/src/mr/src/main/java/com/mr/common/service/CodeService.java
+END
+EmpAndTeamService.java
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/repos_edims/!svn/ver/66/trunk/src/mr/src/main/java/com/mr/common/service/EmpAndTeamService.java
+END
+SsoLoginCheckService.java
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/service/SsoLoginCheckService.java
+END

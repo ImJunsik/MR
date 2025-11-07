@@ -1,0 +1,486 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.mrReq">
+    <resultMap id="mrReqMap" type="com.mr.mrrq.domain.MRrqRegisterVO">
+        <id property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrTmpNo" column="MR_TMP_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="plant" column="PLANT" />
+        <result property="plantNm" column="PLANT_NM" />
+        <result property="reqClCd" column="REQ_CL_CD" />
+        <result property="reqClNm" column="REQ_CL_NM" />
+        <result property="reqClDtlCd" column="REQ_CL_DTL_CD" />
+        <result property="reqClDtlNm" column="REQ_CL_DTL_NM" />
+        <result property="workPsblClCd" column="WORK_PSBL_CL_CD" />
+        <result property="workPsblClNm" column="WORK_PSBL_CL_NM" />
+        <result property="workPsblDt" column="WORK_PSBL_DT" />
+        <result property="workPsblClRsn" column="WORK_PSBL_CL_RSN" />
+        <result property="rigionCd" column="RIGION_CD" />
+        <result property="issueCtt" column="ISSUE_CTT" />
+        <result property="inflnceLoss" column="INFLNCE_LOSS" />
+        <result property="incnvCtt" column="INCNV_CTT" />
+        <result property="useCnt" column="USE_CNT" />
+        <result property="useCntPrd" column="USE_CNT_PRD" />
+        <result property="imprvPrpslCtt" column="IMPRV_PRPSL_CTT" />
+        <result property="qualEptEftCtt" column="QUAL_EPT_EFT_CTT" />
+        <result property="quanEptEftCtt" column="QUAN_EPT_EFT_CTT" />
+        <result property="quanEptEftCd" column="QUAN_EPT_EFT_CD" />
+        <result property="cnclEmpNo" column="CNCL_EMP_ID" />
+        <result property="cnclDt" column="CNCL_DT" />
+        <result property="cnclRsnCtt" column="CNCL_RSN_CTT" />
+        <result property="safetyChkDt" column="SAFETY_CHK_DT" />
+        <result property="safetyChkLoc" column="SAFETY_CHK_LOC" />
+        <result property="invstCostNo" column="INVST_COST_NO" />
+        <result property="capexNo" column="CAPEX_NO" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <collection property="issues" ofType="com.mr.mrrq.domain.MrReqIssueReformVO" column="MR_REQ_NO" select="selectMrReqIssue" />
+        <collection property="equips" ofType="com.mr.mrrq.domain.MrReqEquipVO" column="MR_REQ_NO" select="selectMrReqEquip" />
+        <collection property="procs" ofType="com.mr.mrrq.domain.MrReqProcVO" column="MR_REQ_NO" select="selectMrReqProc" />
+        <collection property="appLine" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD} " select="mr.step.selectAppLine" />
+    </resultMap>
+    <!-- mr요청서 조회  -->
+    <!-- wj:mr 임시번호 조회로직 추가  -->
+    <select id="selectMrReq" resultMap="mrReqMap">
+    --mr요청서조회(selectMrReq)
+         SELECT MR.MR_REQ_NO,
+                MR.MR_REQ_TITLE,
+                MR.MR_NO,
+                MR.MR_TMP_NO,
+                'Z0010' AS MR_STEP_CD,
+                MR.PROC_ST_CD,
+                MR.PLANT,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD REQ_CD
+                  WHERE MR_COMM_GRP_CD(+) = 'PLANT' AND MR_COMM_CD = MR.PLANT ) PLANT_NM,
+                MR.REQ_CL_CD,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD REQ_CD
+                  WHERE MR_COMM_GRP_CD(+) = 'REQ' AND MR_COMM_CD = MR.REQ_CL_CD ) REQ_CL_NM,
+                MR.REQ_CL_DTL_CD,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD REQ_CD
+                  WHERE MR_COMM_GRP_CD(+) = 'REQ_DET' AND MR_COMM_CD = MR.REQ_CL_DTL_CD ) REQ_CL_DTL_NM,
+                MR.WORK_PSBL_CL_CD,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD REQ_CD
+                  WHERE MR_COMM_GRP_CD(+) = 'WORK' AND MR_COMM_CD = MR.WORK_PSBL_CL_CD ) WORK_PSBL_CL_NM,
+                MR.WORK_PSBL_DT,
+                MR.WORK_PSBL_CL_RSN,
+                MR.RIGION_CD,
+                MR.ISSUE_CTT,
+                MR.INFLNCE_LOSS,
+                MR.INCNV_CTT,
+                MR.USE_CNT,
+                MR.USE_CNT_PRD,
+                MR.IMPRV_PRPSL_CTT,
+                MR.QUAL_EPT_EFT_CTT,
+                MR.QUAN_EPT_EFT_CTT,
+                MR.QUAN_EPT_EFT_CD,
+                MR.CNCL_EMP_ID,
+                MR.CNCL_DT,
+                MR.CNCL_RSN_CTT,
+                MR.SAFETY_CHK_DT,
+                MR.SAFETY_CHK_LOC,
+                MR.INVST_COST_NO,
+                MR.CAPEX_NO,
+                MR.DEL_YN,
+                MR.FST_RGST_DT,
+                MR.FST_RGSTR,
+                MR.LAST_CHG_DT,
+                MR.LAST_CHGR
+           FROM MR_REQ_MST MR
+          WHERE MR.MR_REQ_NO = #{mrReqNo}
+            AND MR.DEL_YN=0
+    </select>
+
+    <update id="updateMakeMrNo" parameterType="int">
+             UPDATE MR_REQ_MST
+                SET MR_NO = (SELECT TO_CHAR(SYSDATE,'YYYY') || LPAD(TO_NUMBER(NVL(SUBSTR(MAX(MR_NO),-4),0))+1,4,'0')
+                               FROM MR_REQ_MST
+                              WHERE SUBSTR(MR_NO, 0, 4) = TO_CHAR(SYSDATE,'YYYY')
+                                AND DEL_YN = 0)
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN = 0
+    </update>
+
+
+    <update id="updateHazopAndPorc" parameterType="map">
+             UPDATE MR_REQ_MST
+                SET HAZOP_ACT_YN = #{hazopActYn},
+                    PORC_ACT_YN = #{porcActYn}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN = 0
+    </update>
+
+    <insert id="insertMrReq" parameterType="com.mr.mrrq.domain.MRrqRegisterVO">
+        <selectKey keyProperty="mrReqNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_NO),0)+1
+              FROM MR_REQ_MST
+        </selectKey>
+        INSERT INTO MR_REQ_MST(
+                    MR_REQ_NO,
+                    MR_REQ_TITLE,
+                    MR_NO,
+                    MR_TMP_NO,
+                    PLANT,
+                    REQ_CL_CD,
+                    REQ_CL_DTL_CD,
+                    WORK_PSBL_CL_CD,
+                    WORK_PSBL_DT,
+                    WORK_PSBL_CL_RSN,
+                    RIGION_CD,
+                    ISSUE_CTT,
+                    INFLNCE_LOSS,
+                    INCNV_CTT,
+                    USE_CNT,
+                    USE_CNT_PRD,
+                    IMPRV_PRPSL_CTT,
+                    QUAL_EPT_EFT_CTT,
+                    QUAN_EPT_EFT_CTT,
+                    QUAN_EPT_EFT_CD,
+                    CNCL_EMP_ID,
+                    CNCL_DT,
+                    CNCL_RSN_CTT,
+                    SAFETY_CHK_DT,
+                    SAFETY_CHK_LOC,
+                    INVST_COST_NO,
+                    CAPEX_NO,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqNo},
+                        #{mrReqTitle},
+                        #{mrNo},
+                        (SELECT 'TM' || TO_CHAR(SYSDATE,'YY') || LPAD(TO_NUMBER(NVL(SUBSTR(MAX(MR_TMP_NO),-4),0))+1,4,'0')
+                           FROM MR_REQ_MST
+                          WHERE SUBSTR(MR_TMP_NO, 3, 2) = TO_CHAR(SYSDATE,'YY')), --MR 임시번호 채번
+                        #{plant},
+                        #{reqClCd},
+<!-- 기존 REQ_CL_CD 등록...왜 이렇게??  
+                       (SELECT MR_COMM_CD
+                           FROM MR_COMM_COD
+                          WHERE MR_COMM_GRP_CD = 'REQ'
+                            AND MR_COMM_CD = ( SELECT DIV_1
+                                                 FROM MR_COMM_COD
+                                                WHERE MR_COMM_GRP_CD = 'REQ_DET'
+                                                  AND MR_COMM_CD = #{reqClDtlCd})),
+ -->                    
+                        #{reqClDtlCd},
+                        #{workPsblClCd},
+                        #{workPsblDt},
+                        #{workPsblClRsn},
+                        #{rigionCd},
+                        #{issueCtt},
+                        #{inflnceLoss},
+                        #{incnvCtt},
+                        #{useCnt},
+                        #{useCntPrd},
+                        #{imprvPrpslCtt},
+                        #{qualEptEftCtt},
+                        #{quanEptEftCtt},
+                        #{quanEptEftCd},
+                        #{cnclEmpNo},
+                        #{cnclDt},
+                        #{cnclRsnCtt},
+                        #{safetyChkDt},
+                        #{safetyChkLoc},
+                        #{invstCostNo},
+                        #{capexNo},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <update id="updateMrReq" parameterType="map">
+             UPDATE MR_REQ_MST
+                SET MR_REQ_TITLE = #{mrReqTitle},
+                    PLANT = #{plant},
+                    REQ_CL_CD = #{reqClCd},
+<!--                     REQ_CL_CD = (SELECT MR_COMM_CD
+                                   FROM MR_COMM_COD
+                                  WHERE MR_COMM_GRP_CD = 'REQ'
+                                    AND MR_COMM_CD = ( SELECT DIV_1
+                                                         FROM MR_COMM_COD
+                                                        WHERE MR_COMM_GRP_CD = 'REQ_DET'
+                                                          AND MR_COMM_CD = #{reqClDtlCd})),
+ -->                
+                    REQ_CL_DTL_CD = #{reqClDtlCd},
+                    WORK_PSBL_CL_CD = #{workPsblClCd},
+                    WORK_PSBL_DT = #{workPsblDt},
+                    WORK_PSBL_CL_RSN = #{workPsblClRsn},
+                    RIGION_CD = #{rigionCd},
+                    ISSUE_CTT = #{issueCtt},
+                    INFLNCE_LOSS = #{inflnceLoss},
+                    INCNV_CTT = #{incnvCtt},
+                    USE_CNT = #{useCnt},
+                    USE_CNT_PRD = #{useCntPrd},
+                    IMPRV_PRPSL_CTT = #{imprvPrpslCtt},
+                    QUAL_EPT_EFT_CTT = #{qualEptEftCtt},
+                    QUAN_EPT_EFT_CTT = #{quanEptEftCtt},
+                    QUAN_EPT_EFT_CD = #{quanEptEftCd},
+                    CNCL_EMP_ID = #{cnclEmpNo},
+                    CNCL_DT = #{cnclDt},
+                    CNCL_RSN_CTT = #{cnclRsnCtt},
+                    SAFETY_CHK_DT = #{safetyChkDt},
+                    SAFETY_CHK_LOC = #{safetyChkLoc},
+                    INVST_COST_NO = #{invstCostNo},
+                    CAPEX_NO = #{capexNo},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+    </update>
+
+    <update id="updateMrReqTitle" parameterType="map">
+             UPDATE MR_REQ_MST
+                SET MR_REQ_TITLE = #{mrReqTitle},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN=0
+    </update>
+
+    <update id="updateMrReqStep" parameterType="map">
+    --updateMrReqStep(마스터 테이블 STEP 업데이트)
+             UPDATE MR_REQ_MST
+                SET MR_STEP_CD = #{mrStepCd},
+                    PROC_ST_CD = #{procStCd},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN = 0
+    </update>
+
+    <update id="updateMrReqDelYn" parameterType="map">
+        UPDATE MR_REQ_MST
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+    <resultMap id="mrReqIssueMap" type="com.mr.mrrq.domain.MrReqIssueReformVO">
+        <id property="mrReqIssueReformNo" column="MR_REQ_ISSUE_REFORM_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="issueCd" column="ISSUE_CD" />
+        <result property="issueCtt" column="ISSUE_CTT" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMrReqIssue" resultMap="mrReqIssueMap">
+        SELECT MR_REQ_ISSUE_REFORM_NO,
+               MR_REQ_NO,
+               ISSUE_CD,
+               ISSUE_CTT,
+               DEL_YN,
+               FST_RGST_DT,
+               FST_RGSTR,
+               LAST_CHG_DT,
+               LAST_CHGR
+          FROM MR_REQ_ISSUE_REFORM
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <insert id="insertMrReqIssue" parameterType="com.mr.mrrq.domain.MrReqIssueReformVO">
+        <selectKey keyProperty="mrReqIssueReformNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_ISSUE_REFORM_NO),0)+1
+              FROM MR_REQ_ISSUE_REFORM
+        </selectKey>
+        INSERT INTO MR_REQ_ISSUE_REFORM(
+                    MR_REQ_ISSUE_REFORM_NO,
+                    MR_REQ_NO,
+                    ISSUE_CD,
+                    ISSUE_CTT,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqIssueReformNo},
+                        #{mrReqNo},
+                        #{issueCd},
+                        #{issueCtt},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <update id="updateMrReqIssueDelYn" parameterType="map">
+        UPDATE MR_REQ_ISSUE_REFORM
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+
+    <resultMap id="mrEquipMap" type="com.mr.mrrq.domain.MrReqEquipVO">
+        <id property="mrReqEquipNo" column="MR_REQ_EQUIP_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrProcNo" column="MR_PROC_NO" />
+        <result property="mrEquipCd" column="MR_EQUIP_CD" />
+        <result property="mrEquipName" column="MR_EQUIP_NAME" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMrReqEquip" resultMap="mrEquipMap">
+        SELECT MR_REQ_EQUIP_NO,
+               MR_REQ_NO,
+               MR_PROC_NO,
+               MR_EQUIP_CD,
+               MST.EQKTX AS MR_EQUIP_NAME,
+               DEL_YN,
+               FST_RGST_DT,
+               FST_RGSTR,
+               LAST_CHG_DT,
+               LAST_CHGR
+          FROM MR_REQ_EQUIP EQUIP,
+               SAP_EQUIP MST
+         WHERE EQUIP.MR_EQUIP_CD = MST.EQUNR
+           AND MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <insert id="insertMrReqEquip" parameterType="com.mr.mrrq.domain.MrReqEquipVO">
+        <selectKey keyProperty="mrReqEquipNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_EQUIP_NO),0)+1
+              FROM MR_REQ_EQUIP
+        </selectKey>
+        INSERT INTO MR_REQ_EQUIP(
+                    MR_REQ_EQUIP_NO,
+                    MR_REQ_NO,
+                    MR_PROC_NO,
+                    MR_EQUIP_CD,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqEquipNo},
+                        #{mrReqNo},
+                        #{mrProcNo},
+                        #{mrEquipCd},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo})
+    </insert>
+
+    <update id="updateMrReqEquipDelYn" parameterType="map">
+        UPDATE MR_REQ_EQUIP
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+    <resultMap id="mrProcMap" type="com.mr.mrrq.domain.MrReqProcVO">
+        <id property="mrReqProcNo" column="MR_REQ_PROC_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrProcNo" column="MR_PROC_NO" />
+        <result property="mrProcName" column="MR_PROC_NAME" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMrReqProc" resultMap="mrProcMap">
+        SELECT MR_REQ_PROC_NO,
+               MR_REQ_NO,
+               MR_PROC_NO,
+               MST.KTEXT AS MR_PROC_NAME,
+               DEL_YN,
+               FST_RGST_DT,
+               FST_RGSTR,
+               LAST_CHG_DT,
+               LAST_CHGR
+          FROM MR_REQ_PROC PROC,
+               (SELECT STAND, KTEXT FROM SAP_LOCA WHERE WERKS=(SELECT PLANT FROM MR_REQ_MST WHERE MR_REQ_NO=#{mrReqNo} )) MST
+         WHERE PROC.MR_PROC_NO = MST.STAND
+           AND MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <insert id="insertMrReqProc" parameterType="com.mr.mrrq.domain.MrReqProcVO">
+        <selectKey keyProperty="mrReqProcNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_PROC_NO),0)+1
+              FROM MR_REQ_PROC
+        </selectKey>
+        INSERT INTO MR_REQ_PROC(
+                    MR_REQ_PROC_NO,
+                    MR_REQ_NO,
+                    MR_PROC_NO,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqProcNo},
+                        #{mrReqNo},
+                        #{mrProcNo},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo})
+    </insert>
+
+    <update id="updateMrReqProcDelYn" parameterType="map">
+        UPDATE MR_REQ_PROC
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateEdimsFileInfo" parameterType="map">
+        UPDATE EDM_DOC
+           SET MR_CODE = (SELECT MR_NO
+                            FROM MR_REQ_MST
+                           WHERE MR_REQ_NO = #{mrReqNo}
+                             AND DEL_YN = 0),
+               COM_CODE = (SELECT PLANT
+                             FROM MR_REQ_MST
+                            WHERE MR_REQ_NO = #{mrReqNo}
+                              AND DEL_YN = 0)
+         WHERE DOC_SEQ IN
+         <foreach item="file" index="index" collection="mrAtchFiles" open="(" separator="," close=")">
+                #{file.drawMngNo}
+         </foreach>
+    </update>
+
+    <!-- 상신 -->
+     <update id="updateMrIfStat" parameterType="map">
+      UPDATE MR_REQ_CHRGR_CHG_HIST
+	     SET IF_NAME = ''
+	   WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+	     AND MR_REQ_NO   = #{connkey}
+	     AND CHRGR_CL_CD = 'Z02A'
+	     AND EFF_END_DTM &lt;&gt; '99991231235959' 
+    </update>    
+
+</mapper>

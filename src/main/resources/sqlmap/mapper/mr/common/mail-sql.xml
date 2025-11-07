@@ -1,0 +1,245 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.mail">
+    <resultMap id="mailMap" type="com.mr.step.domain.MrMailVO">
+        <result property="mrReqNo" column= "MR_REQ_NO" />
+        <result property="mrNo" column= "MR_NO" />
+        <result property="mrReqTitle" column= "MR_REQ_TITLE" />
+        <result property="cnclRsnCtt" column= "CNCL_RSN_CTT" />
+        <result property="safetyChkDt" column= "SAFETY_CHK_DT" />
+        <result property="safetyChkLoc" column= "SAFETY_CHK_LOC" />
+        <result property="mrStepCd" column= "MR_STEP_CD" />
+        <result property="procStCd" column= "PROC_ST_CD" />
+        <result property="mrStepName" column= "MR_STEP_NAME" />
+        <result property="procStName" column= "PROC_ST_NAME" />
+
+    </resultMap>
+
+    <select id="selectMrMailInfo" resultMap="mailMap">
+            SELECT MR.MR_REQ_NO,
+                   NVL(MR.MR_NO,MR.MR_TMP_NO) AS MR_NO,
+                   MR.MR_REQ_TITLE,                   
+                   MR.CNCL_RSN_CTT,
+                   TO_CHAR(MR.SAFETY_CHK_DT,'YYYY.MM.DD HH24:MI') SAFETY_CHK_DT,
+                   MR.SAFETY_CHK_LOC,
+                   STEP.MR_STEP_CD,
+                   STEP.PROC_ST_CD,
+                   MRC.MR_COMM_NM   AS MR_STEP_NAME,
+                   PROCC.MR_COMM_NM AS PROC_ST_NAME
+              FROM MR_REQ_MST MR,
+                   MR_REQ_PROC_STEP STEP,
+                   MR_COMM_COD MRC,
+                   MR_COMM_COD PROCC
+             WHERE MR.MR_REQ_NO = STEP.MR_REQ_NO
+               AND STEP.MR_STEP_CD = MRC.MR_COMM_CD
+               AND STEP.PROC_ST_CD = PROCC.MR_COMM_CD
+               AND STEP.EFF_END_DTM = '99991231235959'
+               AND MR.MR_REQ_NO = #{mrReqNo}
+               AND MRC.MR_COMM_GRP_CD = 'MR_PROC'
+               AND PROCC.MR_COMM_GRP_CD = 'MR_PROC'
+               AND STEP.DEL_YN = 0
+               AND MR.DEL_YN = 0
+               AND ROWNUM = 1
+    </select>
+    
+    <select id="selectMrTitle" resultMap="mailMap">
+            SELECT MR_REQ_NO,
+                   MR_NO,
+                   MR_REQ_TITLE
+              FROM MR_REQ_MST
+             WHERE MR_REQ_NO = #{mrReqNo}
+               AND DEL_YN = 0
+    </select>
+
+    <select id="selectEmailAddr" resultType="map">
+            SELECT EMP_EMAIL
+              FROM EDM_EMP
+             WHERE EMP_ID IN
+          <foreach item="to" index="index" collection="tos" open="(" separator="," close=")">
+                #{to.value}
+         </foreach>
+    </select>
+    
+    <select id="selectIncompleteEmailAddr" parameterType="string" resultMap="limitDateMailMap">
+            SELECT EMP_EMAIL, CHRG_EMAIL AS SUGG, G.CHRG_TEAM_NM AS THDAY_POS, G.CHRG_TEAM_NO AS CHRG_TEAM_NO FROM EDM_EMP E, MR_MAIL_ADD G WHERE E.ORG_ID = G.CHRG_TEAM_NO AND ORG_ID = #{tos} AND E.USE_YN = 'Y' AND G.CHRG_ACTIVE = 'A'
+    </select>
+  
+	<select id="selectCapexNo" parameterType="string" resultType="string">
+            SELECT CAPEX_NO from MR_REQ_MST WHERE MR_REQ_NO = #{tos}
+    </select>
+
+    <resultMap id="limitDateMailMap" type="com.mr.step.domain.ChrgrChgHist">
+        <id property="mrReqProcStepDetNo" column="MR_REQ_PROC_STEP_DET_NO" />
+        <result property="mrReqProcStepNo" column="MR_REQ_PROC_STEP_NO" />
+        <result property="chrgrClCd" column="CHRGR_CL_CD" />
+        <result property="effEndDtm" column="EFF_END_DTM" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="fstProcTrmDt" column="FST_PROC_TRM_DT" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="empEmail" column="EMP_EMAIL" />
+        <result property="chrgTeamNo" column="CHRG_TEAM_NO" />
+        <result property="chrgEmpNo" column="CHRG_EMP_NO" />
+        <result property="chrgEmpName" column="CHRG_EMP_NAME" />
+        <result property="aprvChgYn" column="APRV_CHG_YN" />
+        <result property="thdayTeam" column="THDAY_TEAM" />
+        <result property="thdayPos" column="THDAY_POS" />
+        <result property="jobRvCd" column="JOB_RV_CD" />
+        <result property="sugg" column="SUGG" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectLimitDateMail" resultMap="limitDateMailMap">
+    --메일셋(승인기한을 넘긴 메일발송)
+  SELECT MR.MR_NO,DET.MR_REQ_NO, DET.MR_REQ_PROC_STEP_DET_NO,
+       STEP.MR_STEP_CD,
+       STEP.PROC_ST_CD,
+       HIST.CHRGR_CL_CD,
+       HIST.CHRG_EMP_NO,
+       EMP.EMP_NAME AS CHRG_EMP_NAME,
+       EMP.EMP_EMAIL,
+       DET.FST_PROC_TRM_DT
+  FROM MR_REQ_MST MR,
+       MR_REQ_PROC_STEP STEP,
+       MR_REQ_CHRGR_CHG_HIST HIST,
+       MR_REQ_PROC_STEP_DET DET,
+       (SELECT DET.MR_REQ_NO, STEP.MR_REQ_PROC_STEP_NO, MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+           AND STEP.MR_STEP_CD NOT IN ('Z0040','Z0050','Z0060','Z00Z0','Z0070')
+           AND STEP.PROC_ST_CD NOT IN ('Z0141','Z0143')
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND DET.FST_PROC_TRM_DT IS NOT NULL
+           AND STEP.EFF_END_DTM = '99991231235959'
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND STEP.DEL_YN = 0
+           AND DET.DEL_YN=0
+           AND HIST.DEL_YN=0
+      GROUP BY DET.MR_REQ_NO, STEP.MR_REQ_PROC_STEP_NO
+      UNION ALL  -- 직무검토자
+        SELECT DET.MR_REQ_NO, STEP.MR_REQ_PROC_STEP_NO, DET.MR_REQ_PROC_STEP_DET_NO AS MR_REQ_PROC_STEP_DET_NO
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+--           AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+           AND STEP.MR_STEP_CD = 'Z0040'
+           AND STEP.PROC_ST_CD NOT IN ('Z0141','Z0143')
+           AND DET.MR_STEP_CD  NOT IN ('Z00P0','Z00R0')   /**P*/
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND DET.FST_PROC_TRM_DT IS NOT NULL
+           AND STEP.EFF_END_DTM = '99991231235959'
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND STEP.DEL_YN = 0
+           AND DET.DEL_YN=0
+           AND HIST.DEL_YN=0
+           AND NOT EXISTS (SELECT *
+                             FROM MR_RV_RST RST
+                            WHERE RST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                              AND RST.CL_CD_01 <![CDATA[ <>]]> ' '
+                              AND RST.ITEM_CD  = 'JOBS'
+                              AND RST.DEL_YN   = '0')
+      UNION ALL  -- PORC 위원회
+        SELECT DET.MR_REQ_NO, STEP.MR_REQ_PROC_STEP_NO, DET.MR_REQ_PROC_STEP_DET_NO AS MR_REQ_PROC_STEP_DET_NO
+          FROM MR_REQ_MST MST,
+               MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_REQ_NO = MST.MR_REQ_NO
+           AND MST.PORC_ACT_YN = 'Y'
+--           AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+           AND STEP.MR_STEP_CD = 'Z0040'
+           AND STEP.PROC_ST_CD NOT IN ('Z0141','Z0143')
+           AND DET.MR_STEP_CD  = 'Z00P0'   /**P*/
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND DET.FST_PROC_TRM_DT IS NOT NULL
+           AND STEP.EFF_END_DTM = '99991231235959'
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND STEP.DEL_YN = 0
+           AND DET.DEL_YN=0
+           AND HIST.DEL_YN=0
+           AND NOT EXISTS (SELECT *
+                             FROM MR_RV_RST RST
+                            WHERE RST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                              AND RST.CL_CD_01  <![CDATA[ <>]]> ' '
+                              AND RST.ITEM_CD   = 'PORC'
+                              AND RST.DEL_YN    = '0') 
+      UNION ALL  -- 위험성 검토 승인자
+        SELECT DET.MR_REQ_NO, STEP.MR_REQ_PROC_STEP_NO, MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND STEP.MR_STEP_CD = 'Z0040'
+           AND STEP.PROC_ST_CD NOT IN ('Z0141','Z0143')
+           AND DET.FST_PROC_TRM_DT IS NOT NULL
+           AND STEP.EFF_END_DTM = '99991231235959'
+           AND STEP.DEL_YN = 0
+           AND DET.DEL_YN=0
+           AND EXISTS
+                   (SELECT DET1.MR_REQ_PROC_STEP_DET_NO
+                      FROM MR_REQ_PROC_STEP_DET DET1,
+                           MR_REQ_CHRGR_CHG_HIST HIST1
+                     WHERE DET.MR_REQ_PROC_STEP_DET_NO  = DET1.MR_REQ_PROC_STEP_DET_NO
+                       AND DET1.MR_REQ_PROC_STEP_DET_NO = HIST1.MR_REQ_PROC_STEP_DET_NO
+                       AND DET1.MR_STEP_CD  =  'Z00R0' /**P*/
+                       AND DET1.FST_PROC_TRM_DT IS NOT NULL
+--                       AND DET1.MR_REQ_NO =  4664 /**P*/
+                       AND HIST1.EFF_END_DTM = '99991231235959'
+                       AND DET1.DEL_YN  = 0
+                       AND HIST1.DEL_YN = 0 )
+        GROUP BY DET.MR_REQ_NO, STEP.MR_REQ_PROC_STEP_NO )GRP_MR_INFO,
+       EDM_EMP EMP
+WHERE 1 = 1
+   AND MR.MR_STEP_CD NOT IN ('Z0050','Z0060','Z00Z0','Z0070')
+   AND MR.PROC_ST_CD NOT IN ('Z0141','Z0143')
+   AND MR.MR_REQ_NO  NOT IN (SELECT MR_REQ_NO FROM MR_REQ_MST MR WHERE MR.MR_STEP_CD = 'Z0080' AND MR.PROC_ST_CD = 'Z0121')
+   AND MR.DEL_YN   = 0
+   AND STEP.DEL_YN = 0
+   AND HIST.DEL_YN = 0
+--   AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+   AND STEP.MR_STEP_CD  <![CDATA[ <>]]> 'Z00Z0'
+   AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+   AND MR.MR_REQ_NO     = GRP_MR_INFO.MR_REQ_NO
+   AND STEP.MR_REQ_NO   = GRP_MR_INFO.MR_REQ_NO
+   AND DET.MR_REQ_NO    = GRP_MR_INFO.MR_REQ_NO
+   AND DET.MR_REQ_PROC_STEP_DET_NO  = GRP_MR_INFO.MR_REQ_PROC_STEP_DET_NO
+   AND DET.MR_REQ_PROC_STEP_NO      = STEP.MR_REQ_PROC_STEP_NO
+   AND HIST.MR_REQ_PROC_STEP_DET_NO = GRP_MR_INFO.MR_REQ_PROC_STEP_DET_NO
+   AND DET.FST_PROC_TRM_DT <![CDATA[ < ]]> SYSDATE
+   AND DET.MR_REQ_NO NOT IN (SELECT MR_REQ_NO
+                               FROM MR_REQ_MST
+                              WHERE MR_NO >= 50000000
+                                AND DEL_YN=0)
+ORDER BY MR.MR_NO
+		
+    </select>
+
+    <insert id="insertMailLog" parameterType="com.mr.step.domain.MrMailVO">
+        INSERT INTO MR_MAIL_LOG(
+                    S_DATE,
+                    TYPE,
+                    RESULT_MSG,
+                    RESULT,
+                    DESTINATION,
+                    TRY_COUNT,
+                    NOTE,
+                    NUM
+             ) VALUES ( SYSDATE,
+                        #{mrNo},
+                        #{content},
+                        #{mrReqNo},
+                        #{to},
+                        0,
+                        #{mailTitle},
+                        #{safetyChkLoc})
+    </insert>
+</mapper>

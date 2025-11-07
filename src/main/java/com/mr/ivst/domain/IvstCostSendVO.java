@@ -1,0 +1,191 @@
+package com.mr.ivst.domain;
+
+import com.base.domain.Domain;
+
+/**
+ * 투자지출 품의서 발송 도메인
+ *
+ * @author 조상욱
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.08.05 조상욱 최초 작성
+ * </pre>
+ */
+
+public class IvstCostSendVO extends Domain {
+
+    private String mngAccount;
+    private String invstYear;
+    private String respTeamCd;
+    private String mrReqTitle;
+    private String costTeamCd;
+    private String invstCd;
+    private String invstPurpCd;
+    private String mrProcNo;
+    private String plant;
+    private String regionCd;
+    private String propClass;
+    private String invstStaDt;
+    private String invstEndDt; 
+    private String invstManNo;
+    private String sapSender;
+    private String waers;
+    private String sapSendDt;
+    private String mngAnalEmpNo;
+    private String mrNo;
+    private String bizPurpSurr;
+    private String imprvPlan;
+    private String eptEft;
+    private String zoutqty;
+    private String zoutamt;
+
+    public String getMngAccount() {
+        return mngAccount;
+    }
+    public void setMngAccount(String mngAccount) {
+        this.mngAccount = mngAccount;
+    }
+    public String getInvstYear() {
+        return invstYear;
+    }
+    public void setInvstYear(String invstYear) {
+        this.invstYear = invstYear;
+    }
+    public String getRespTeamCd() {
+        return respTeamCd;
+    }
+    public void setRespTeamCd(String respTeamCd) {
+        this.respTeamCd = respTeamCd;
+    }
+    public String getMrReqTitle() {
+        return mrReqTitle;
+    }
+    public void setMrReqTitle(String mrReqTitle) {
+        this.mrReqTitle = mrReqTitle;
+    }
+    public String getCostTeamCd() {
+        return costTeamCd;
+    }
+    public void setCostTeamCd(String costTeamCd) {
+        this.costTeamCd = costTeamCd;
+    }
+    public String getInvstCd() {
+        return invstCd;
+    }
+    public void setInvstCd(String invstCd) {
+        this.invstCd = invstCd;
+    }
+    public String getInvstPurpCd() {
+        return invstPurpCd;
+    }
+    public void setInvstPurpCd(String invstPurpCd) {
+        this.invstPurpCd = invstPurpCd;
+    }
+    public String getMrProcNo() {
+        return mrProcNo;
+    }
+    public void setMrProcNo(String mrProcNo) {
+        this.mrProcNo = mrProcNo;
+    }
+    public String getPlant() {
+        return plant;
+    }
+    public void setPlant(String plant) {
+        this.plant = plant;
+    }
+    public String getRegionCd() {
+        return regionCd;
+    }
+    public void setRegionCd(String regionCd) {
+        this.regionCd = regionCd;
+    }
+    public String getPropClass() {
+        return propClass;
+    }
+    public void setPropClass(String propClass) {
+        this.propClass = propClass;
+    }
+    public String getInvstStaDt() {
+        return invstStaDt;
+    }
+    public void setInvstStaDt(String invstStaDt) {
+        this.invstStaDt = invstStaDt;
+    }
+    public String getInvstEndDt() {
+        return invstEndDt;
+    }
+    public void setInvstEndDt(String invstEndDt) {
+        this.invstEndDt = invstEndDt;
+    }
+    public String getInvstManNo() {
+        return invstManNo;
+    }
+    public void setInvstManNo(String invstManNo) {
+        this.invstManNo = invstManNo;
+    }
+    public String getSapSender() {
+        return sapSender;
+    }
+    public void setSapSender(String sapSender) {
+        this.sapSender = sapSender;
+    }
+    public String getWaers() {
+        return waers;
+    }
+    public void setWaers(String waers) {
+        this.waers = waers;
+    }
+    public String getSapSendDt() {
+        return sapSendDt;
+    }
+    public void setSapSendDt(String sapSendDt) {
+        this.sapSendDt = sapSendDt;
+    }
+    public String getMngAnalEmpNo() {
+        return mngAnalEmpNo;
+    }
+    public void setMngAnalEmpNo(String mngAnalEmpNo) {
+        this.mngAnalEmpNo = mngAnalEmpNo;
+    }
+    public String getMrNo() {
+        return mrNo;
+    }
+    public void setMrNo(String mrNo) {
+        this.mrNo = mrNo;
+    }
+    public String getBizPurpSurr() {
+        return bizPurpSurr;
+    }
+    public void setBizPurpSurr(String bizPurpSurr) {
+        this.bizPurpSurr = bizPurpSurr;
+    }
+    public String getImprvPlan() {
+        return imprvPlan;
+    }
+    public void setImprvPlan(String imprvPlan) {
+        this.imprvPlan = imprvPlan;
+    }
+    public String getEptEft() {
+        return eptEft;
+    }
+    public void setEptEft(String eptEft) {
+        this.eptEft = eptEft;
+    }
+	public String getZoutqty() {
+		return zoutqty;
+	}
+	public void setZoutqty(String zoutqty) {
+		this.zoutqty = zoutqty;
+	}
+	public String getZoutamt() {
+		return zoutamt;
+	}
+	public void setZoutamt(String zoutamt) {
+		this.zoutamt = zoutamt;
+	}
+
+
+}

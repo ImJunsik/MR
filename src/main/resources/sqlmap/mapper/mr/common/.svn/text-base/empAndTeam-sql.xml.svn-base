@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common.empAndTeam">
+    <resultMap id="empMap" type="com.mr.common.domain.EmpInfoVo">
+        <result property="empNo" column="EMP_iD" />
+        <result property="empName" column="EMP_NAME" />
+        <result property="dutyNo" column="DUTY_ID" />
+        <result property="dutyName" column="DUTY_NAME" />
+        <result property="teamNo" column="ORG_ID" />
+        <result property="teamName" column="ORG_NAME" />
+        <result property="empEmail" column="EMP_EMAIL" />
+
+    </resultMap>
+    <select id="loginCheck" resultMap="empMap">
+        SELECT EMP.EMP_ID,
+               EMP.EMP_NAME,
+               DUTY.DUTY_ID,
+               DUTY.DUTY_NAME,
+               ORG.ORG_ID,
+               ORG.ORG_NAME
+          FROM EDM_EMP EMP,
+               EDM_DUTY DUTY,
+               EDM_ORG  ORG
+         WHERE EMP.DUTY_ID = DUTY.DUTY_ID
+           AND EMP.ORG_ID = ORG.ORG_ID
+           AND EMP.EMP_ID = #{empNo}
+           AND UPPER(EMP.EMP_PW) = UPPER(#{passwd})
+           AND EMP.AUTH_END_DATE >= SYSDATE
+
+    </select>
+
+    <select id="getEmp" resultMap="empMap">
+        SELECT EMP.EMP_ID,
+               EMP.EMP_NAME,
+               EMP.EMP_EMAIL,
+               DUTY.DUTY_ID,
+               DUTY.DUTY_NAME,
+               ORG.ORG_ID,
+               ORG.ORG_NAME
+          FROM EDM_EMP EMP,
+               EDM_DUTY DUTY,
+               EDM_ORG  ORG
+         WHERE EMP.DUTY_ID = DUTY.DUTY_ID
+           AND EMP.ORG_ID = ORG.ORG_ID
+           AND EMP.EMP_ID = #{empNo}
+           AND EMP.AUTH_END_DATE >= SYSDATE
+    </select>
+
+    <select id="empSearch" resultMap="empMap">
+        SELECT EMP.EMP_ID,
+               EMP.EMP_NAME
+               || (SELECT '(부재중)'
+                                FROM MR_COMM_COD
+                               WHERE MR_COMM_GRP_CD = 'EMP_PROXY'
+                                 AND MR_COMM_CD = EMP.EMP_ID
+                                 AND DIV_2 >= TO_CHAR(SYSDATE,'YYYYMMDD')
+                                 AND DEL_YN = 0)
+               || (SELECT '(업무대행)'
+                                FROM MR_COMM_COD
+                               WHERE MR_COMM_GRP_CD = 'EMP_PROXY'
+                                 AND SAP_CD = EMP.EMP_ID
+                                 AND DIV_2 >= TO_CHAR(SYSDATE,'YYYYMMDD')
+                                 AND DEL_YN = 0)
+               AS EMP_NAME,
+               DUTY.DUTY_ID,
+               DUTY.DUTY_NAME,
+               ORG.ORG_ID,
+               ORG.ORG_NAME
+          FROM EDM_EMP  EMP,
+               EDM_DUTY DUTY,
+               EDM_ORG  ORG
+         WHERE EMP.DUTY_ID = DUTY.DUTY_ID
+           AND EMP.ORG_ID = ORG.ORG_ID
+           
+       <if test="empName != null">
+           AND (UPPER(EMP.EMP_NAME) LIKE UPPER('%'||#{empName}||'%')
+            OR  EMP.EMP_ID = (SELECT SAP_CD
+                                FROM MR_COMM_COD
+                               WHERE MR_COMM_GRP_CD = 'EMP_PROXY'
+                                 AND MR_COMM_NM LIKE UPPER('%'||#{empName}||'%')
+                                 AND DIV_2 >= TO_CHAR(SYSDATE,'YYYYMMDD')
+                                 AND DEL_YN = 0))
+       </if>
+
+       <if test="teamName != null">
+           AND (UPPER(ORG.ORG_NAME) LIKE UPPER('%'||#{teamName}||'%') 
+            OR  EMP.EMP_ID = (SELECT SAP_CD
+                                FROM MR_COMM_COD
+                               WHERE MR_COMM_GRP_CD = 'EMP_PROXY'
+                                 AND MR_COMM_GRP_NM LIKE UPPER('%'||#{teamName}||'%')
+                                 AND DIV_2 >= TO_CHAR(SYSDATE,'YYYYMMDD')
+                                 AND DEL_YN = 0))
+       </if>
+           AND EMP.AUTH_END_DATE >= SYSDATE
+    </select>
+
+
+    <select id="teamSearch" resultMap="empMap">
+        SELECT ORG_NAME,
+               ORG_ID
+          FROM EDM_ORG
+       <if test="teamName != null">
+         WHERE UPPER(ORG_NAME) LIKE UPPER('%'||#{teamName}||'%')
+       </if>
+    </select>
+
+
+
+    <resultMap id="costCenterMap" type="com.mr.common.domain.CostCenterVO">
+        <result property="bukrs" column="BUKRS" />
+        <result property="kokrs" column="KOKRS" />
+        <result property="kosar" column="KOSAR" />
+        <result property="kostl" column="KOSTL" />
+        <result property="lctxt" column="LCTXT" />
+        <result property="datab" column="DATAB" />
+        <result property="datbi" column="DATBI" />
+    </resultMap>
+
+    <select id="selectCostCenter" resultMap="costCenterMap">
+        SELECT BUKRS,
+               DATAB,
+               DATBI,
+               KOKRS,
+               KOSAR,
+               KOSTL,
+               LCTXT
+          FROM SAP_COST_CENTER
+         WHERE (LCTXT LIKE '%' || #{teamText} || '%' OR KOSTL LIKE '%' || #{teamText} || '%')
+           AND DATBI > SYSDATE-1
+    </select>
+    
+    <select id="selectCostCenterMap" resultMap="costCenterMap" parameterType="map">
+        SELECT BUKRS,
+               DATAB,
+               DATBI,
+               KOKRS,
+               KOSAR,
+               KOSTL,
+               LCTXT
+          FROM SAP_COST_CENTER
+         WHERE (LCTXT LIKE '%' || #{teamText} || '%' OR KOSTL LIKE '%' || #{teamText} || '%')
+         <if test="{burks != null and burks != ''}">
+           AND BUKRS = (SELECT DIV_1 
+                          FROM MR_COMM_COD
+                         WHERE MR_COMM_GRP_CD = 'PLANT'
+                           AND MR_COMM_CD = #{burks}
+                           AND DEL_YN = 0)
+         </if>
+           AND DATBI > SYSDATE-1
+    </select>
+    
+</mapper>

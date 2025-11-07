@@ -1,0 +1,85 @@
+package com.mr.mngr.repository;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.mr.common.domain.CommCdVO;
+import com.mr.step.domain.ChrgrChgHist;
+
+
+/**
+ * 관리자 DB처리
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.08.04 박성룡 최초 작성
+ * </pre>
+ */
+
+@Repository
+public class MngrDAO extends BaseSqlMapRepository {
+
+
+    /**
+     * 단일코드 조회
+     * @param commCdVO
+     * @return
+     */
+    public CommCdVO selectCode(CommCdVO commCdVO) {
+        return selectOne("mr.mngr.selectCode", commCdVO);
+    }
+
+    /**
+     * 코드 리스트 조회
+     * @param commCdVO
+     * @return
+     */
+    public List<CommCdVO> selectCodeList(CommCdVO commCdVO){
+        return selectList("mr.mngr.selectCodeList", commCdVO);
+    }
+
+    /**
+     * 신규코드 등록
+     * @param commCdVO
+     * @return
+     */
+    public int insertCode(CommCdVO commCdVO) {
+        return insert("mr.mngr.insertCode", commCdVO);
+    }
+
+    /**
+     * 코드정보 업데이트
+     * @param commCdVO
+     * @return
+     */
+    public int updateCode(CommCdVO commCdVO) {
+        return update("mr.mngr.updateCode", commCdVO);
+    }
+
+    /**
+     * 코드정보 삭제
+     * @param commCdVO
+     * @return
+     */
+    public int updateCodeDelYn(CommCdVO commCdVO) {
+        return update("mr.mngr.updateCodeDelYn", commCdVO);
+    }
+
+    /**
+     * 결재라인정보 조회
+     * @param mrReqNo
+     * @return
+     */
+    public List<ChrgrChgHist> selectMngrChangeList(int mrReqNo){
+        return selectList("mr.mngr.selectMngrChangeList", mrReqNo);
+    }
+
+
+
+}

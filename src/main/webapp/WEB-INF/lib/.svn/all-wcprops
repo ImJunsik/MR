@@ -1,0 +1,605 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib
+END
+spring-context-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-context-3.0.5.RELEASE.jar
+END
+tiles-core-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-core-2.2.2.jar
+END
+spring-beans-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-beans-3.0.5.RELEASE.jar
+END
+tiles-velocity-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-velocity-2.2.2.jar
+END
+commons-digester-2.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-digester-2.0.jar
+END
+spring-context-support-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-context-support-3.0.5.RELEASE.jar
+END
+commons-io-2.4.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-io-2.4.jar
+END
+tiles-extras-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-extras-2.2.2.jar
+END
+wm-isclient-1.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/wm-isclient-1.0.jar
+END
+hibernate-validator-5.1.0.Alpha1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/hibernate-validator-5.1.0.Alpha1.jar
+END
+velocity-tools-2.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/velocity-tools-2.0.jar
+END
+jackson-mapper-asl-1.9.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/jackson-mapper-asl-1.9.1.jar
+END
+com.sap.security.core.jar
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/com.sap.security.core.jar
+END
+log4sql-7.0.8.jar
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/log4sql-7.0.8.jar
+END
+poi-3.8.jar
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/poi-3.8.jar
+END
+jackson-core-asl-1.9.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/jackson-core-asl-1.9.1.jar
+END
+velocity-1.6.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/velocity-1.6.2.jar
+END
+log4j-1.2.16.jar
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/log4j-1.2.16.jar
+END
+jcl-over-slf4j-1.6.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/jcl-over-slf4j-1.6.1.jar
+END
+plexus-compiler-manager-1.8.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 103
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-compiler-manager-1.8.1.jar
+END
+ognl-2.7.3.jar
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/ognl-2.7.3.jar
+END
+aspectjweaver-1.6.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/aspectjweaver-1.6.1.jar
+END
+aopalliance-1.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/aopalliance-1.0.jar
+END
+freemarker-2.3.15.jar
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/freemarker-2.3.15.jar
+END
+tiles-jsp-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-jsp-2.2.2.jar
+END
+poi-ooxml-schemas-3.8.jar
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/poi-ooxml-schemas-3.8.jar
+END
+jta-1.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/jta-1.1.jar
+END
+plexus-compiler-javac-1.8.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-compiler-javac-1.8.1.jar
+END
+spring-orm-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-orm-3.0.5.RELEASE.jar
+END
+tiles-el-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-el-2.2.2.jar
+END
+tomcat7-maven-plugin-2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tomcat7-maven-plugin-2.2.jar
+END
+hdoTicket.jar
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/hdoTicket.jar
+END
+com.sap.security.api.jar
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/com.sap.security.api.jar
+END
+spring-expression-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-expression-3.0.5.RELEASE.jar
+END
+tiles-mvel-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-mvel-2.2.2.jar
+END
+plexus-build-api-0.0.4.jar
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-build-api-0.0.4.jar
+END
+spring-jdbc-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-jdbc-3.0.5.RELEASE.jar
+END
+validation-api-1.1.0.Final.jar
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/validation-api-1.1.0.Final.jar
+END
+tiles-api-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-api-2.2.2.jar
+END
+commons-logging-1.1.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-logging-1.1.1.jar
+END
+commons-configuration-1.10.jar
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-configuration-1.10.jar
+END
+iaik_jce.jar
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/iaik_jce.jar
+END
+junit-3.8.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/junit-3.8.1.jar
+END
+spring-test-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-test-3.0.5.RELEASE.jar
+END
+iaik_jce_export.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/iaik_jce_export.jar
+END
+spring-aop-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-aop-3.0.5.RELEASE.jar
+END
+tiles-freemarker-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-freemarker-2.2.2.jar
+END
+quartz-oracle-1.8.5.jar
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/quartz-oracle-1.8.5.jar
+END
+tiles-servlet-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-servlet-2.2.2.jar
+END
+commons-beanutils-1.8.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-beanutils-1.8.0.jar
+END
+mail-1.5.0-b01.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/mail-1.5.0-b01.jar
+END
+javassist-3.7.ga.jar
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/javassist-3.7.ga.jar
+END
+plexus-interactivity-api-1.0-alpha-4.jar
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-interactivity-api-1.0-alpha-4.jar
+END
+tiles-portlet-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-portlet-2.2.2.jar
+END
+xmlbeans-2.3.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/xmlbeans-2.3.0.jar
+END
+ojdbc6.jar
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/ojdbc6.jar
+END
+sap.logging.jar
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/sap.logging.jar
+END
+joda-time-2.3.jar
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/joda-time-2.3.jar
+END
+spring-tx-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-tx-3.0.5.RELEASE.jar
+END
+tiles-ognl-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-ognl-2.2.2.jar
+END
+commons-lang3-3.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-lang3-3.1.jar
+END
+classmate-0.8.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/classmate-0.8.0.jar
+END
+dom4j-1.6.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/dom4j-1.6.1.jar
+END
+taglibs-standard-impl-1.2.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/taglibs-standard-impl-1.2.1.jar
+END
+stax-api-1.0.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/stax-api-1.0.1.jar
+END
+xstream-1.3.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/xstream-1.3.1.jar
+END
+cglib-nodep-2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/cglib-nodep-2.2.jar
+END
+commons-collections-3.2.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-collections-3.2.1.jar
+END
+tiles-servlet-wildcard-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-servlet-wildcard-2.2.2.jar
+END
+poi-ooxml-3.8.jar
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/poi-ooxml-3.8.jar
+END
+activation-1.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/activation-1.1.jar
+END
+tiles-compat-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-compat-2.2.2.jar
+END
+plexus-compiler-api-1.8.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-compiler-api-1.8.1.jar
+END
+oro-2.0.8.jar
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/oro-2.0.8.jar
+END
+mvel2-2.0.11.jar
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/mvel2-2.0.11.jar
+END
+mybatis-spring-1.1.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/mybatis-spring-1.1.1.jar
+END
+mybatis-3.1.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/mybatis-3.1.1.jar
+END
+javax.servlet.jsp.jstl-api-1.2.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/javax.servlet.jsp.jstl-api-1.2.1.jar
+END
+spring-core-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-core-3.0.5.RELEASE.jar
+END
+commons-cli-1.0.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-cli-1.0.jar
+END
+plexus-utils-2.0.5.jar
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-utils-2.0.5.jar
+END
+plexus-archiver-1.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-archiver-1.2.jar
+END
+plexus-io-1.0.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-io-1.0.1.jar
+END
+jce1_2_2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/jce1_2_2.jar
+END
+plexus-interpolation-1.13.jar
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/plexus-interpolation-1.13.jar
+END
+commons-codec-1.5.jar
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-codec-1.5.jar
+END
+tiles-template-2.2.2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/tiles-template-2.2.2.jar
+END
+xml-apis-1.0.b2.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/xml-apis-1.0.b2.jar
+END
+slf4j-api-1.6.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/slf4j-api-1.6.1.jar
+END
+jboss-logging-3.1.3.GA.jar
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/jboss-logging-3.1.3.GA.jar
+END
+commons-fileupload-1.3.jar
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-fileupload-1.3.jar
+END
+quartz-1.8.5.jar
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/quartz-1.8.5.jar
+END
+commons-lang-2.6.jar
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/commons-lang-2.6.jar
+END
+spring-web-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-web-3.0.5.RELEASE.jar
+END
+spring-modules-jakarta-commons-0.8.jar
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-modules-jakarta-commons-0.8.jar
+END
+xpp3_min-1.1.4c.jar
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/xpp3_min-1.1.4c.jar
+END
+spring-asm-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-asm-3.0.5.RELEASE.jar
+END
+doxia-sink-api-1.0-alpha-7.jar
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/doxia-sink-api-1.0-alpha-7.jar
+END
+slf4j-log4j12-1.6.1.jar
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/slf4j-log4j12-1.6.1.jar
+END
+spring-webmvc-3.0.5.RELEASE.jar
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/lib/spring-webmvc-3.0.5.RELEASE.jar
+END

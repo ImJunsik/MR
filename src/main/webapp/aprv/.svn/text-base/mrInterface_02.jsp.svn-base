@@ -1,0 +1,210 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="java.util.*"%>
+<%@ page import="java.io.*"%>
+<%@ page import="javax.servlet.http.HttpServletRequest" %>
+<%@ page import="javax.servlet.http.HttpServletResponse" %>
+<%@ page import="javax.servlet.http.HttpSession"%>
+<%@ page import="org.springframework.beans.factory.annotation.Autowired"%>
+<%@ page import="org.springframework.stereotype.Controller"%>
+<%@ page import="org.springframework.ui.Model"%>
+<%@ page import="org.w3c.dom.Document"%>
+<%@ page import="org.w3c.dom.Node"%>
+<%@ page import="com.mr.common.controller.*"%>
+<%@ page import="com.mr.mrrq.domain.MRrqRegisterVO"%>
+<%@ page import="com.mr.tech.domain.TechInvestVO"%>
+<%@ page import="com.mr.tech.domain.TechReviewVO"%>
+<%@ page import="com.mr.comp.domain.CompRptVO"%>
+
+<%@ page import="com.base.util.mrInterfaceUtil"%>
+<%@ page import="org.springframework.web.context.WebApplicationContext"%>
+<%@ page import="org.springframework.web.context.support.WebApplicationContextUtils"%>
+<%@ page import="com.mr.step.domain.ChrgrChgHist"%>
+<%@ page import="com.common.file.domain.MrAtchFile"%>
+
+<%
+
+/* mrInterface_02.jsp 
+* 통합결재 페이지에 문서내용 보내기
+*/
+
+	System.out.println("wj::mrInterface_02.jsp ");            
+
+    request.setCharacterEncoding("UTF-8");
+    String body = null;
+    StringBuilder stringBuilder = new StringBuilder();
+    BufferedReader bufferedReader = null;   
+    
+    //통합결재 리턴값
+    String connkey = "";        //전자결배번호
+    String connCode = "";       //문서종류
+    
+    String title = "";
+    String bodyHtml = "";
+    
+    HashMap paramMap = new HashMap();
+    String[] rslt = new String[2]; 
+    Model model = null;
+    
+    MRrqRegisterVO mRrqRegisterVO = new MRrqRegisterVO();
+    TechInvestVO techInvestVO = new TechInvestVO();
+    TechReviewVO techReviewVO = new TechReviewVO();
+    CompRptVO compRptVO = new CompRptVO();    
+    
+    List<ChrgrChgHist> appLine = null;
+    List<MrAtchFile> mrAtchFiles = null;
+    
+    WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(application);
+    MrAprvIfGwController controller = (MrAprvIfGwController)context.getBean("mrAprvIfGwController");
+    
+    //파라미터 리턴문서
+    Document doc = null;
+    try{
+    
+        doc = (Document)mrInterfaceUtil.parsePostParam(request.getInputStream());
+        doc.getDocumentElement().normalize();
+        
+        Node nodeConnkey = doc.getElementsByTagName("connkey").item(0);
+        Node nodeConnCode = doc.getElementsByTagName("connCode").item(0);
+        
+        connkey = nodeConnkey.getFirstChild().getNodeValue();
+        connCode = nodeConnCode.getFirstChild().getNodeValue();
+        
+        /*
+	    connCode = request.getParameter("connCode");
+	    connkey = request.getParameter("connkey");
+	   */
+	   
+	   System.out.println("mrInterface_02.jsp");
+	   
+	    System.out.println("connkey  "+ connkey);
+	    System.out.println("connCode  "+ connCode);
+	    
+	    
+	    
+	    paramMap.put("connkey", connkey);
+	    paramMap.put("connCode", connCode);
+	    
+	    
+	    MrAprvIfGwController ctl = new MrAprvIfGwController();
+
+	    if("Z0010".equals(connCode)){
+	    	//mr요청서
+            System.out.println("connkey  " + connkey);
+	    	mRrqRegisterVO = controller.mrAprvInit_Z0010(paramMap, model);
+	        title = mRrqRegisterVO.getMrConnTitle();
+	        bodyHtml = mRrqRegisterVO.getMrConnBdoy();
+	        mrAtchFiles = mRrqRegisterVO.getMrAtchFiles();
+	        appLine = mRrqRegisterVO.getAppLine();
+	    }
+	    else if("Z0030_Z0110".equals(connCode)){
+	    	//초기투자비 
+	    	System.out.println("초기투자비 시작 connCode::  "+ connCode);
+	    	techInvestVO = controller.mrAprvInit_Z0030_Z0110(paramMap, model);
+	        title = techInvestVO.getMrConnTitle();
+	        bodyHtml = techInvestVO.getMrConnBdoy();
+	        mrAtchFiles = techInvestVO.getMrAtchFiles();
+	        appLine = techInvestVO.getAppLine();
+	        
+            System.out.println("jsp_Z0030_Z0110_title" + title);
+            System.out.println("jsp_Z0030_Z0110_bodyHtml" + bodyHtml);
+            System.out.println("jsp_Z0030_Z0110_mrAtchFiles" + mrAtchFiles);
+            System.out.println("jsp_Z0030_Z0110_appLine" + appLine);            
+	        
+	    }
+	    else if("Z0030_Z0122".equals(connCode)){
+            //타당성검토   (재상신) 
+            //System.out.println("connCode : " +connCode);
+            //System.out.println("mrInterface_02.jsp_Z0030_Z0122_1");
+            
+            techReviewVO = controller.mrAprvInit_Z0030_Z0122(paramMap, model);
+            title = techReviewVO.getMrConnTitle();
+            bodyHtml = techReviewVO.getMrConnBdoy();
+            mrAtchFiles = techReviewVO.getMrAtchFiles();
+            appLine = techReviewVO.getAppLine();
+            //System.out.println("jsp_Z0030_Z0122_1_title" + title);
+            //System.out.println("jsp_Z0030_Z0122_1_bodyHtml" + bodyHtml);
+            //System.out.println("jsp_Z0030_Z0122_1_mrAtchFiles" + mrAtchFiles);
+            //System.out.println("jsp_Z0030_Z0122_1_appLine" + appLine);            
+        }
+	    else if("Z0090".equals(connCode)){
+            //MR완료
+	    	compRptVO = controller.mrAprvInit_Z0090(paramMap, model);
+            title = compRptVO.getMrConnTitle();
+            bodyHtml = compRptVO.getMrConnBdoy();
+            mrAtchFiles = compRptVO.getMrAtchFiles();
+            appLine = compRptVO.getAppLine();
+        }
+	    
+    //TODO if log 테이블 추가해야 함
+    } catch(Exception e ) {
+        System.out.println("e " +e);
+        System.out.println("mrInterface_02.jsp error : " +e);
+    }
+%>
+<?xml version="1.0" encoding="utf-8"?>
+<DATA>
+    <APRV_FILE_LIST>
+    <%
+    if(mrAtchFiles.size() > 0 ){
+    	String str = "";
+    	for(int i=0; i < mrAtchFiles.size(); i++) {
+            MrAtchFile vo = (MrAtchFile)mrAtchFiles.get(i);
+            str = vo.getFileNm();
+            System.out.println("vo.mrAtchFiles()  : "+ vo.getFileCd());
+    %>
+    <ROW>
+        <APRV_FILE_DIR><%=vo.getFileCd() %></APRV_FILE_DIR>
+        <APRV_FILE_ID><%=vo.getDrawMngNo() %></APRV_FILE_ID>
+        <APRV_FILE_NM><%=str.replace("&","&amp;") %></APRV_FILE_NM>
+    </ROW>
+    <%  }
+    }else{%>
+    <ROW>
+        <APRV_FILE_DIR></APRV_FILE_DIR>
+        <APRV_FILE_ID></APRV_FILE_ID>
+        <APRV_FILE_NM></APRV_FILE_NM>
+    </ROW>
+    <%}%>
+    </APRV_FILE_LIST>
+    <APRV_LINE>
+    <%
+    for(int i=0; i < appLine.size(); i++) {
+    	ChrgrChgHist vo = (ChrgrChgHist)appLine.get(i);
+    	
+    	if("Z0010".equals(connCode)){
+    		   if("Z02C".equals(vo.getChrgrClCd()) || "Z02A".equals(vo.getChrgrClCd()) ){
+    			   System.out.println("vo.getChrgEmpNo()  : "+vo.getChrgEmpNo());
+        %><ROW><APRV_UID><%=vo.getChrgEmpNo()%></APRV_UID><APRV_LEV></APRV_LEV></ROW>
+        <%}
+    	}
+    	else if("Z0030_Z0110".equals(connCode)){
+    		//wj:mrTechInvest에서 Z0030_Z0110 con code     		
+    		//2018_03_16 wj 초기투자비처리시 직책과장 결재라인에 추가 기존 z02b > z02g1    		
+    		//if("Z02G".equals(vo.getChrgrClCd()) || "Z02B".equals(vo.getChrgrClCd()) || "Z02I".equals(vo.getChrgrClCd())){
+    			
+			System.out.println("Z0030_Z0110_결재라인 vo.getChrgrClCd"+ vo.getChrgrClCd());
+			
+    		if("Z02G".equals(vo.getChrgrClCd()) || "Z02G1".equals(vo.getChrgrClCd()) || "Z02I".equals(vo.getChrgrClCd())){
+    	%><ROW><APRV_UID><%=vo.getChrgEmpNo()%></APRV_UID><APRV_LEV></APRV_LEV></ROW>
+    	<%}
+    	}
+    	else if("Z0030_Z0122".equals(connCode)){
+    		//mrComplete    		
+   		   if("Z02F".equals(vo.getChrgrClCd()) || "Z02C".equals(vo.getChrgrClCd()) || "Z02D".equals(vo.getChrgrClCd())  ){ 
+   			System.out.println("결재라인 vo.getChrgEmpNo()  : "+vo.getChrgEmpNo());
+        %><ROW><APRV_UID><%=vo.getChrgEmpNo()%></APRV_UID><APRV_LEV></APRV_LEV></ROW>
+        <%}
+        }
+    	else if("Z0090".equals(connCode)){
+    		//if("Z02D".equals(vo.getChrgrClCd()) || "Z02F".equals(vo.getChrgrClCd())){
+       		if("Z02F".equals(vo.getChrgrClCd())){
+    			System.out.println("vo.getChrgEmpNo()  : "+vo.getChrgEmpNo());
+    	%><ROW><APRV_UID><%=compRptVO.getLoginEmpNo() %></APRV_UID><APRV_LEV></APRV_LEV></ROW><ROW><APRV_UID><%=vo.getChrgEmpNo()%></APRV_UID><APRV_LEV></APRV_LEV></ROW>
+    	<%}
+    	}
+    }%>
+    </APRV_LINE>
+    <APRV_TITLE><![CDATA[ <%=title %> ]]></APRV_TITLE>
+    <APRV_BODY><![CDATA[ <%=bodyHtml %> ]]></APRV_BODY>
+</DATA>

@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/layouts
+END
+baseLayout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/76/trunk/src/mr/src/main/webapp/WEB-INF/layouts/baseLayout.jsp
+END
+printLayout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/layouts/printLayout.jsp
+END
+emptyLayout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/layouts/emptyLayout.jsp
+END
+excelLayout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/layouts/excelLayout.jsp
+END
+leftMenu.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svn/repos_edims/!svn/ver/66/trunk/src/mr/src/main/webapp/WEB-INF/layouts/leftMenu.jsp
+END
+popupLayout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/layouts/popupLayout.jsp
+END
+defaultLayout.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/repos_edims/!svn/ver/189/trunk/src/mr/src/main/webapp/WEB-INF/layouts/defaultLayout.jsp
+END

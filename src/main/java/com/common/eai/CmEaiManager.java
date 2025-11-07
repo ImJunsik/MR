@@ -1,0 +1,178 @@
+package com.common.eai;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+
+import com.wm.app.b2b.client.Context;
+import com.wm.app.b2b.client.ServiceException;
+import com.wm.data.IData;
+import com.wm.data.IDataCursor;
+import com.wm.data.IDataFactory;
+
+public class CmEaiManager {
+
+    // 변수 설정
+    //private final String SERVER = "172.18.1.54:5300";
+    //private final String SERVER = "172.18.1.56:6300";
+
+	//EAI 운영기
+	//private final String SERVER = "172.18.3.110 :6300";
+	
+    //SAP S4/HANA용 EAI 검증기 테스트
+	//private final String SERVER = "10.171.24.38 :6300";
+	//SAP S4/HANA용 EAI 운영기 테스트
+	private final String SERVER = "10.171.26.124:6300";
+	//private final String SERVER = "eai.oilbank.co.kr:6300";
+
+	
+    //	private final String SERVER = "EAI Production L4 IP";
+    private Context context = new Context();
+    private final String USERNAME = null;
+    private final String PASSWORD = null;
+    private final Logger logger = Logger.getLogger(this.getClass());
+
+    // EAI 서버 접속
+    private void connectServer(String server) throws ServiceException {
+        try {
+        	System.out.println("## connectServer(String server)");
+            if(server == null) {
+            	//logger.info("## connectServer(String server) " + SERVER);
+                context.connect(SERVER, USERNAME, PASSWORD);
+            } else {
+            	//logger.info("## connectServer(String server) " + server);
+                context.connect(server, USERNAME, PASSWORD);
+            }
+        } catch (ServiceException e) {
+            e.printStackTrace();
+            logger.info("\n\tCannot connect to server \""+SERVER+"\"");
+            throw new ServiceException();
+        }
+    }
+
+    // EAI 서비스 실행
+    public HashMap executeService(String server, String nameSpace, String service, HashMap inData) throws Exception {
+        try { 
+            connectServer(server);
+            //System.out.println("## connectServer(server)");
+            logger.info("## connectServer(server)");
+            IData inputDocument = makeIData(inData);
+            //System.out.println("## IData inputDocument = makeIData(inData))");
+            logger.info("## IData inputDocument = makeIData(inData))");
+            IData outputDocument = invoke(nameSpace, service, context, inputDocument);
+            logger.info("## invoke");
+            return makeHash(outputDocument);
+           
+        } catch(Exception e) {
+            e.printStackTrace();
+            //logger.info(e.getMessage());
+            //logger.info(e.toString());
+            throw new Exception("error");
+        } finally {
+            context.disconnect();
+        }
+        
+    }
+
+    // Invoke Service
+    private IData invoke(String nameSpace, String service, Context context, IData inputDocument) throws IOException, ServiceException { 
+        IData out = context.invoke(nameSpace, service, inputDocument);
+        return out;
+    }
+
+    // HashMap to IData
+    private IData makeIData(HashMap inData) throws Exception {
+        String name = "";
+        Object value = null;
+        String type = "";
+
+        IData out = IDataFactory.create();
+        IDataCursor idc = out.getCursor();
+
+        Set s = inData.keySet();
+        Iterator ite = s.iterator();
+
+        while(ite.hasNext()) {
+            name = (String)ite.next();
+            value = inData.get(name);
+            type = value.getClass().getName();
+
+            // HashMap[] to IData[]
+            if (type.equals("[Ljava.util.HashMap;")) {
+                HashMap[] temp = (HashMap[])value;
+                IData[] records = new IData[temp.length];
+                for ( int j=0; j<temp.length; j++)
+                    records[j] = makeIData(temp[j]);
+                idc.insertAfter(name, records);
+            }
+
+            // HashMap to IData
+            else if(type.equals("java.util.HashMap"))
+                idc.insertAfter(name, makeIData((HashMap)value));
+
+            // String to IData
+            else if (type.equals("java.lang.String"))
+                idc.insertAfter(name, value);
+
+            // String Array to Idata
+            else if (type.equals("[Ljava.lang.String;"))
+                idc.insertAfter(name, value);
+            else
+                idc.insertAfter(name, value);
+        }
+        idc.destroy();
+        return out;
+    }
+
+    // IData to HashMap
+    private HashMap makeHash(IData outData) throws Exception {
+        String name = "";
+        Object value = null;
+        String type = "";
+        HashMap out = new HashMap();
+
+        IDataCursor idc = outData.getCursor();
+
+        while(idc.next()) {
+            name = idc.getKey();
+            value = idc.getValue();
+
+            if(value == null) {
+                out.put(name, "");
+            } else {
+                type = value.getClass().getName();
+
+                // IData(String) to HashMap
+                if(type.equals("java.lang.String"))
+                    out.put(name, value);
+
+                // IData(String []) to HashMap
+                else if (type.equals("[Ljava.lang.String;"))
+                    out.put(name, value);
+
+                // IData to HashMap
+                // else if (type.equals("com.wm.data.IData"))
+                else if(type.equals("com.wm.data.IData") || type.equals("com.wm.util.Values") || type.equals("com.wm.data.ISMemDataImpl"))
+                    out.put(name, makeHash((IData)value));
+
+                // IData[] to HashMap[]
+                //else if (type.equals("[Lcom.wm.data.IData;"))
+                else if(type.equals("[Lcom.wm.data.IData;") || type.equals("[Lcom.wm.util.Values;") || type.equals("[Lcom.wm.data.ISMemDataImpl;")) {
+                    IData[] temp = (IData[])value;
+                    HashMap[] results = new HashMap[temp.length];
+                    HashMap detail = new HashMap();
+                    for (int j=0; j<temp.length; j++)
+                        results[j]= makeHash(temp[j]);
+                    out.put(name, results);
+                }
+                else
+                    out.put(name, value);
+            }
+        }
+
+        return out;
+    }
+}

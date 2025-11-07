@@ -1,0 +1,110 @@
+package com.mr.main.domain;
+
+import com.base.domain.Domain;
+
+/**
+ * 메인페이지 상단 요약 정리
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.24 박성룡 최초 작성
+ * </pre>
+ */
+public class MrSummary extends Domain {
+    private String procStCd;
+    private int col1;
+    private int col2;
+    private int col3;
+    private int col4;
+    private int col5;
+    private int col6;
+    private int col7;
+    private int col8;
+    private int col9;
+
+    public String getProcStCd() {
+        return procStCd;
+    }
+
+    public void setProcStCd(String procStCd) {
+        this.procStCd = procStCd;
+    }
+
+    public int getCol1() {
+        return col1;
+    }
+
+    public void setCol1(int col1) {
+        this.col1 = col1;
+    }
+
+    public int getCol2() {
+        return col2;
+    }
+
+    public void setCol2(int col2) {
+        this.col2 = col2;
+    }
+
+    public int getCol3() {
+        return col3;
+    }
+
+    public void setCol3(int col3) {
+        this.col3 = col3;
+    }
+
+    public int getCol4() {
+        return col4;
+    }
+
+    public void setCol4(int col4) {
+        this.col4 = col4;
+    }
+
+    public int getCol5() {
+        return col5;
+    }
+
+    public void setCol5(int col5) {
+        this.col5 = col5;
+    }
+
+    public int getCol6() {
+        return col6;
+    }
+
+    public void setCol6(int col6) {
+        this.col6 = col6;
+    }
+
+    public int getCol7() {
+        return col7;
+    }
+
+    public void setCol7(int col7) {
+        this.col7 = col7;
+    }
+
+    public int getCol8() {
+        return col8;
+    }
+
+    public void setCol8(int col8) {
+        this.col8 = col8;
+    }
+
+	public int getCol9() {
+		return col9;
+	}
+
+	public void setCol9(int col9) {
+		this.col9 = col9;
+	}
+
+
+}

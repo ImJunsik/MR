@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common.file">
+    <resultMap id="attachFileResultMap" type="com.common.file.domain.AttachFile">
+        <id property="code" column="FILE_CD" />
+        <result property="path" column="FILE_PATH" />
+        <result property="name" column="FILE_NM" />
+        <result property="convertName" column="CONV_FILE_NM" />
+        <result property="size" column="FILE_SIZE" />
+    </resultMap>
+    
+    <select id="getAttachFile" parameterType="string" resultMap="attachFileResultMap">
+        SELECT file_cd
+              ,file_path
+              ,file_nm
+              ,conv_file_nm
+              ,file_size
+          FROM exam_file
+         WHERE file_cd = #{code}
+    </select>
+
+    <select id="getAttachFileList" parameterType="java.util.List" resultMap="attachFileResultMap">
+        SELECT file_cd
+              ,file_path
+              ,file_nm
+              ,conv_file_nm
+              ,file_size
+          FROM exam_file
+         WHERE file_cd IN
+         <foreach collection="list" index="index" item="code" separator="," open="(" close=")">
+             #{code}
+         </foreach>
+    </select>
+    
+    <insert id="insertAttachFile" parameterType="com.common.file.domain.AttachFile">
+        INSERT INTO exam_file (
+                file_cd
+               ,file_path
+               ,file_nm
+               ,conv_file_nm
+               ,file_size)
+            VALUES (
+                #{code}
+               ,#{path}
+               ,#{name}
+               ,#{convertName}
+               ,#{size})
+    </insert>
+    
+    <delete id="deleteAttachFile" parameterType="list">
+        DELETE
+          FROM exam_file
+         WHERE file_cd IN 
+         <foreach collection="list" index="index" item="code" separator="," open="(" close=")">
+             #{code}
+         </foreach>
+    </delete>
+</mapper>

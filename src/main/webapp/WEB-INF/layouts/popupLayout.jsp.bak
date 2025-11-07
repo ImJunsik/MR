@@ -1,0 +1,345 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+<s:eval var="authenticationKey" expression="T(com.mr.common.domain.Authentication).SESSION_ATTRIBUTE_KEY"/>
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>MR</title>
+
+
+    <link href="../css/common.css" rel="stylesheet">
+    <link href="../css/layout.css" rel="stylesheet">
+    <link href="../css/popup.css" rel="stylesheet">
+
+    <!-- jquery-ui css -->
+    <link href="../css/widgets/jquery-ui.css" rel="stylesheet">
+
+    <!-- jquery script -->
+    <script src="../js/jquery/jquery-1.10.2.min.js"></script>
+
+    <!-- jquery-ui script & datepicker i18n -->
+    <script src="../js/widgets/jquery-ui.min.js"></script>
+    <script src="../js/widgets/i18n/jquery.ui.datepicker-ko.js"></script>
+
+    <!-- timepicker script & i18n -->
+    <script src="../js/widgets/addon/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script src="../js/widgets/addon/timepicker/i18n/jquery-ui-timepicker-ko.js"></script>
+
+    <!-- common scripts -->
+    <script src="../js/common/common.js"></script>
+    <script src="../js/common/common.ajax.js"></script>
+    <script src="../js/common/common.validation.js"></script>
+    <script src="../js/file/file_with_jQuery.js"></script>
+    <script type="text/javascript">
+    var url = document.location.href;
+    var edimsAddr = url.substring(7, url.indexOf("/mr/"));
+        $.popupTitle = function (title){
+            $("#pop_header .title").html(title);
+        };
+
+        $(document).ready(function(){
+          $('#pageLoadingWrap').css('width' ,  $(window).width());
+          $('#pageLoadingWrap').css('height' ,  $(window).height());
+          $(window).resize(function() {
+            $('#pageLoadingWrap').css('width' ,  $(window).width());
+            $('#pageLoadingWrap').css('height' ,  $(window).height());
+          });
+
+          $.removeComma = function(){
+              $('.number').each(function(){
+                    $(this).val($(this).val().replace(/[,]/g, ""));
+              });
+          };
+
+          // 파일구분 Select
+          $.selectLoad({
+              className : "fileDiv",
+              url : "../codeList.do?mrCommGrpCd=ATCH",
+              defaultText : "선택",
+          });
+
+          $(".inputDate").datepicker({
+              dateformat:"yyyy-mm-dd",
+              showOn:"button",
+              changeYear: true,
+              changeMonth: true,
+              buttonImage:"../images/icon_calendar.png",
+              buttonImageOnly:true,
+          });
+
+          $(".inputBeforeDate").datepicker({
+              dateformat:"yyyy-mm-dd",
+              showOn:"button",
+              changeYear: true,
+              changeMonth: true,
+              buttonImage:"../images/icon_calendar.png",
+              buttonImageOnly:true,
+              maxDate: "today"
+          });
+
+          $("img.ui-datepicker-trigger").attr("style", "border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;");
+          $(".ui-datepicker-month").attr("width", "30px");
+
+        });
+
+        $(document).on("focusout",".number",function(event) {
+            $(this).val($.separator($(this).val()));
+        });
+
+        $(document).on("focusin",".number",function(event) {
+              var value = $(this).val().replace(/[^0-9]/g, '');
+              value = value*1;
+              $(this).val(value);
+        });
+
+        $(window).ajaxStart(function() {
+            $('#pageLoadingWrap').show();
+        }).ajaxStop(function() {
+            $('#pageLoadingWrap').hide();
+        }).ajaxComplete(function() {
+            $('#pageLoadingWrap').hide();
+        }).ajaxError(function() {
+            $('#pageLoadingWrap').hide();
+        }).ajaxSuccess(function() {
+            $('#pageLoadingWrap').hide();
+        });
+
+
+        //첨부파일관리 추가
+        $(document).on("click", "#addFile",function(){
+            fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+            $("#fileTemp").children("tbody").children("tr").children("td").children(".multipartFile").attr("name","mrAtchFiles["+fileCnt+"].fileNm");
+            $("#fileTemp").children("tbody").children("tr").children("td").children(".fileCd").attr("name","mrAtchFiles["+fileCnt+"].fileCd");
+            $("#fileTemp").children("tbody").children("tr").children("td").children(".insFlag").attr("name","mrAtchFiles["+fileCnt+"].inserted");
+            $("#fileTemp").children("tbody").children("tr").children("td").children(".drawMngNo").attr("name","mrAtchFiles["+fileCnt+"].drawMngNo");
+            $("#fileTemp").children("tbody").children("tr").clone().insertAfter($("#fileList").children("tbody").children("tr:last"));
+        });
+
+        // 첨부파일관리 다운로드
+        $(document).on("click", ".fileDown", function() {
+            if($(this).parent("td").children(".drawMngNo").val()==""){
+                alert("도면관리번호가 누락되었습니다. 관리자에게 문의하세요.");
+                return;
+            }
+            document.location.href = "../download.do?drawMngNo="+$(this).parent("td").children(".drawMngNo").val();
+        });
+        // 추가한 파일 삭제
+        $(document).on("click", ".removeFile", function() {
+            $(this).parent("td").parent("tr").remove();
+        });
+
+        // 저장된 파일 삭제
+        $(document).on("click", ".removeDownFile", function() {
+            $(this).parent("td").children(".delFlag").val("true");
+            $(this).parent("td").parent("tr").attr("style", "display:none");
+        });
+
+
+
+        $(document).on("change",".fileForm", function () {
+            var fileList = new Array();
+            var fileName = this.value;
+           /*  if(fileName.indexOf("fake")>0) {
+                if(confirm("익스플로러 - 옵션 - 보안 - 신뢰할수 있는 사이트에 \n 추가가 필요합니다. \n 추가하는 방법 가이드로 이동하겠습니까?")) {
+                    $.popup({url:"../fileUploadErrorGuide.jsp", width:"1000", height:"500", scroll:"yes"});
+                }
+                return false;
+            } */
+
+            var td = $(this).parent("td");
+            var fileTemp = $("#fileTemp").children("tbody").children("tr");
+            var fileTr;
+            var fileType;
+            var fileTempTd = fileTemp.children("td");
+            var drive = fileName.substring(0,4);
+            fileList = fileName.split(", "+drive);
+
+            if(fileList.length>1){
+                fileType = td.children(".fileCd").val();
+                td.parent("tr").remove();
+                for( var i = 0; i<fileList.length; i++){
+                    fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+
+
+                    fileTempTd.children(".multipartFile").attr("name","mrAtchFiles["+fileCnt+"].fileNm");
+                    fileTempTd.children(".fileCd").attr("name","mrAtchFiles["+fileCnt+"].fileCd");
+                    fileTempTd.children(".insFlag").attr("name","mrAtchFiles["+fileCnt+"].inserted");
+                    fileTempTd.children(".drawMngNo").attr("name","mrAtchFiles["+fileCnt+"].drawMngNo");
+                    fileTemp.clone().insertAfter($("#fileList").children("tbody").children("tr:last"));
+
+                    fileTr = $("#fileList").children("tbody").children("tr:last");
+                    fileTr.children("td").children(".realPath").val(i==0 ? fileList[i] : drive+fileList[i]);
+                    fileTr.children("td").children(".fileCd").val(fileType);
+                    fileTr.children("td").children(".multipartFile").val(fileList[i].substring(fileList[i].lastIndexOf("\\") + 1, fileList[i].length));
+
+                }
+            } else {
+                td.find(".realPath").val(fileName);
+                td.find(".multipartFile").val(fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length));
+            }
+        });
+
+        $(document).on("click",".inputFile", function () {
+            $(this).parent("td").find(".fileForm").click();
+        });
+
+        $(document).submit(function() {
+
+            var td;
+            var realPath = "";
+
+
+            if(!$.fileCdValidation()) {
+                alert("파일구분을 선택하세요.");
+                $('#pageLoadingWrap').hide();
+                return false;
+            }
+
+            if(!$.fileNameValidation()) {
+                alert("파일을 선택하세요.");
+                $('#pageLoadingWrap').hide();
+                return false;
+            }
+
+            $(document).find(".multipartFile").each(function(index){
+                td = $(this).parent("td");
+                if($(this).val()!=""){
+                      if(td.children(".insFlag").val()) {
+                          realPath = td.children(".realPath").val().replace(/\\/g, '/');
+                          td.children(".drawMngNo").val($.fileUpload({ localAddr: edimsAddr, filePath : realPath , empNo: "${sessionScope[authenticationKey].empNo}", plantNo:$("#plantNo").val(), mrNo:$("#mrNo").val()})); 
+                          /*
+                    	  var data = new FormData();
+           					  data.append("localAddr", edimsAddr);
+           					  data.append("filePath", $('.fileForm')[index].files[0]);
+           					  data.append("empNo", "${sessionScope[authenticationKey].empNo}");
+           					  data.append("plantNo", $("#plantNo").val());
+           					  data.append("mrNo", $("#mrNo").val());		
+           					  data.append("mrNo2", "");
+           				
+           				$.ajax({
+           		           type:"POST",
+           		           url:"/mr/fileUploadAjax.do",
+           		           data:data,
+           		           dataType:"JSON",
+    	       		       enctype: 'multipart/form-data',
+    	   		           processData : false,
+    	   		           contentType : false,
+    	   		           async: false,
+    	   		        	success : function(data) {
+         		        	  if(data.doc_seq == null){
+         		        			alert("파일업로드에 실패했습니다. 관리자에게 문의하세요.");
+         		        			td.parent("tr").remove();
+         		        	   }else{
+         		        			td.children(".drawMngNo").val(data.doc_seq);
+         		        	   }
+         		            },
+         		            error : function(request) {
+         		            	alert("네트워크에 문제가 있습니다. 관리자에게 문의하세요.");
+         		            	td.parent("tr").remove();
+         		            }
+           		    	}); 
+           				*/
+                      }
+                }
+            });
+        });
+
+        $.fileCdValidation = function () {
+            var count = 0;
+            $("form").find(".fileCd").each(function(){
+                $(this).css("border-style","solid");
+                $(this).css("border-color","#e5e5e5");
+                $(this).css("border-width","1px");
+                if($(this).val() == "" ){
+                      $(this).focus();
+                      $(this).css("border-style","solid");
+                      $(this).css("border-color","#91ce44");
+                      $(this).css("border-width","2px");
+                      count++;
+                }
+            });
+
+            if(count>0){
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+        $.fileNameValidation = function () {
+            var count = 0;
+            $("form").find(".multipartFile").each(function(){
+                $(this).css("border-style","solid");
+                $(this).css("border-color","#e5e5e5");
+                $(this).css("border-width","1px");
+                if($(this).val() == "" ){
+                      $(this).focus();
+                      $(this).css("border-style","solid");
+                      $(this).css("border-color","#91ce44");
+                      $(this).css("border-width","2px");
+                      count++;
+                }
+            });
+
+            if(count>0){
+                return false;
+            } else {
+                return true;
+            }
+        };
+
+
+    </script>
+  </head>
+  <body>
+  <a name="top"></a>
+  <div id="pop_wrap">
+      <div id="pageLoadingWrap" style="position:absolute; top:0px;left:0px; display:none; background-color:white; z-index:1000; filter: alpha(opacity=50); -khtml-opacity: 0.5; -moz-opacity:0.5; opacity: 0.5;">
+        <div id="pageLoading" style="position:absolute;top:50%;left:50%;z-index:999">
+             <img src="../images/ajax_progress.gif" />
+        </div>
+      </div>
+      <!-- header -->
+      <div id="pop_header">
+      <h4 class="pop_header title"> </h4>
+      </div>
+      <!-- //header -->
+      <!-- content -->
+      <div id="pop_content">
+        <table id="fileTemp" class="table_row" border="1" cellspacing="0" style="display:none">
+            <tr>
+            <td>
+              <select class="fileDiv fileCd" name="mrAtchFiles[0].fileCd"></select>
+              <input type="file" class="fileForm" multiple>
+              <input type="hidden" class="realPath i_input_300">
+              <input type="text" class="i_input_300 multipartFile" name="mrAtchFiles[0].fileNm">
+              <img src="../images/btn_search.png" class="inputFile cursor"/>
+              <img id="deleteFile" class="cursor removeFile" src="../images/icon_minus.png" />
+              <input type="hidden" class="i_input_200 insFlag" name="mrAtchFiles[0].inserted" value="true"/>
+              <input type="hidden" class="drawMngNo" name="mrAtchFiles[0].drawMngNo" value=""/>
+            </td>
+            </tr>
+        </table>
+        <tiles:insertAttribute name="content" />
+      </div>
+      <!-- //content -->
+  </div>
+  </body>
+    <script type="text/javascript">
+    $(document).ready(function(){
+        if("${modeClass}"!="") {
+            $('.${modeClass}').attr('disabled',false);
+            $('.${modeClass}').attr('readonly',false);
+            $('.${modeClass}').show();
+        }
+
+    });
+
+    </script>
+</html>

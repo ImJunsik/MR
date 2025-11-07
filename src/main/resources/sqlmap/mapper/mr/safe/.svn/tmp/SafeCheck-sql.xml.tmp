@@ -1,0 +1,435 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.safe">
+    <resultMap id="safeCheckMap" type="com.mr.safe.domain.SafeCheckVO">
+        <id property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrTmpNo" column="MR_TMP_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="plant" column="PLANT" />
+        <result property="plantNm" column="PLANT_NM" />
+        <result property="reqClCd" column="REQ_CL_CD" />
+        <result property="reqClDtlCd" column="REQ_CL_DTL_CD" />
+        <result property="workPsblClCd" column="WORK_PSBL_CL_CD" />
+        <result property="workPsblClNm" column="WORK_PSBL_CL_NM" />
+        <result property="workPsblDt" column="WORK_PSBL_DT" />
+        <result property="workPsblClRsn" column="WORK_PSBL_CL_RSN" />
+        <result property="rigionCd" column="RIGION_CD" />
+        <result property="issueCtt" column="ISSUE_CTT" />
+        <result property="inflnceLoss" column="INFLNCE_LOSS" />
+        <result property="incnvCtt" column="INCNV_CTT" />
+        <result property="useCnt" column="USE_CNT" />
+        <result property="useCntPrd" column="USE_CNT_PRD" />
+        <result property="imprvPrpslCtt" column="IMPRV_PRPSL_CTT" />
+        <result property="qualEptEftCtt" column="QUAL_EPT_EFT_CTT" />
+        <result property="quanEptEftCtt" column="QUAN_EPT_EFT_CTT" />
+        <result property="quanEptEftCd" column="QUAN_EPT_EFT_CD" />
+        <result property="cnclEmpNo" column="CNCL_EMP_ID" />
+        <result property="cnclDt" column="CNCL_DT" />
+        <result property="cnclRsnCtt" column="CNCL_RSN_CTT" />
+        <result property="safetyDate" column="SAFETY_DATE" />
+        <result property="safetyChkDt" column="SAFETY_CHK_DT" />
+        <result property="safetyChkTime" column="SAFETY_CHK_TIME" />
+        <result property="safetyChkLoc" column="SAFETY_CHK_LOC" />
+        <result property="invstCostNo" column="INVST_COST_NO" />
+        <result property="capexNo" column="CAPEX_NO" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <result property="invstCd" column="INVST_CD" />
+        <result property="invstPurpCd" column="INVST_PURP_CD" />
+        <result property="invstCdNm" column="INVST_CD_NM" />
+        <result property="invstPurpCdNm" column="INVST_PURP_CD_NM" />
+        <collection property="equips" ofType="com.mr.ivst.domain.IvstReqEquipVO" column="MR_REQ_NO" select="selectMrReqEquip" />
+        <collection property="procs" ofType="com.mr.ivst.domain.IvstReqProcVO" column="MR_REQ_NO" select="selectMrReqProc" />
+        <collection property="appLine" ofType="com.mr.safe.domain.SafeChrgrChgHistVO" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD} " select="selectSafeLine" />
+    </resultMap>
+    <select id="selectSafeCheck" resultMap="safeCheckMap">
+    --가동전 안전점검 조회쿼리(vo확인)
+         SELECT A.MR_REQ_NO,
+                A.MR_REQ_TITLE,
+                A.MR_NO,
+                A.MR_TMP_NO,
+                A.MR_STEP_CD,
+                A.PROC_ST_CD,
+                A.PLANT,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='PLANT' AND MR_COMM_CD=A.PLANT) PLANT_NM,
+                A.REQ_CL_CD,
+                A.REQ_CL_DTL_CD,
+                A.WORK_PSBL_CL_CD,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='WORK' AND MR_COMM_CD=A.WORK_PSBL_CL_CD) WORK_PSBL_CL_NM,
+                A.WORK_PSBL_DT,
+                A.WORK_PSBL_CL_RSN,
+                A.RIGION_CD,
+                A.ISSUE_CTT,
+                A.INFLNCE_LOSS,
+                A.INCNV_CTT,
+                A.USE_CNT,
+                A.USE_CNT_PRD,
+                A.IMPRV_PRPSL_CTT,
+                A.QUAL_EPT_EFT_CTT,
+                A.QUAN_EPT_EFT_CTT,
+                A.QUAN_EPT_EFT_CD,
+                A.CNCL_EMP_ID,
+                A.CNCL_DT,
+                A.CNCL_RSN_CTT,
+                NVL(A.SAFETY_CHK_DT,SYSDATE) SAFETY_DATE,
+                TO_CHAR(NVL(A.SAFETY_CHK_DT,SYSDATE),'YYYY-MM-DD') SAFETY_CHK_DT,
+                TO_CHAR(NVL(A.SAFETY_CHK_DT,SYSDATE),'HH24:MI') SAFETY_CHK_TIME,
+                A.SAFETY_CHK_LOC,
+                A.INVST_COST_NO,
+                A.CAPEX_NO,
+                A.DEL_YN,
+                A.FST_RGST_DT,
+                A.FST_RGSTR,
+                A.LAST_CHG_DT,
+                A.LAST_CHGR,
+                B.INVST_CD,
+                B.INVST_PURP_CD,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='IVST' AND MR_COMM_CD=B.INVST_CD) INVST_CD_NM,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='IVST_PUR' AND MR_COMM_CD=B.INVST_PURP_CD) INVST_PURP_CD_NM
+           FROM MR_REQ_MST A, MR_TECH_RV B
+          WHERE A.MR_REQ_NO = B.MR_REQ_NO(+)
+            AND A.MR_REQ_NO = #{mrReqNo}
+            AND A.DEL_YN=0
+            AND B.DEL_YN=0
+    </select>
+
+    <resultMap id="mrEquipMap" type="com.mr.ivst.domain.IvstReqEquipVO">
+        <id property="mrReqEquipNo" column="MR_REQ_EQUIP_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrProcNo" column="MR_PROC_NO" />
+        <result property="mrEquipCd" column="MR_EQUIP_CD" />
+        <result property="mrEquipName" column="MR_EQUIP_NAME" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMrReqEquip" resultMap="mrEquipMap">
+        SELECT MR_REQ_EQUIP_NO,
+               MR_REQ_NO,
+               MR_PROC_NO,
+               MR_EQUIP_CD,
+               MST.EQUIP_TEXT1 MR_EQUIP_NAME,
+               DEL_YN,
+               FST_RGST_DT,
+               FST_RGSTR,
+               LAST_CHG_DT,
+               LAST_CHGR
+          FROM MR_REQ_EQUIP EQUIP,
+               (SELECT EQUNR EQUIP_NO, EQKTX EQUIP_TEXT1 FROM SAP_EQUIP) MST
+         WHERE EQUIP.MR_EQUIP_CD = MST.EQUIP_NO
+           AND MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <resultMap id="mrProcMap" type="com.mr.ivst.domain.IvstReqProcVO">
+        <id property="mrReqProcNo" column="MR_REQ_PROC_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrProcNo" column="MR_PROC_NO" />
+        <result property="mrProcName" column="MR_PROC_NAME" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMrReqProc" resultMap="mrProcMap">
+        SELECT MR_REQ_PROC_NO,
+               MR_REQ_NO,
+               MR_PROC_NO,
+               MST.UNIT_NM AS MR_PROC_NAME,
+               DEL_YN,
+               FST_RGST_DT,
+               FST_RGSTR,
+               LAST_CHG_DT,
+               LAST_CHGR
+          FROM MR_REQ_PROC PROC,
+               (SELECT STAND UNIT_NO, KTEXT UNIT_NM FROM SAP_LOCA WHERE WERKS=(SELECT PLANT FROM MR_REQ_MST WHERE MR_REQ_NO=#{mrReqNo} )) MST
+         WHERE PROC.MR_PROC_NO = MST.UNIT_NO
+           AND MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <resultMap id="safeChrgrChgHistMap" type="com.mr.safe.domain.SafeChrgrChgHistVO">
+        <id property="mrReqProcStepDetNo" column="MR_REQ_PROC_STEP_DET_NO" />
+        <result property="mrReqProcStepNo" column="MR_REQ_PROC_STEP_NO" />
+        <result property="chrgrClCd" column="CHRGR_CL_CD" />
+        <result property="effEndDtm" column="EFF_END_DTM" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="fstProcTrmDt" column="FST_PROC_TRM_DT" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="chrgTeamNo" column="CHRG_TEAM_NO" />
+        <result property="chrgEmpNo" column="CHRG_EMP_NO" />
+        <result property="chrgEmpName" column="CHRG_EMP_NAME" />
+        <result property="aprvChgYn" column="APRV_CHG_YN" />
+        <result property="thdayTeam" column="THDAY_TEAM" />
+        <result property="thdayPos" column="THDAY_POS" />
+        <result property="sugg" column="SUGG" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectSafeLine" resultMap="safeChrgrChgHistMap">
+        SELECT DET.MR_REQ_NO,
+               DET.MR_REQ_PROC_STEP_NO,
+               DET.MR_REQ_PROC_STEP_DET_NO,
+               HIST.CHRGR_CL_CD,
+               HIST.PROC_ST_CD,
+               DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+               EMP.EMP_NAME AS CHRG_EMP_NAME,
+               HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+               DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+               HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO,
+               DET.FST_PROC_TRM_DT,
+               DECODE(DET.FST_PROC_TRM_DT, NULL, HIST.LAST_CHG_DT, '') AS LAST_CHG_DT
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST,
+               EDM_EMP EMP,
+               EDM_ORG TEAM,
+               EDM_DUTY DUTY
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+           AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+)
+           AND EMP.DUTY_ID = DUTY.DUTY_ID
+           AND STEP.MR_REQ_NO = #{mrReqNo}
+           AND DET.MR_STEP_CD = 'Z0070'
+           AND HIST.CHRGR_CL_CD LIKE 'Z02P%'
+           /* AND HIST.EFF_END_DTM = '99991231235959' */
+           AND HIST.DEL_YN=0
+           AND DET.DEL_YN=0
+           AND STEP.DEL_YN=0
+    </select>
+
+    <update id="updateSafeCheck" parameterType="map">
+    --updateSafeCheck가동전 안저점검 수정
+             UPDATE MR_REQ_MST
+                SET MR_STEP_CD = #{mrStepCd},
+                    PROC_ST_CD = #{procStCd},
+                    SAFETY_CHK_DT = #{safetyDate},
+                    SAFETY_CHK_LOC = #{safetyChkLoc},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+    <resultMap id="countSafeCheckMap" type="com.mr.safe.domain.SafeChrgrChgHistVO">
+        <result property="checkCnt" column="CHECK_CNT" />
+    </resultMap>
+
+    <select id="countSafeCheck" resultMap="countSafeCheckMap">
+    	--countSafeCheck임시저장 값이 기존에 있나 없나 체크
+        SELECT COUNT(*) CHECK_CNT
+          FROM MR_REQ_CHRGR_CHG_HIST
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND CHRGR_CL_CD LIKE 'Z02P%'
+           AND DEL_YN=0
+    </select>
+
+       <insert id="insertSafeProcStepDet" parameterType="com.mr.safe.domain.SafeProcStepDetVO">
+        <selectKey keyProperty="mrReqProcStepDetNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_PROC_STEP_DET_NO),0)+1
+              FROM MR_REQ_PROC_STEP_DET
+        </selectKey>
+        INSERT INTO MR_REQ_PROC_STEP_DET (
+                    MR_REQ_PROC_STEP_DET_NO,
+                    MR_REQ_PROC_STEP_NO,
+                    MR_REQ_NO,
+                    MR_STEP_CD,
+                    PROC_ST_CD,
+                    JOB_RV_CD,
+                    MR_PROC_STEP_DET_CL_CD,
+                    RV_REQ_CTT,
+                    REQ_DT,
+                    END_DT,
+                    PROC_TRM_CL_CD,
+                    FST_PROC_TRM_DT,
+                    SCND_PROC_TRM_DT,
+                    THRD_PROC_TRM_DT,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqProcStepDetNo},
+                        (SELECT MAX(MR_REQ_PROC_STEP_NO)
+                           FROM MR_REQ_PROC_STEP
+                          WHERE MR_REQ_NO=#{mrReqNo}
+                            AND EFF_END_DTM = '99991231235959'
+                            AND DEL_YN=0),
+                        #{mrReqNo},
+                        #{mrStepCd},
+                        #{procStCd},
+                        #{jobRvCd},
+                        #{mrProcStepDetClCd},
+                        #{rvReqCtt},
+                        #{reqDt},
+                        #{endDt},
+                        #{procTrmClCd},
+                        #{fstProcTrmDt},
+                        #{scndProcTrmDt},
+                        #{thrdProcTrmDt},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <insert id="insertSafeChrgrChgHist" parameterType="com.mr.safe.domain.SafeChrgrChgHistVO">
+        INSERT INTO MR_REQ_CHRGR_CHG_HIST (
+                    MR_REQ_PROC_STEP_DET_NO,
+                    CHRGR_CL_CD,
+                    EFF_END_DTM,
+                    EFF_STA_DTM,
+                    MR_REQ_NO,
+                    PROC_ST_CD,
+                    CHRG_TEAM_NO,
+                    CHRG_EMP_NO,
+                    APRV_CHG_YN,
+                    THDAY_TEAM,
+                    THDAY_POS,
+                    SUGG,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqProcStepDetNo},
+                        #{chrgrClCd},
+                        '99991231235959',
+                        TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+                        #{mrReqNo},
+                        #{procStCd},
+                        #{chrgTeamNo},
+                        #{chrgEmpNo},
+                        #{aprvChgYn},
+                        #{thdayTeam},
+                        #{thdayPos},
+                        #{sugg},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <update id="updateSafeProcStepDet" parameterType="map">
+             UPDATE MR_REQ_PROC_STEP_DET
+                SET FST_PROC_TRM_DT = #{fstProcTrmDt},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_PROC_STEP_DET_NO = ( SELECT MR_REQ_PROC_STEP_DET_NO FROM MR_REQ_CHRGR_CHG_HIST
+                                                WHERE MR_REQ_NO = #{mrReqNo}
+                                                  AND CHRGR_CL_CD = #{chrgrClCd}
+                                                  AND EFF_END_DTM = '99991231235959'
+                                                  AND DEL_YN = '0'
+                                               )
+                AND MR_REQ_NO = #{mrReqNo}
+                AND MR_STEP_CD = #{mrStepCd}
+                AND PROC_ST_CD = #{procStCd}
+                AND DEL_YN='0'
+    </update>
+
+    <update id="updateSafeChrgrChgHist" parameterType="map">
+             UPDATE MR_REQ_CHRGR_CHG_HIST
+                SET CHRG_TEAM_NO = #{chrgTeamNo},
+                    CHRG_EMP_NO = #{chrgEmpNo},
+                    THDAY_TEAM = #{thdayTeam},
+                    THDAY_POS = #{thdayPos},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND CHRGR_CL_CD = #{chrgrClCd}
+                AND EFF_END_DTM = '99991231235959'
+                AND DEL_YN='0'
+    </update>
+
+    <update id="updateSafeChrgrEffEnd" parameterType="map">
+       --updateSafeChrgrEffEnd
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN
+        (SELECT MR_REQ_PROC_STEP_DET_NO
+           FROM MR_REQ_PROC_STEP_DET
+          WHERE MR_REQ_NO = #{mrReqNo}
+            AND MR_STEP_CD = #{mrStepCd}
+            AND PROC_ST_CD = #{procStCd}
+            AND EFF_END_DTM = '99991231235959'
+            AND DEL_YN=0)
+    </update>
+
+	<update id="updateCheckZ02d" parameterType="map">
+		 UPDATE MR_REQ_CHRGR_CHG_HIST
+		    SET CHRGR_CL_CD = 'Z02I'
+		        ,CHRG_TEAM_NO = (SELECT CHRG_TEAM_NO FROM MR_REQ_CHRGR_CHG_HIST WHERE MR_REQ_NO=#{mrReqNo} AND CHRGR_CL_CD='Z02I' AND DEL_YN='0' AND ROWNUM=1)
+		        ,CHRG_EMP_NO = (SELECT CHRG_EMP_NO FROM MR_REQ_CHRGR_CHG_HIST WHERE MR_REQ_NO=#{mrReqNo} AND CHRGR_CL_CD='Z02I' AND DEL_YN='0' AND ROWNUM=1)
+          WHERE MR_REQ_NO = #{mrReqNo}
+            AND MR_REQ_PROC_STEP_DET_NO = (SELECT MR_REQ_PROC_STEP_DET_NO FROM MR_REQ_PROC_STEP_DET WHERE MR_REQ_NO = #{mrReqNo} AND MR_STEP_CD='Z0060' AND PROC_ST_CD = 'Z0110' AND DEL_YN = 0 AND ROWNUM=1 )
+            AND EFF_END_DTM = '99991231235959'
+            AND DEL_YN=0
+    </update>
+    
+     <!-- MR_SHE_INTERFACE_INS -->
+     <insert id="insertMrSheInterfaceTask" parameterType="map">
+     --she 인터페이스(task)
+	INSERT INTO MR_INTERFACE_SHE (MR_REQ_NO, TASK_YN, REQ_DATE, REQ_TIME)  
+    select MR_REQ_NO, 'Y' as TASK_YN, TO_CHAR(SYSDATE,'YYYY-MM-DD') as REQ_DATE , TO_CHAR(SYSDATE,'hh24:mi:dd') as REQ_TIME
+	from (      
+        select mr_req_no, mr_no, mr_req_title, sum(b) as b, sum(c) as c, sum(d) as d, sum(e) as e, sum(f) as f
+	          from(select mr_req_no, mr_no, mr_req_title
+	                      , (case when chrgr_cl_cd = 'Z02H1' and cl_Cd_11 = '2'  then 1 
+	                              else 0 end) as b      --기술관점 공전안전자료 변경이 있을경우
+	                      , (case when chrgr_cl_cd = 'Z02H5' and cl_Cd_05 = '2'  then 1 
+	                              else 0 end) as c      --안전관점 공전안전자료 변경이 있을경우
+	                      , (case when chrgr_cl_cd = 'Z02H9' and cl_Cd_02 = '2'  then 1 
+	                              else 0 end) as d      --산업안전보건법 공전안전자료 변경이 있을경우
+	                      , (case when chrgr_cl_cd = 'Z02H10' and cl_Cd_01 = '2'  then 1 
+	                              else 0 end) as e      --고압가스관계법 수행필요일 경우
+	                      , (case when chrgr_cl_cd = 'Z02H11' and cl_Cd_01 = '2'  then 1 
+	                              else 0 end) as f      --소방관계법 수행필요일 경우                                  
+	                from (  select mst.mr_req_no, mst.mr_no, mst.mr_req_title, mst.hazop_act_yn, det.mr_req_proc_step_det_no
+                                    , hist.chrgr_cl_cd, rv.cl_cd_01,rv.cl_cd_02, rv.cl_cd_05, rv.cl_cd_11              
+	                          from mr_req_mst mst                   --마스터
+	                                , mr_req_proc_step step         --단계
+	                                , mr_req_proc_step_det det      --단계상세
+	                                , mr_req_chrgr_chg_hist hist    --단계별담당자
+	                                , mr_rv_rst rv                  --검토항목
+	                                , (select max(mr_rv_rst_no) as mr_rv_rst_no, mr_req_no, mr_req_proc_step_det_no 
+	                                     from mr_rv_rst group by mr_req_no, mr_req_proc_step_det_no) rv_max --검토항목 데이터중 최종데이터 조회
+	                         where mst.mr_req_no = step.mr_req_no 
+	                           and step.mr_req_proc_step_no = det.mr_req_proc_step_no
+	                           and det.mr_req_proc_step_det_no = hist.mr_req_proc_step_det_no
+	                           and det.mr_req_proc_step_det_no = rv.mr_req_proc_step_det_no
+	                           and rv.mr_rv_rst_no = rv_max.mr_rv_rst_no
+	                           and mst.mr_step_cd in ('Z0070','Z0080','Z0090')                  --기술검토가 완료된 항목 조회(기술검토 코드는 'Z0070' 이나 작성이 완료되면 'Z0080'으로 넘어감)
+	                           and hist.chrgr_cl_cd in ('Z02H1','Z02H5','Z02H9','Z02H10','Z02H11')         --기술관점, 안전관점, 산업안전, 과압가스, 소방관계법조회
+	                           and rv.item_cd = 'JOBS'                                --직무검토의 항목만 조회(해당테이블에는 여러단계의 검토항목 보유)
+	                           and hist.eff_end_dtm = '99991231235959'                  --유효한 단계별 담당자 데이터만 조회(신규 저장기 기존자료는 날짜 입력)                       
+	                    ) r  
+	               ) s
+	          where mr_req_no not in (select mr_req_no from MR_INTERFACE_SHE where TASK_YN = 'Y')
+	          group by mr_req_no, mr_no, mr_req_title
+            ) rst 
+	        where b+c+d+e+f > 0 
+	        --and MR_REQ_NO = #{mrReqNo}
+    </insert>
+</mapper>

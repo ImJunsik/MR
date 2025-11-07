@@ -1,0 +1,443 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+<div class="mainimg">
+</div>
+
+
+<div id="content_wrap">
+<table id="summary" class="table_col" border="1" cellspacing="0">
+    <caption class="blind"></caption>
+    <colgroup>
+    <col width="9%">
+    <col width="9%">
+    <col width="9%">
+    <col width="9%">
+    <col width="9%">
+    <col width="9%">
+    <col width="9%">
+    <col width="9%">
+    <col width="9%">
+    <col width="9%">
+    </colgroup>
+    <thead>
+    <tr>
+        <th scope="col">처리상태</th>
+        <th scope="col">MR요청</th>
+        <th scope="col">기술검토</th>
+        <th scope="col">직무검토 ①</th>
+        <th scope="col">초기투자비산정</th>
+        <th scope="col">타당성검토</th>
+        <th scope="col">직무검토 ②</th>
+        <th scope="col">위험성검토</th>
+        <th scope="col">투자승인</th>
+        <th scope="col">MR수행</th>
+        <th scope="col">MR완료</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+      <c:choose>
+        <c:when test="${techInvestCnt > 0 }">
+          <th class="deprow" scope="row">지정</th>
+        </c:when>
+        <c:otherwise>
+          <th class="deprow" scope="row">작성</th>
+        </c:otherwise>
+      </c:choose>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+    </tr>
+    <tr>
+        <th class="deprow" scope="row">승인</th>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+    </tr>
+    <tr>
+        <th class="deprow" scope="row">반려</th>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+        <td class="center cursor summaryTd">0</td>
+    </tr>
+    <tr>
+        <th class="none" scope="row"></th>
+        <td class="none"></td>
+        <td class="none"></td>
+        <td class="none"></td>
+        <td class="none"></td>
+        <td class="none"></td>
+        <td class="none"></td>
+        <td class="none"></td>
+        <td class="none"></td>
+        <td class="none"></td>
+        <td class="none"></td>
+    </tr>
+    <tr>
+        <th class="mtotal">나의 MR</th>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+        <td class="center cursor summaryAppTd mtotal">0</td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- space non 10 -->
+<hr class="divider_none_10" />
+
+<table border="1" cellspacing="0" style="display:none">
+    <thead>
+    <tr>
+        <th class="deprow" scope="row" scope="col"></th>
+        <th class="deprow" scope="row" scope="col">진행</th>
+        <th class="deprow" scope="row" scope="col">초과</th>
+    </tr>
+    </thead>
+    <tr>
+        <th class="deprow" scope="row">임시변경</th>
+        <td class="center cursor tempSummaryTd"><c:out value="${tempSummary.col01}"/></td>
+        <td class="center cursor tempSummaryTd"><c:out value="${tempSummary.col02}"/></td>
+    </tr>
+</table>
+
+<!-- space non 10 -->
+<hr class="divider_none_10" />
+
+<table class="table_col mrList" border="1" cellspacing="0">
+
+</table>
+</div>
+<script>
+
+var titleTr = "";
+titleTr = titleTr +"<tr>";
+titleTr = titleTr +"<th scope='col' style='display:none'>MR Req No</th>";
+titleTr = titleTr +"<th scope='col' style='display:none'>MR Step Cd</th>";
+titleTr = titleTr +"<th scope='col' style='display:none'>상세 상태 코드</th>";
+titleTr = titleTr +"<th scope='col'>MR No.</th>";
+titleTr = titleTr +"<th scope='col'>사업명</th>";
+titleTr = titleTr +"<th scope='col'>작성일</th>";
+titleTr = titleTr +"<th scope='col'>요청자</th>";
+titleTr = titleTr +"<th scope='col'>요청팀</th>";
+titleTr = titleTr +"<th scope='col'>수행팀</th>";
+titleTr = titleTr +"<th scope='col'>진행상태</th>";
+titleTr = titleTr +"<tr>";
+$(document).ready(function() {
+
+	$.drawTable=function(isTotal, procStCd, col0, col01, col02, col03, col04, col05, col06, col07, col08, col09, col10){
+        var row=0;
+        switch (procStCd) {
+        case "Z0110":
+            row=0;
+            break;
+        case "Z0121":
+            row=1;
+            break;
+        case "Z0122":
+            row=1;
+            break;
+        case "Z0131":
+            row=1;
+            break;
+        case "Z0133":
+            row=1;
+            break;
+        case "Z0132":
+            row=1;
+            break;
+        case "Z0141":
+            row=2;
+            break;
+        }
+
+        if(isTotal){
+            row=4;
+        }
+
+
+        for (var i=1; i< 10;i++){
+        	console.log(eval("col0"+i))
+        	console.log(parseInt($("#summary").children("tbody").children("tr:eq("+row+")").children("td").eq(i).html())+parseInt(eval("col0"+i)))
+            if(row==1)	// not total
+            {
+                $("#summary").children("tbody").children("tr:eq("+row+")").children("td").eq(i).html(parseInt($("#summary").children("tbody").children("tr:eq("+row+")").children("td").eq(i).html())+parseInt(eval("col0"+i)));
+            } else 	// total
+            {
+                $("#summary").children("tbody").children("tr:eq("+row+")").children("td").eq(i).html(eval("col0"+i));
+            }
+        }
+    };
+//not total
+    "<c:forEach var='summary' items='${summary}'>";
+    $.drawTable(false,"${summary.procStCd}","${summary.col01}","${summary.col02}","${summary.col03}","${summary.col04}","${summary.col05}","${summary.col06}","${summary.col07}","${summary.col08}","${summary.col09}","${summary.col10}");
+    "</c:forEach>";
+//total
+    "<c:forEach var='appSummary' items='${appSummary}'>";
+    $.drawTable(true, "${appSummary.procStCd}","${appSummary.col01}","${appSummary.col02}","${appSummary.col03}","${appSummary.col04}","${appSummary.col05}","${appSummary.col06}","${appSummary.col07}","${appSummary.col08}","${appSummary.col09}","${appSummary.col10}");
+    "</c:forEach>";
+
+
+
+
+        $(".summaryTd").mouseover(function() {
+            $(this).css("background","#fcf8e3");
+        }).mouseleave(function() {
+           $(this).css("background","#ffffff");
+        }).click(function(){
+            $(".mrList").find("tr").remove().end();
+
+            if($(this).html()!="0"){
+
+            var tr ="";
+            var count=0;
+            var mrStepCd = "C" +$(this).index();
+            console.log('mrStepCd : ' + mrStepCd)
+            var procStCd = "R"+(parseInt($(this).parent("tr").index()+1));
+            tr = titleTr;
+            $(".mrList").append(tr);
+                $.ajax({
+                       type:"GET",
+                       url:"mrList.do?mrStepCd="+mrStepCd+"&procStCd="+procStCd,
+                       dataType:"JSON",
+                       success : function(data) {
+                           if(data.mrSearchList!=null) {
+                                 $.each(data.mrSearchList, function() {
+                                    count++;
+                                     tr = "";
+                                     tr = tr +"<tr class='mrLink cursor'>";
+                                     tr = tr +"<td style='display:none'>"+this.mrReqNo+"</td>";
+                                     tr = tr +"<td style='display:none'>"+this.mrStepCd+"</td>";
+                                     tr = tr +"<td style='display:none'>"+this.procStCd+"</td>";
+                                     tr = tr +"<td>"+this.mrNo+"</td>";
+                                     tr = tr +"<td>"+this.mrTitle+"</td>";
+                                     tr = tr +"<td>"+this.mrReqDate+"</td>";
+                                     tr = tr +"<td>"+this.mrReqEmp+"</td>";
+                                     tr = tr +"<td>"+this.mrReqTeam+"</td>";
+                                     tr = tr +"<td>"+this.mrActionTeam+"</td>";
+                                     tr = tr +"<td>"+this.mrStepNm+"</td>";
+                                     tr = tr +"<tr>";
+                                     $(".mrList").append(tr);
+                                  });
+                               tr = "";
+                               tr = tr +"<tr>";
+                               tr = tr +"<td colspan='7' class='foot'>총 "+count+ " 건이 조회 되었습니다.</td>";
+                               tr = tr +"<tr>";
+                               $(".mrList").append(tr);
+                             }
+                       }
+                });
+
+            }
+        });
+
+        $(".summaryAppTd").mouseover(function() {
+            $(this).css("background","#fcf8e3");
+        }).mouseleave(function() {
+           $(this).css("background","#fafafa");
+        }).click(function(){
+            $(".mrList").find("tr").remove().end();
+
+            if($(this).html()!="0"){
+
+            var tr ="";
+            var count=0;
+            var mrStepCd = "C" +$(this).index();
+            console.log('mrStepCd : ' + mrStepCd)
+            tr = titleTr;
+            $(".mrList").append(tr);
+                $.ajax({
+                       type:"GET",
+                       url:"mrAppList.do?mrStepCd="+mrStepCd,
+                       dataType:"JSON",
+                       success : function(data) {
+                           if(data.mrSearchList!=null) {
+                                 $.each(data.mrSearchList, function() {
+                                    count++;
+                                     tr = "";
+                                     tr = tr +"<tr class='mrLink cursor'>";
+                                     tr = tr +"<td style='display:none'>"+this.mrReqNo+"</td>";
+                                     tr = tr +"<td style='display:none'>"+this.mrStepCd+"</td>";
+                                     tr = tr +"<td style='display:none'>"+this.procStCd+"</td>";
+                                     tr = tr +"<td>"+this.mrNo+"</td>";
+                                     tr = tr +"<td>"+this.mrTitle+"</td>";
+                                     tr = tr +"<td>"+this.mrReqDate+"</td>";
+                                     tr = tr +"<td>"+this.mrReqEmp+"</td>";
+                                     tr = tr +"<td>"+this.mrReqTeam+"</td>";
+                                     tr = tr +"<td>"+this.mrActionTeam+"</td>";
+                                     tr = tr +"<td>"+this.mrStepNm+"</td>";
+                                     tr = tr +"<tr>";
+                                     $(".mrList").append(tr);
+                                  });
+                               tr = "";
+                               tr = tr +"<tr>";
+                               tr = tr +"<td colspan='7' class='foot'>총 "+count+ " 건이 조회 되었습니다.</td>";
+                               tr = tr +"<tr>";
+                               $(".mrList").append(tr);
+                             }
+                       }
+                });
+
+            }
+        });
+
+
+/*
+
+ 
+ 
+ "<c:forEach var='summary' items='${summary}'>";
+ "${summary.col07}"
+ "${summary.col08}"
+"${summary.col09}"
+"${summary.col10}"
+ "</c:forEach>";
+ 
+ "<c:forEach var='appSummary' items='${appSummary}'>";
+ "${appSummary.col07}"
+ "${appSummary.col08}"
+ "${appSummary.col09}"
+ "${appSummary.col10}"
+  "</c:forEach>";
+  
+        $(".tempSummaryTd").mouseover(function() {
+            $(this).css("background","#fcf8e3");
+        }).mouseleave(function() {
+           $(this).css("background","#ffffff");
+        }).click(function(){
+            $(".mrList").find("tr").remove().end();
+
+            if($(this).html()!="0"){
+
+            var tr ="";
+            var count=0;
+            var mrStepCd = "T" +$(this).index();
+            tr = tr +"<tr>";
+            tr = tr +"<th scope='col' style='display:none'>MR Req No</th>";
+            tr = tr +"<th scope='col' style='display:none'>MR Step Cd</th>";
+            tr = tr +"<th scope='col'>MR No.</th>";
+            tr = tr +"<th scope='col'>사업명</th>";
+            tr = tr +"<th scope='col'>작성일</th>";
+            tr = tr +"<th scope='col'>요청자</th>";
+            tr = tr +"<th scope='col'>요청팀</th>";
+            tr = tr +"<th scope='col'>수행팀</th>";
+            tr = tr +"<th scope='col'>진행상태</th>";
+            tr = tr +"<tr>";
+            $(".mrList").append(tr);
+                $.ajax({
+                       type:"GET",
+                       url:"mrList.do?mrStepCd="+mrStepCd,
+                       dataType:"JSON",
+                       success : function(data) {
+                           if(data.mrSearchList!=null) {
+                                 $.each(data.mrSearchList, function() {
+                                    count++;
+                                     tr = "";
+                                     tr = tr +"<tr class='mrLink cursor'>";
+                                     tr = tr +"<td style='display:none'>"+this.mrReqNo+"</td>";
+                                     tr = tr +"<td style='display:none'>"+this.mrStepCd+"</td>";
+                                     tr = tr +"<td>"+this.mrNo+"</td>";
+                                     tr = tr +"<td>"+this.mrTitle+"</td>";
+                                     tr = tr +"<td>"+this.mrReqDate+"</td>";
+                                     tr = tr +"<td>"+this.mrReqEmp+"</td>";
+                                     tr = tr +"<td>"+this.mrReqTeam+"</td>";
+                                     tr = tr +"<td>"+this.mrActionTeam+"</td>";
+                                     tr = tr +"<td>"+this.mrStepNm+"</td>";
+                                     tr = tr +"<tr>";
+                                     $(".mrList").append(tr);
+                                  });
+                               tr = "";
+                               tr = tr +"<tr>";
+                               tr = tr +"<td colspan='7' class='foot'>총 "+count+ " 건이 조회 되었습니다.</td>";
+                               tr = tr +"<tr>";
+                               $(".mrList").append(tr);
+                             }
+                       }
+                });
+
+            }
+        });
+ */
+});
+
+$(document).on("mouseover",".mrLink",function() {
+    $(this).css("background","#fcf8e3");
+}).on("mouseleave",".mrLink",function() {
+   $(this).css("background","#ffffff");
+}).on("click",".mrLink",function() {
+    var url ="";
+    switch ($(this).children("td:eq(1)").html()) {
+    case "Z0010":
+        url="mrRqRegister";
+        break;
+    case "Z0020":
+        url="mrTech";
+        break;
+    case "Z0025":
+        url="mrJobsCheck";
+        break;
+    case "Z0030":
+        if($(this).children("td:eq(2)").html()=="Z0122" || $(this).children("td:eq(2)").html()=="Z0131" || $(this).children("td:eq(2)").html()=="Z0133") {
+            url="mrComplete";
+        } else {
+            url="mrTechInvest";
+        }
+        break;
+    case "Z0040":
+        url="mrJobsReview";
+        break;
+    case "Z0050":
+        url="ivstCostRegister";
+        break;
+    case "Z0060":
+        url="safeCheckExe";
+        break;
+    case "Z0070":
+        url="safeCheckRegister";
+        break;
+    case "Z0080":
+        url="compFileManage";
+        break;
+    case "Z0090":
+        url="compRptRegister";
+        break;
+    case "Z00P0":
+        url="mrRiskCheck";
+        break;
+    case "Z00R0":
+        url="mrRiskCheck";
+        break;
+    default:
+        url="mrRqRegister";
+        break;
+    }
+    document.location.href = url+".do?mrReqNo="+$(this).children("td:eq(0)").html();
+});
+</script>

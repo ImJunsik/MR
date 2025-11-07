@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <bean id="jobListenerImpl" class="com.base.scheduling.JobListenerImpl">
+        <property name="jobSchedulingRepository">
+            <bean class="com.base.scheduling.repository.JobSchedulingRepository" />
+        </property>
+    </bean>
+ 
+    <bean class="com.base.scheduling.JobManuallyExecution">
+        <property name="jobListener" ref="jobListenerImpl" />
+        <property name="messageSource" ref="messageSource" />
+    </bean>
+  
+    <bean id="scheduler" class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="globalJobListeners">
+            <list>
+                <ref bean="jobListenerImpl" />
+            </list>
+        </property>
+        <property name="triggers">
+            <list>
+                <!-- <ref bean="temporaryFileDeleteJobCronTrigger" /> -->
+                <ref bean="limitDateMailSendTrigger" />
+                <ref bean="incompleteMrMailSendTrigger" />
+            </list>
+        </property>
+    </bean>
+
+    <bean id="mrMailService" class="com.mr.step.service.impl.MrMailServiceImpl" />
+
+    <bean id="limitDateMailSendTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="limitDateMailSendJob" />
+        <property name="cronExpression" value="0 30 7 * * ?" />
+    </bean>
+    <bean id="limitDateMailSendJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass" value="com.mr.scheduling.LimitDateMailSender" />
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="mrMailService" value-ref="mrMailService" />
+                <entry key="jobName" value="승인기한을 넘긴 MR 건 담당자에게 메일전송" />
+            </map>
+        </property>
+    </bean>
+
+    <bean id="incompleteMrMailSendTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="incompleteMrMailSendJob" />
+        <property name="cronExpression" value="0 50 7 * * ?" />
+    </bean>
+    <bean id="incompleteMrMailSendJob" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass" value="com.mr.scheduling.IncompleteMrMailSender" />
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="mrMailService" value-ref="mrMailService" />
+                <entry key="jobName" value="미완료 건 부서 그룹에게 메일전송" />
+            </map>
+        </property>
+    </bean>
+    
+    <bean id="temporaryFileDeleteJobCronTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail" ref="temporaryFileDeleteJobDetail" />
+        <!-- 초-분-시-일-월-주-년 순서로 표현 / -->
+        <!-- http://dakccom.tistory.com/entry/Support-for-specifying-both-a-day-of-week-AND-a-day-of-month-parameter-is-not-implemented -->
+        <property name="cronExpression" value="0 42 18 * * ?" />
+        <!-- property name="cronExpression" value="5 * * * * ?" /-->
+    </bean>
+
+    <bean id="temporaryFileDeleteJobDetail" class="org.springframework.scheduling.quartz.JobDetailBean">
+        <property name="jobClass" value="com.common.file.scheduling.TemporaryFileDeleteJob" />
+        <property name="jobDataAsMap">
+            <map>
+                <entry key="jobName" value="임시파일 삭제잡" />
+                <entry key="path" value="${attach-path.temp}" />
+                <!-- 단위 시간 e.g. 24 == 1일 (현재 설정은 1주일), 기본값 24시간 -->
+                <entry key="period" value="168" />
+            </map>
+        </property>
+    </bean>
+
+
+</beans>

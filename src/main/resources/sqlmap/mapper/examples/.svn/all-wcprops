@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/resources/sqlmap/mapper/examples
+END
+DepartmentRepository.xml
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/resources/sqlmap/mapper/examples/DepartmentRepository.xml
+END
+EmployeeRepository.xml
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/resources/sqlmap/mapper/examples/EmployeeRepository.xml
+END

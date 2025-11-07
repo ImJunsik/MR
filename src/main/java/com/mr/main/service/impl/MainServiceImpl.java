@@ -1,0 +1,56 @@
+package com.mr.main.service.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.base.service.BaseService;
+import com.mr.common.domain.EmpInfoVo;
+import com.mr.main.domain.MrListVO;
+import com.mr.main.domain.MrSummary;
+import com.mr.main.domain.MrSummaryEx;
+import com.mr.main.repository.MainDAO;
+import com.mr.main.service.MainService;
+
+@Service
+public class MainServiceImpl extends BaseService implements MainService{
+
+    @Autowired
+    MainDAO mainDAO;
+
+    @Override
+    public List<MrSummary> selectMrSummary(EmpInfoVo empInfoVo) {
+        return mainDAO.selectMrSummary(empInfoVo);
+    }
+    
+    @Override
+    public List<MrSummary> selectAppSummary(EmpInfoVo empInfoVo) {
+        return mainDAO.selectAppSummary(empInfoVo);
+    }
+
+    @Override
+    public MrSummary selectTempMrSummary(EmpInfoVo empInfoVo) {
+        return mainDAO.selectTempMrSummary(empInfoVo);
+    }
+
+    @Override
+    public List<MrListVO> selectMrList(MrListVO mrListVO){
+        return mainDAO.selectMrList(mrListVO);
+    }
+
+    @Override
+    public List<MrListVO> selectAppMrList(MrListVO mrListVO) {
+        return mainDAO.selectAppMrList(mrListVO);
+    }
+
+    @Override
+    public int getTechInvestCnt(EmpInfoVo empInfoVo) {
+        return mainDAO.getTechInvestCnt(empInfoVo);
+    }
+
+
+
+
+
+}

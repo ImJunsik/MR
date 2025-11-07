@@ -1,0 +1,180 @@
+﻿package com.mr.detailsearch.controller;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.View;
+
+import com.base.servlet.BaseController;
+import com.mr.detailsearch.domain.DetailSearchVO;
+import com.mr.detailsearch.service.DetailSearchService;
+import com.mr.detailsearch.service.impl.DetailSearchExcelWriter;
+import com.mr.main.domain.MrListVO;
+
+/**
+ * 상세검색 컨트롤러
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * 2014.06.25 박성룡 ajax 상세검색 추가
+ * </pre>
+ */
+
+@Controller
+@RequestMapping(value = "/")
+public class DetailSearchController extends BaseController {
+    private final Logger logger = Logger.getLogger(this.getClass());
+
+
+    @Autowired
+    DetailSearchService detailSearchService;
+
+    /**
+     * 상세검색 화면 View(사용안함)
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/detailSearch.do", method=RequestMethod.GET)
+    public String detailSearch(Model model) {
+        return "main/detailSearch";
+    }
+
+    //상세조회 화면, mr정보리스트조회
+    @RequestMapping(value = "/detailSearch.do", method=RequestMethod.POST)
+    public Model detailSearchAjax(DetailSearchVO inDetailSearchVO,Model model) {
+        List<Map> mrSearchList = new ArrayList<Map>();
+        Map<String, String> codeValue;
+        //mr 조회시 에러문구: WHERE CEIL(RN/ 23 /**P*/) = DECODE(?/**P*/,null,1,?/**P*/)
+        System.out.println("## Log => ROWLIMIT" +inDetailSearchVO.getROWLIMIT() );
+        System.out.println("## Log => page" +inDetailSearchVO.getPage());
+        
+        //ListVO selectDetailSearch
+        for(MrListVO mrListVO : detailSearchService.selectDetailSearch(inDetailSearchVO)){
+            codeValue = new LinkedHashMap<String, String>();
+            codeValue.put("mrNo", mrListVO.getMrNo());
+            codeValue.put("totalCount", mrListVO.getTotalCount()==null ? " " : mrListVO.getTotalCount()+"");
+            codeValue.put("mrReqNo", mrListVO.getMrReqNo());
+            codeValue.put("mrStepCd", mrListVO.getMrStepCd());
+            codeValue.put("procStCd", mrListVO.getProcStCd()==null ? " " : mrListVO.getProcStCd());
+            codeValue.put("mrReqTitle", mrListVO.getMrReqTitle()==null ? " " : mrListVO.getMrReqTitle());
+            codeValue.put("mrReqEmp", mrListVO.getEmpName());
+            codeValue.put("mrStepNm", mrListVO.getMrStepNm());
+            codeValue.put("reqEmpName", mrListVO.getReqEmpName()==null ? " " : mrListVO.getReqEmpName()+"");
+            codeValue.put("jobEmpName", mrListVO.getJobEmpName()==null ? " " : mrListVO.getJobEmpName()+"");
+            codeValue.put("proEmpName", mrListVO.getProEmpName()==null ? " " : mrListVO.getProEmpName()+"");
+            codeValue.put("actEmpName", mrListVO.getActEmpName()==null ? " " : mrListVO.getActEmpName()+"");
+            codeValue.put("reqTeamName", mrListVO.getReqTeamName()==null ? " " : mrListVO.getReqTeamName()+"");
+            codeValue.put("jobTeamName", mrListVO.getJobTeamName()==null ? " " : mrListVO.getJobTeamName()+"");
+            codeValue.put("proTeamName", mrListVO.getProTeamName()==null ? " " : mrListVO.getProTeamName()+"");
+            codeValue.put("actTeamName", mrListVO.getActTeamName()==null ? " " : mrListVO.getActTeamName()+"");
+            codeValue.put("capexNo", mrListVO.getCapexNo()==null ? " " : mrListVO.getCapexNo()+"");
+            
+           // logger.debug("getMrNo" +mrListVO.getMrNo() );            
+           // logger.debug("getMrReqNo" +mrListVO.getMrReqNo() );
+           // logger.debug("mrStepCd" +mrListVO.getMrStepCd() );
+           // logger.debug("getEmpName" +mrListVO.getEmpName() );
+           // logger.debug("getMrStepNm" +mrListVO.getMrStepNm() );
+            
+           System.out.println("getMrNo" +mrListVO.getMrNo());
+           System.out.println("getMrReqNo" +mrListVO.getMrReqNo() );
+           System.out.println("mrStepCd" +mrListVO.getMrStepCd() );
+           System.out.println("getEmpName" +mrListVO.getEmpName() );
+           System.out.println("getMrStepNm" +mrListVO.getMrStepNm() );
+            
+           mrSearchList.add(codeValue);
+        }
+        model.addAttribute("mrSearchList",mrSearchList);
+
+        return model;
+    }
+
+    /**
+     * 상세검색 화면 조회리스트 total
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/detailSearchTotal.do", method=RequestMethod.POST)
+    public Model detailSearchTotal(DetailSearchVO inDetailSearchVO,Model model) {
+        List<Map> mrSearchList = new ArrayList<Map>();
+        Map<String, String> codeValue;
+        for(MrListVO mrListVO : detailSearchService.selectDetailSearchTotal(inDetailSearchVO)){
+            codeValue = new LinkedHashMap<String, String>();
+
+            codeValue.put("mrNo", mrListVO.getMrNo());
+            codeValue.put("totalCount", mrListVO.getTotalCount()==null ? " " : mrListVO.getTotalCount()+"");
+            codeValue.put("mrReqNo", mrListVO.getMrReqNo());
+            codeValue.put("mrStepCd", mrListVO.getMrStepCd());
+            codeValue.put("procStCd", mrListVO.getProcStCd()==null ? " " : mrListVO.getProcStCd());
+            codeValue.put("mrReqTitle", mrListVO.getMrReqTitle()==null ? " " : mrListVO.getMrReqTitle());
+            codeValue.put("mrReqEmp", mrListVO.getEmpName());
+            codeValue.put("mrStepNm", mrListVO.getMrStepNm());
+            codeValue.put("reqEmpName", mrListVO.getReqEmpName()==null ? " " : mrListVO.getReqEmpName()+"");
+            codeValue.put("jobEmpName", mrListVO.getJobEmpName()==null ? " " : mrListVO.getJobEmpName()+"");
+            codeValue.put("proEmpName", mrListVO.getProEmpName()==null ? " " : mrListVO.getProEmpName()+"");
+            codeValue.put("actEmpName", mrListVO.getActEmpName()==null ? " " : mrListVO.getActEmpName()+"");
+            codeValue.put("reqTeamName", mrListVO.getReqTeamName()==null ? " " : mrListVO.getReqTeamName()+"");
+            codeValue.put("jobTeamName", mrListVO.getJobTeamName()==null ? " " : mrListVO.getJobTeamName()+"");
+            codeValue.put("proTeamName", mrListVO.getProTeamName()==null ? " " : mrListVO.getProTeamName()+"");
+            codeValue.put("actTeamName", mrListVO.getActTeamName()==null ? " " : mrListVO.getActTeamName()+"");
+            codeValue.put("capexNo", mrListVO.getCapexNo()==null ? " " : mrListVO.getCapexNo()+"");
+            codeValue.put("sapCostTot", mrListVO.getSapCostTot()==null ? " " : mrListVO.getSapCostTot()+"");
+            codeValue.put("costTotalSum", mrListVO.getCostTotalSum()==null ? " " : mrListVO.getCostTotalSum()+"");
+            mrSearchList.add(codeValue);
+            
+            //System.out.println("sapCostTot   :: " + mrListVO.getCapexNo() + "::" + mrListVO.getSapCostTot());  
+        }
+        model.addAttribute("mrSearchList",mrSearchList);
+
+        return model;
+    }
+    
+    @RequestMapping(value = "/detailSearchExcel.do")
+    public View excelTotalYearList(DetailSearchVO inDetailSearchVO, Map<String,Object> ModelMap) {
+
+        List<Map> mrSearchList = new ArrayList<Map>();
+        Map<String, String> codeValue;
+        for(MrListVO mrListVO : detailSearchService.selectDetailSearchTotal(inDetailSearchVO)){
+            codeValue = new LinkedHashMap<String, String>();
+
+            codeValue.put("mrNo", mrListVO.getMrNo());
+            codeValue.put("totalCount", mrListVO.getTotalCount()==null ? " " : mrListVO.getTotalCount()+"");
+            codeValue.put("mrReqNo", mrListVO.getMrReqNo());
+            codeValue.put("mrStepCd", mrListVO.getMrStepCd());
+            codeValue.put("procStCd", mrListVO.getProcStCd()==null ? " " : mrListVO.getProcStCd());
+            codeValue.put("mrReqTitle", mrListVO.getMrReqTitle()==null ? " " : mrListVO.getMrReqTitle());
+            codeValue.put("mrReqEmp", mrListVO.getEmpName());
+            codeValue.put("mrStepNm", mrListVO.getMrStepNm());
+            codeValue.put("reqEmpName", mrListVO.getReqEmpName()==null ? " " : mrListVO.getReqEmpName()+"");
+            codeValue.put("jobEmpName", mrListVO.getJobEmpName()==null ? " " : mrListVO.getJobEmpName()+"");
+            codeValue.put("proEmpName", mrListVO.getProEmpName()==null ? " " : mrListVO.getProEmpName()+"");
+            codeValue.put("actEmpName", mrListVO.getActEmpName()==null ? " " : mrListVO.getActEmpName()+"");
+            codeValue.put("reqTeamName", mrListVO.getReqTeamName()==null ? " " : mrListVO.getReqTeamName()+"");
+            codeValue.put("jobTeamName", mrListVO.getJobTeamName()==null ? " " : mrListVO.getJobTeamName()+"");
+            codeValue.put("proTeamName", mrListVO.getProTeamName()==null ? " " : mrListVO.getProTeamName()+"");
+            codeValue.put("actTeamName", mrListVO.getActTeamName()==null ? " " : mrListVO.getActTeamName()+"");
+            codeValue.put("capexNo", mrListVO.getCapexNo()==null ? " " : mrListVO.getCapexNo()+"");
+            codeValue.put("sapCostTot", mrListVO.getSapCostTot()==null ? " " : mrListVO.getSapCostTot()+"");
+            codeValue.put("costTotalSum", mrListVO.getCostTotalSum()==null ? " " : mrListVO.getCostTotalSum()+"");
+            mrSearchList.add(codeValue);
+        }
+        ModelMap.put("mrSearchList", mrSearchList);
+        
+        return new DetailSearchExcelWriter();
+    }
+}
+
+

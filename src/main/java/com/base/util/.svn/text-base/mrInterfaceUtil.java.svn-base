@@ -1,0 +1,92 @@
+package com.base.util;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
+
+/**
+ * <pre>
+ * 스트림 데이터 파싱 (post형태 값은 스트림으로 넘오옴 닷넷에서) 
+ * </pre>
+ *
+ * @author 하제욱
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2015.09.03 하제욱 최초 작성
+ * </pre>
+ */
+public class mrInterfaceUtil {
+
+	 /**
+     *  스트림 파싱해서 xml 형태의 문서로(Document)로 리턴 <BR>
+     * @return Document
+     * @param InputStream
+     */  
+		public static Document parsePostParam(InputStream inputStream) throws Exception{
+			Document doc = null;
+			StringBuilder stringBuilder = new StringBuilder();
+			BufferedReader bufferedReader = null;
+
+				try {
+					if (inputStream != null) {
+						bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+						char[] charBuffer = new char[128];
+						int bytesRead = -1;
+						while ((bytesRead = bufferedReader.read(charBuffer)) > 0) {
+							stringBuilder.append(charBuffer, 0, bytesRead);
+						}
+					}
+				} catch (IOException ex) {
+					System.out.println("IOException inputStream :" + inputStream);
+					throw ex;
+				} finally {
+					if (bufferedReader != null) {
+						try {
+							bufferedReader.close();
+						} catch (IOException ex) {
+							throw ex;
+						}
+					}  
+				}		
+			   System.out.println("stringBuilder doc : "+stringBuilder.toString());
+			   doc =  parseXML(stringBuilder.toString());
+			   
+			   return doc;
+		   }
+		
+		
+		public static Document parseXML(String strDoc) throws Exception{
+			Document doc = null;
+			try{
+				System.out.println("parseXML start : ");
+				InputSource is = new InputSource(new StringReader(strDoc));
+				doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
+				System.out.println("parseXML end: " );
+			}catch(Exception ex){
+				throw ex;
+			}
+			return doc;
+		}
+		
+		
+		 /**
+	     *  String의 널값을 초기화<BR>
+	     * @return String - NULL 이면 "" 값을 리턴한다.
+	     * @param String
+	     */     
+	    public static String strNull( String str ) {
+	        if ( str == null ) return "";
+	        else return str;
+	    }
+ 
+}

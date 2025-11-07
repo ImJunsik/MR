@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="examples">
+    <!--
+    resultMap은 MyBatis가 Java Object에 쿼리 결과 값을 바인딩할 때 데이터베이스 컬럼네임과
+    자바의 변수 이름이 같은 것을 찾아 자동으로 바인딩해준다.
+    보통 자바의 변수 이름과 데이터베이스의 컬럼 네임은 상이하기 때문에
+    특정 컬럼명이 자바 변수의 어떤 변수와 동등하다는 것을 표현하기 위해 resultMap을 사용한다.
+    -->
+    <resultMap id="employeeResultMap" type="com.examples.domain.Employee">
+        <id property="employeeNo" column="EMP_NO" />
+        <result property="employeeName" column="EMP_NAME" />
+        <result property="salary" column="SALARY" />
+        <result property="hireDate" column="HIRE_DATE" />
+        <result property="married" column="MARRIED" />
+        <result property="departmentNo" column="DEPT_NO" />
+        <result property="departmentName" column="DEPT_NAME" />
+        <result property="photoFileCode" column="PHOTO_FILE_CD" />
+        <association property="photoFile" javaType="com.common.file.domain.AttachFile" column="PHOTO_FILE_CD" select="common.file.getAttachFile" />
+        <collection property="academicCareers" ofType="com.examples.domain.AcademicCareer" column="EMP_NO" select="examples.getAcademicCareerListByEmployeeNo" />
+        <collection property="careers" ofType="com.examples.domain.Career" column="EMP_NO" select="examples.getCareerListByEmployeeNo" />
+        <collection property="attachFiles" ofType="com.common.file.domain.AttachFile" column="EMP_NO" select="examples.getAttachFileListByEmployeeNo" />
+    </resultMap>
+    
+    <resultMap id="employeeListResultMap" type="map">
+        <id property="employeeNo" column="EMP_NO" />
+        <result property="employeeName" column="EMP_NAME" />
+        <result property="salary" column="SALARY" />
+        <result property="hireDate" column="HIRE_DATE" />
+        <result property="departmentName" column="DEPT_NAME" />
+        <result property="totalCount" column="TOT_CNT" />
+    </resultMap>
+
+    <resultMap id="academicCareerResultMap" type="com.examples.domain.AcademicCareer">
+        <id property="academicCareerNo" column="ACDMCR_NO" />
+        <result property="employeeNo" column="EMP_NO" />
+        <result property="schoolName" column="SCHUL_NM" />
+        <result property="graduationYear" column="GRDTN_YEAR" />
+        <result property="graduationTypeCode" column="GRDTN_TYPE_CD" />
+        <result property="point" column="PNT" />
+    </resultMap>
+
+    <resultMap id="careerResultMap" type="com.examples.domain.Career">
+        <id property="careerNo" column="CAREER_NO" />
+        <result property="employeeNo" column="EMP_NO" />
+        <result property="companyName" column="WRC_NM" />
+        <result property="officialPositionCode" column="OFCPS_CD" />
+        <result property="retirementDate" column="RETIRE_YM" />
+        <result property="chargeJob" column="CHRG_JOB" />
+    </resultMap>
+
+    <!-- 
+    SQL 문장 끝에 ;(Semicolon) 붙이지 않도록 주의..
+    다음과 같은 에러를 만날 수 있음..
+    ORA-00911: invalid character
+    주석 또한 주의 (한 줄 주석은 안 됨)
+    XML 내 Database 주석을 사용하고자 할 때는 반드 /* */ 주석을 사용할 것 
+    -->
+    <select id="getEmployee" parameterType="int" resultMap="employeeResultMap">
+       SELECT a.emp_no
+             ,a.emp_name
+             ,a.salary
+             ,a.married
+             ,a.hire_date
+             ,a.dept_no
+             ,b.dept_name
+             ,a.photo_file_cd
+         FROM exam_emp a
+             ,exam_dept b
+        WHERE a.dept_no = b.dept_no
+          AND emp_no = #{employeeNo}
+    </select>
+
+    <select id="getEmployeeList" parameterType="com.examples.web.EmployeeSearchCondition" resultMap="employeeListResultMap">
+        <include refid="pagination.header" />
+		SELECT a.emp_no
+		      ,a.emp_name
+		      ,a.salary
+		      ,a.hire_date
+		      ,b.dept_name
+              ,COUNT(a.emp_no) OVER() tot_cnt
+		  FROM exam_emp a
+		      ,exam_dept b
+		 WHERE a.dept_no = b.dept_no
+		 <if test="employeeName != null">
+		   AND a.emp_name LIKE '%' || #{employeeName} || '%'
+		 </if>
+		 <if test="departmentNo > 0">
+		   AND a.dept_no = #{departmentNo}
+		 </if>
+		ORDER BY a.emp_no
+        <include refid="pagination.footer" />
+    </select>
+
+    <!--
+    MyBatis는 dynamic query를 위해 다양한 조건문을 제공한다.
+    자세한 내용은 iBatis(MyBatis) 홈페이지를 참고한다.
+    http://www.mybatis.org/core/ko/index.html
+    
+    본 쿼리는 임의의 컬럼 alias를 주지는 않았지만 underscore와 대문자의 컬럼명을
+    자동으로 java 표준 표기법은 Camel case(카멜표기법)으로 변환하여 Map의 key값으로 넣는다.
+    단 자동으로 변환되기 위해서는 HashMap을 상속받은 CamelCaseMap을 resultType으로 주어야 한다.
+    -->
+    <select id="getCamelCaseEmployeeList" parameterType="com.examples.web.EmployeeSearchCondition" resultType="CamelCaseMap">
+        <include refid="pagination.header" />
+        SELECT a.emp_no
+              ,a.emp_name
+              ,a.salary
+              ,a.hire_date
+              ,b.dept_name
+              ,COUNT(a.emp_no) OVER() tot_cnt
+          FROM exam_emp a
+              ,exam_dept b
+         WHERE a.dept_no = b.dept_no
+         <if test="employeeName != null">
+           AND a.emp_name LIKE '%' || #{employeeName} || '%'
+         </if>
+         <if test="departmentNo > 0">
+           AND a.dept_no = #{departmentNo}
+         </if>
+        ORDER BY a.emp_no
+        <include refid="pagination.footer" />
+    </select>
+    
+    <select id="getAcademicCareerListByEmployeeNo" parameterType="int" resultMap="academicCareerResultMap">
+        SELECT acdmcr_no
+              ,emp_no
+              ,schul_nm
+              ,grdtn_year
+              ,grdtn_type_cd
+              ,pnt
+          FROM exam_emp_acdmcr
+         WHERE emp_no = #{employeeNo}
+    </select>
+    
+    <select id="getCareerListByEmployeeNo" parameterType="int" resultMap="careerResultMap">
+        SELECT career_no
+              ,emp_no
+              ,wrc_nm
+              ,ofcps_cd
+              ,retire_ym
+              ,chrg_job
+          FROM exam_emp_career
+         WHERE emp_no = #{employeeNo}
+    </select>
+    
+    <select id="getAttachFileListByEmployeeNo" parameterType="int" resultMap="common.file.attachFileResultMap">
+        SELECT a.file_cd
+              ,a.file_path
+              ,a.file_nm
+              ,a.conv_file_nm
+              ,a.file_size
+          FROM exam_file a
+              ,exam_emp_file_rls b
+         WHERE a.file_cd = b.file_cd
+           AND b.emp_no = #{employeeNo}
+    </select>
+
+    <!--
+    selectKey는 특정 테이블에 사용할 키 값을 만들어 사용할 수 있도록
+    지원해주는 tag이다.
+    예제에서는 exam_emp 테이블의 emp_no의 max 값에 +1를 한 값을
+    Employee.employeeNo 변수에 할당하는 내용이다.
+    만약 Domain Object가 없는 경우에는 keyProperty 값에 임의의 값을 입력하고
+    참조하여 사용할 수도 있다.
+    -->
+    <insert id="insertEmployee" parameterType="com.examples.domain.Employee">
+        <selectKey keyProperty="employeeNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(emp_no) + 1, 1)
+              FROM exam_emp
+        </selectKey>
+        INSERT INTO exam_emp (
+                emp_no
+               ,emp_name
+               ,salary
+               ,married
+               ,hire_date
+               ,dept_no
+               ,photo_file_cd)
+            VALUES (
+                #{employeeNo}
+               ,#{employeeName}
+               ,#{salary}
+               ,#{married}
+               ,#{hireDate}
+               ,#{departmentNo}
+               ,#{photoFileCode})
+    </insert>
+    
+    <insert id="insertAcademicCareer" parameterType="com.examples.domain.AcademicCareer">
+        <selectKey keyProperty="academicCareerNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(acdmcr_no) + 1, 1)
+              FROM exam_emp_acdmcr
+        </selectKey>
+        INSERT INTO exam_emp_acdmcr (
+                acdmcr_no
+               ,emp_no
+               ,schul_nm
+               ,grdtn_year
+               ,grdtn_type_cd
+               ,pnt)
+            VALUES (
+                #{academicCareerNo}
+               ,#{employeeNo}
+               ,#{schoolName}
+               ,#{graduationYear}
+               ,#{graduationTypeCode}
+               ,#{point})
+    </insert>
+    
+    <insert id="insertCareer" parameterType="com.examples.domain.Career">
+        <selectKey keyProperty="careerNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(career_no) + 1, 1)
+              FROM exam_emp_career
+        </selectKey>
+        INSERT INTO exam_emp_career (
+                career_no
+               ,emp_no
+               ,wrc_nm
+               ,ofcps_cd
+               ,retire_ym
+               ,chrg_job)
+            VALUES (
+                #{careerNo}
+               ,#{employeeNo}
+               ,#{companyName}
+               ,#{officialPositionCode}
+               ,#{retirementDate}
+               ,#{chargeJob})
+    </insert>
+    
+    <insert id="insertEmployeeAttachFileRelations" parameterType="map">
+        INSERT INTO exam_emp_file_rls (
+                emp_no
+               ,file_cd )
+            VALUES (
+                #{employeeNo}
+               ,#{code}
+            )
+    </insert>
+    
+    <update id="updateEmployee" parameterType="com.examples.domain.Employee">
+        UPDATE exam_emp
+           SET emp_name = #{employeeName}
+              ,salary = #{salary}
+              ,married = #{married}
+              ,hire_date = #{hireDate}
+              ,dept_no = #{departmentNo}
+              ,photo_file_cd = #{photoFileCode}
+         WHERE emp_no = #{employeeNo}
+    </update>
+
+    <update id="updateAcademicCareer" parameterType="com.examples.domain.AcademicCareer">
+        UPDATE exam_emp_acdmcr
+           SET schul_nm = #{schoolName}
+              ,grdtn_year = #{graduationYear}
+              ,grdtn_type_cd = #{graduationTypeCode}
+              ,pnt = #{point}
+         WHERE acdmcr_no = #{academicCareerNo}
+    </update>
+    
+    <update id="updateCareer" parameterType="com.examples.domain.Career">
+        UPDATE exam_emp_career
+           SET wrc_nm = #{companyName}
+              ,ofcps_cd = #{officialPositionCode}
+              ,retire_ym = #{retirementDate}
+              ,chrg_job = #{chargeJob}
+         WHERE career_no = #{careerNo}
+    </update>
+    
+    <delete id="deleteEmployee" parameterType="int">
+        DELETE
+          FROM exam_emp
+         WHERE emp_no = #{employeeNo}
+    </delete>
+
+    <delete id="deleteAcademicCareer" parameterType="int">
+        DELETE
+          FROM exam_emp_acdmcr
+         WHERE acdmcr_no = #{academicCareerNo}
+    </delete>
+
+    <delete id="deleteAcademicCareerByEmployeeNo" parameterType="int">
+        DELETE
+          FROM exam_emp_acdmcr
+         WHERE emp_no = #{employeeNo}
+    </delete>
+
+    <delete id="deleteCareer" parameterType="int">
+        DELETE
+          FROM exam_emp_career
+         WHERE career_no = #{careerNo}
+    </delete>
+
+    <delete id="deleteCareerByEmployeeNo" parameterType="int">
+        DELETE
+          FROM exam_emp_career
+         WHERE emp_no = #{employeeNo}
+    </delete>
+    
+    <delete id="deleteEmployeeAttachFileRelations" parameterType="map">
+        DELETE
+          FROM exam_emp_file_rls
+         WHERE emp_no = #{employeeNo}
+           AND file_cd = #{code}
+    </delete>
+    
+    <delete id="deleteEmployeeAttachFileRelationsByEmployeeNo" parameterType="int">
+        DELETE
+          FROM exam_emp_file_rls
+         WHERE emp_no = #{employeeNo}
+    </delete>
+    
+    <delete id="deleteEmployeeWithAllRelated" parameterType="map">
+        DELETE
+          FROM ${tableName}
+         WHERE emp_no = #{employeeNo}
+    </delete>
+</mapper>

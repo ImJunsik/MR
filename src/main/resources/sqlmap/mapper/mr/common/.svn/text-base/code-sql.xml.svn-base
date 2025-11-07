@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common.code">
+    <resultMap id="codeMap" type="com.mr.common.domain.CommCdVO">
+        <result property="mrCommGrpCd" column="MR_COMM_GRP_CD" />
+        <result property="mrCommGrpNm" column="MR_COMM_GRP_NM" />
+        <result property="mrCommCd" column="MR_COMM_CD" />
+        <result property="mrCommNm" column="MR_COMM_NM" />
+    </resultMap>
+
+    <select id="selectAllGrpCd" resultMap="codeMap">
+        SELECT DISTINCT MR_COMM_GRP_CD,
+               MR_COMM_GRP_NM
+          FROM MR_COMM_COD
+         WHERE DEL_YN='0'
+         ORDER BY MR_COMM_GRP_CD ASC
+    </select>
+
+    <select id="selectCommCd" resultMap="codeMap">
+        SELECT MR_COMM_GRP_CD,
+               MR_COMM_CD,
+               MR_COMM_NM
+          FROM MR_COMM_COD
+         WHERE MR_COMM_GRP_CD = #{mrCommGrpCd}
+           AND DEL_YN='0'
+         <if test="mrCommCd != null">
+           AND MR_COMM_CD LIKE #{mrCommCd} || '%'
+         </if>
+         <if test="parentCd != null">
+           AND DIV_1 = #{parentCd}
+         </if>
+    </select>
+
+    <select id="selectAllUnit" resultMap="codeMap">
+        SELECT STAND AS MR_COMM_CD,
+               KTEXT AS MR_COMM_NM
+          FROM SAP_LOCA
+         ORDER BY KTEXT
+    </select>
+
+
+    <select id="selectEquip" resultMap="codeMap">
+        SELECT EQUNR    AS MR_COMM_CD,
+               EQKTX    AS MR_COMM_NM
+          FROM SAP_EQUIP
+         WHERE STORT = #{mrProcNo}
+         ORDER BY EQKTX
+    </select>    
+
+	<!-- wj: 초기투자비 산정 직책과장 조회 추가-->    
+    <select id="techInvestEmp" resultMap="codeMap">    
+	--techInvestEmp 초기투자비 산정 직책과장 조회(드롭다운리스트조회쿼리)			
+	SELECT MR_COMM_CD, MR_COMM_NM 
+	  FROM (SELECT DET.MR_REQ_PROC_STEP_DET_NO AS MR_COMM_CD
+                        ,DECODE(HIST.THDAY_TEAM, NULL, TEAM.ORG_NAME, HIST.THDAY_TEAM) 
+	               || ' / ' || DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) 
+	               || ' / ' || EMP.EMP_NAME AS MR_COMM_NM
+	          FROM MR_REQ_PROC_STEP_DET DET,
+	               MR_REQ_CHRGR_CHG_HIST HIST,
+	               EDM_EMP EMP,
+	               EDM_ORG TEAM,
+	               EDM_DUTY DUTY
+	         WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+	           AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+	           AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+)
+	           AND EMP.DUTY_ID = DUTY.DUTY_ID
+	           AND DET.MR_REQ_NO =  #{parentCd}
+	           AND DET.MR_STEP_CD =  'Z0030' /**P*/			           
+	           AND HIST.CHRGR_CL_CD = 'Z02G1'	
+	           AND DET.MR_REQ_PROC_STEP_NO IN ( SELECT MR_REQ_PROC_STEP_NO FROM MR_REQ_PROC_STEP 
+	                                             WHERE MR_STEP_CD =  'Z0030' AND EFF_END_DTM = '99991231235959' AND MR_REQ_NO = #{parentCd} )           
+	           <!-- 날짜 및 삭재여부는 의미없어 주석처리
+	           AND DET.DEL_YN=0
+	           AND HIST.EFF_END_DTM = '99991231235959'
+	           AND DET.DEL_YN=0
+	           AND STEP.DEL_YN=0 -->  
+	        )
+	        ORDER BY 1
+    </select>    
+
+    <resultMap id="unitMap" type="com.mr.common.domain.UnitVo">
+        <result property="mrProcNo" column="UNIT_NO" />
+        <result property="mrProcName" column="UNIT_NAME" />
+        <result property="mrEquipCd" column="EQUIP_NO" />
+        <result property="mrEquipName" column="EQUIP_NAME" />
+        <result property="plantNo" column="PLANT_NO" />
+        <result property="plantName" column="PLANT_NAME" />
+    </resultMap>
+
+
+    <select id="selectPlant" resultMap="unitMap">
+        SELECT MR_COMM_CD AS PLANT_NO,
+               MR_COMM_NM AS PLANT_NAME
+          FROM MR_COMM_COD
+         WHERE MR_COMM_GRP_CD = 'PLANT'
+           AND DEL_YN='0'
+         <if test="plantNo != null">
+           AND MR_COMM_CD = #{plantNo}
+         </if>
+    </select>
+
+    <select id="unitSearch" resultMap="unitMap">
+        SELECT STAND AS UNIT_NO,
+               KTEXT AS UNIT_NAME
+          FROM SAP_LOCA
+         WHERE 1=1
+           AND WERKS = #{plantNo}
+           AND (UPPER(STAND) LIKE '%'||UPPER(#{mrProcName})||'%' OR UPPER(KTEXT) LIKE '%'||UPPER(#{mrProcName})||'%' )           
+         ORDER BY KTEXT
+    </select>
+
+    <select id="equipSearch" resultMap="unitMap">
+        SELECT EQUIP.STORT AS UNIT_NO,
+               UNIT.KTEXT AS UNIT_NAME,
+               EQUIP.EQUNR AS EQUIP_NO,
+               EQUIP.EQKTX AS EQUIP_NAME
+          FROM SAP_EQUIP EQUIP,
+               SAP_LOCA UNIT
+         WHERE EQUIP.STORT = UNIT.STAND
+
+         <if test="mrEquipCd != null">
+           AND ( UPPER(EQUIP.EQKTX) LIKE '%'||UPPER(#{mrEquipCd})||'%' OR UPPER(EQUIP.EQUNR) LIKE '%'||UPPER(#{mrEquipCd})||'%' )
+         </if>
+
+
+           AND EQUIP.STORT IN
+         <foreach item="unit" index="index" collection="procs" open="(" separator="," close=")">
+            #{unit.mrProcNo}
+         </foreach>
+
+           AND UNIT.WERKS = #{plantNo}
+
+         ORDER BY EQUIP.EQUNR ASC
+    </select>
+
+</mapper>

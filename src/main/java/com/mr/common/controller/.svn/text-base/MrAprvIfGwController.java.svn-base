@@ -1,0 +1,735 @@
+package com.mr.common.controller;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
+
+import com.base.servlet.BaseController;
+import com.base.servlet.view.FileDownloadView;
+import com.base.util.mrInterfaceUtil;
+import com.common.file.service.AttachFileService;
+import com.mr.comp.domain.CompChrgrChgHistVO;
+import com.mr.comp.domain.CompRptVO;
+import com.mr.comp.service.CompService;
+import com.mr.ivst.domain.IvstCostRptVO;
+import com.mr.mrrq.domain.MRrqRegisterVO;
+import com.mr.mrrq.domain.MrReqEquipVO;
+import com.mr.mrrq.domain.MrReqProcVO;
+import com.mr.mrrq.service.MRrqService;
+import com.mr.step.domain.ChrgrChgHist;
+import com.mr.step.domain.MrReqProcStepDetVO;
+import com.mr.step.repository.MrStepRepository;
+import com.mr.step.service.MrStepService;
+import com.mr.tech.domain.TechInvestVO;
+import com.mr.tech.domain.TechReviewVO;
+import com.mr.tech.service.MrCompleteService;
+import com.mr.tech.service.TechInvestService;
+
+/**
+ * 사원, 팀관련 컨트롤러
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * 2014.06.24 박성룡 팀검색 추가
+ * 2017.05.19 wj 초기투자비 산정화면에서 직책과장 입력란 추가
+ * </pre>
+ */
+
+@Controller
+@RequestMapping(value = "/")
+public class MrAprvIfGwController extends BaseController {
+    private final Logger logger = Logger.getLogger(this.getClass());
+    @Autowired
+    MRrqService mRrqService;
+
+    @Autowired
+    TechInvestService techInvestService;
+    
+    @Autowired
+    MrCompleteService mrCompleteService;
+    
+    @Autowired
+    CompService compService;
+    
+    @Autowired
+    MrStepService mrStepService;
+    
+    @Autowired
+    AttachFileService attachFileService;
+
+    @Autowired
+    MrStepRepository mrStepRepository;
+    
+    /**
+     * 
+     * @param mRrqRegisterVO
+     * @param model
+     * @return
+     */
+    public void updateMrIfStat01(MrReqProcStepDetVO mrReqProcStepDetVO, Model model){
+    	mrStepService.updateMrIfStat01(mrReqProcStepDetVO);
+    } 
+    
+    /**
+     * mr요청 기본데이터 조회
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public MRrqRegisterVO selectMRrqRegisterVO(HashMap paramMap, Model model) {
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	return mRrqService.selectMrRreq(mrReqNo);
+    }
+    
+    /**
+     * 초기 투자비승인 기본데이터 조회
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public TechInvestVO selectTechInvestVO(HashMap paramMap, Model model) {
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	return techInvestService.selectMrTechInvest(mrReqNo);
+    }
+    
+    /**
+     * 초기 타당성검 기본데이터 조회
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public TechReviewVO selectTechReviewVO(HashMap paramMap, Model model) {
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	return mrCompleteService.selectMrComplete(mrReqNo);
+    }
+    
+    /**
+     * MR완료 기본데이터 조회
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public CompRptVO selectCompRptVO(HashMap paramMap, Model model) {
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	return compService.selectCompRpt(mrReqNo);
+    }
+    
+    
+    
+    /**
+     * 모델  조회
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public String selectModel(HashMap paramMap, Model model) {
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	return mrStepService.getModeClass(mrReqNo);
+    }
+    
+    
+    /**
+     * 승인반려 처리
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public String appURL(MRrqRegisterVO mRrqRegisterVO, HashMap paramMap, Model model) {
+    	
+    	String connStatGubun = paramMap.get("connStatGubun").toString();
+    	String ret = "01";
+    	 
+        try{
+	        //승인04,빈려05
+	        if("04".equals(connStatGubun)){
+	        //	System.out.println("JEWOOK connStatGubun jewook  : " + connStatGubun);
+	        	mRrqService.mrRqRegisterAgree(mRrqRegisterVO);
+	        } 
+	        else if("05".equals(connStatGubun)){
+	        //	System.out.println("JEWOOK connStatGubun  jewook: " + connStatGubun);
+	        	mRrqService.mrRqRegisterReturn(mRrqRegisterVO);
+	        }
+        } catch(Exception e){
+        	ret = "02";
+        //	System.out.println("jewook appURL " + e);
+        }
+    	return ret;
+    }
+    
+    
+    
+    /****************************************************************************************************************
+    * 승인/반려 시작
+    ****************************************************************************************************************/
+    /**
+     * 승인반려 처리
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public String appAgreeReturn_Z0010(MRrqRegisterVO mRrqRegisterVO, HashMap paramMap, Model model) {
+    	
+    	String connStatGubun = paramMap.get("connStatGubun").toString();
+    	String ret = "01";
+    	 
+        try{
+	        //승인04,빈려05
+	        if("04".equals(connStatGubun)){
+	        //	System.out.println("JEWOOK connStatGubun jewook  : " + connStatGubun);
+	        	mRrqService.mrRqRegisterAgree(mRrqRegisterVO);
+	        } 
+	        else if("05".equals(connStatGubun)){
+	        //	System.out.println("JEWOOK connStatGubun  jewook: " + connStatGubun);
+	        	mRrqService.mrRqRegisterReturn(mRrqRegisterVO);
+	        }
+        } catch(Exception e){
+        	ret = "02";
+        //	System.out.println("jewook appURL " + e);
+        }
+    	return ret;
+    }
+    
+    /**
+     * 승인반려 처리
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public String appAgreeReturn_Z0030_Z0110(TechInvestVO techInvestVO, HashMap paramMap, Model model) {
+    	
+    	String connStatGubun = paramMap.get("connStatGubun").toString();
+    	String ret = "01";
+    	
+    	//타당성 검토 반려시 로직 변경 
+    	//기존: 반려시 기술검토항목으로 단계 롤백됨  
+    	//변경: 반려시 타당성검토 작성단계로 롤백
+    	System.out.println(" connStatGubun: " + connStatGubun);
+        try{
+	        //승인04,빈려05
+	        if("04".equals(connStatGubun)){
+	        	techInvestService.insertMrTechInvestApp(techInvestVO.getMrReqNo());
+	        } 
+	        else if("05".equals(connStatGubun)){
+	        	
+	        	System.out.println("반려  시작");
+	        	
+	        	 //hajewook 반려시 결재라인중 Z02I
+	        	
+	        	 int cnt = techInvestVO.getAppLine().size();
+	        	 List<ChrgrChgHist> list = null;
+	        	 for(int i=0; i<cnt; i++){
+	        		ChrgrChgHist appLine = techInvestVO.getAppLine().get(i);
+	        		if("Z02I".equals(appLine.getChrgrClCd())){
+	        			 list = new ArrayList<ChrgrChgHist>(); 
+	        			 list.add(appLine);
+	        		}
+	        	 }
+	        	 techInvestVO.setAppLine(list);
+	        	//System.out.println("JEWOOK SIZE " + techInvestVO.getAppLine().size());
+	        	techInvestService.insertMrTechInvestReturn(techInvestVO);
+	        }
+        } catch(Exception e){
+        	ret = "02";
+        	System.out.println("jewook appURL " + e);
+        }
+    	return ret;
+    }
+    
+    /**
+     * 타당성검토 승인반려 처리
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public String appAgreeReturn_Z0030_Z0122(TechReviewVO techReviewVO, HashMap paramMap, Model model) {
+
+    	List<ChrgrChgHist> appInfoList = mrStepRepository.selectAppStepEmpMulti(techReviewVO.getMrReqNo());
+        
+    	String connStatGubun = paramMap.get("connStatGubun").toString();
+    	String ret = "01";
+
+    	System.out.println("reqno: " + techReviewVO.getMrReqNo());
+    	System.out.println("타당성검토 승인 connStatGubun 04면 승인, 05면 반려: " + connStatGubun);
+    	
+        try{
+        	
+        	//승인04,빈려05
+	        if("04".equals(connStatGubun)){
+               if(appInfoList.size()==1) {
+            	  System.out.println("최종승인자");
+                  //최종승인자 승인
+	          	  mrCompleteService.insertMrCompleteApp(techReviewVO);
+               } else {
+                  System.out.println("중간승인자");
+                  //중간 승인자 및 최종 승인 요청
+        	      mrCompleteService.insertMrCompleteAgree(techReviewVO.getMrReqNo());
+               }
+	        } else if("05".equals(connStatGubun)){
+  
+	        	mrCompleteService.insertMrTechReturn(techReviewVO);
+	        }
+	        
+	        /* 2015.10.08 HSW
+        	//승인04,빈려05
+	        if("04".equals(connStatGubun)){
+	        	mrCompleteService.insertMrCompleteAgree(techReviewVO.getMrReqNo());
+		        mrCompleteService.insertMrCompleteApp(techReviewVO);
+	        } 
+	        else if("05".equals(connStatGubun)){
+	        	mrCompleteService.insertMrTechReturn(techReviewVO);
+	        }
+	        */
+	        
+        } catch(Exception e){
+        	ret = "02";
+        	System.out.println("jewook appURL " + e);
+        }
+    	return ret;
+    }
+    
+    /**
+     * 타당성검토 승인반려 처리  (MR 완료 (wj))
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public String appAgreeReturn_Z0090(CompRptVO compRptVO, HashMap paramMap, Model model) {
+    	
+    	String connStatGubun = paramMap.get("connStatGubun").toString();
+    	String ret = "01";
+    	
+    	System.out.println("JEWOOK connStatGubun jewook  : " + connStatGubun);
+        try{
+        	
+        	//승인04,빈려05
+	        if("04".equals(connStatGubun)){
+	        	compService.compRptAppr(compRptVO);
+	        } 
+	        else if("05".equals(connStatGubun)){
+	        	compService.compRptRet(compRptVO);
+	        }
+        } catch(Exception e){
+        	ret = "02";
+        	System.out.println("jewook appURL " + e);
+        }
+    	return ret;
+    }
+    
+    
+    /****************************************************************************************************************
+    * 승인/반려 끝
+    ****************************************************************************************************************/
+    
+    
+    
+    
+    /****************************************************************************************************************
+     * 결재선, 결재본문, 기본데이터 조회
+     ****************************************************************************************************************/
+    /**
+     * 통합결재 mr요청
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public MRrqRegisterVO mrAprvInit_Z0010(HashMap paramMap, Model model) {
+    	//변수정의 
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	String connCode = paramMap.get("connCode").toString();
+    	MRrqRegisterVO mRrqRegisterVO = new MRrqRegisterVO();
+    	
+    	//MR 요청서,첨부파일 조회
+    	mRrqRegisterVO = mRrqService.selectMrRreq(mrReqNo);
+    	
+    	//제목
+    	mRrqRegisterVO.setMrConnTitle("[승인] MR 요청서 승인 - "+mRrqRegisterVO.getMrReqTitle());
+    	
+    	System.out.println("제목 타이틀   :: " + mRrqRegisterVO.getMrReqTitle());    	
+    	  
+    	//본문(htmlBody_Z0010)
+    	mRrqRegisterVO.setMrConnBdoy(htmlBody_Z0010(mRrqRegisterVO));
+		
+    	System.out.println("본문   :: " + htmlBody_Z0010(mRrqRegisterVO));
+    	
+        return mRrqRegisterVO;
+    }
+    /**
+     * 통합결재 초기투자비 산정
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public TechInvestVO mrAprvInit_Z0030_Z0110(HashMap paramMap, Model model) {
+    	//변수정의
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	String connCode = paramMap.get("connCode").toString();
+    	TechInvestVO techInvestVO = new TechInvestVO();
+
+    	//초기투자비 승인 
+    	techInvestVO = techInvestService.selectMrTechInvest(mrReqNo);
+    	techInvestVO.setMrConnTitle("[승인] MR 투자비승인 - "+techInvestVO.getMrReqTitle());
+    	techInvestVO.setMrConnBdoy(htmlBody_Z0030_Z0110(techInvestVO));
+		return techInvestVO;
+    }
+    
+    /**
+     * 통합결재 타당성검토 승인(재상신)
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public TechReviewVO mrAprvInit_Z0030_Z0122(HashMap paramMap, Model model) {    	
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	String connCode = paramMap.get("connCode").toString();
+    	TechReviewVO techReviewVO = new TechReviewVO();
+
+    	//타당성검토 승인
+    	techReviewVO = mrCompleteService.selectMrComplete(mrReqNo);
+    	
+    	techReviewVO.setMrConnTitle("[승인] MR 타당성검토 승인 - "+techReviewVO.getMrReqTitle());
+    	techReviewVO.setMrConnBdoy(htmlBody_Z0030_Z0122(techReviewVO));
+		return techReviewVO;
+    }
+    
+    /**
+     * mr완료 결재선, 본문, 
+     * @param mrRqRegisterAppReqIf
+     * @param paramMap
+     * @return
+     */
+    public CompRptVO mrAprvInit_Z0090(HashMap paramMap, Model model) {
+    	//변수정의
+    	int mrReqNo = Integer.parseInt(paramMap.get("connkey").toString());
+    	String connCode = paramMap.get("connCode").toString();
+    	
+    	CompChrgrChgHistVO compFileCount = null;
+    	CompRptVO compRptVO = new CompRptVO();
+    	
+    	//compFileCount = compService.countCompRpt(compRptVO);
+    	compRptVO = compService.selectCompRpt(mrReqNo);
+    	//타당성검토 승인
+    	compRptVO.setMrConnTitle("[승인] MR 완료승인 - "+compRptVO.getMrReqTitle());
+    	compRptVO.setMrConnBdoy(htmlBody_Z0090(compRptVO));
+		return compRptVO;
+    }
+    
+    
+    
+    ////////////////////////////////////////////////////////
+    ////html body
+    ////////////////////////////////////////////////////////
+    
+    private static String htmlBody_Z0010(MRrqRegisterVO mRrqRegisterVO) {
+    	
+    	List<MrReqEquipVO> equipsList = mRrqRegisterVO.getEquips();
+    	List<MrReqProcVO> procsList = mRrqRegisterVO.getProcs();
+    	
+    	//
+    	String equips = "";
+    	String proc = "";
+    	
+    	for(int i=0; i<equipsList.size(); i++){
+    		MrReqEquipVO vo = (MrReqEquipVO)equipsList.get(i);
+    		equips = equips + vo.getMrEquipCd() + " " + vo.getMrEquipName() + "<br />";
+    	}
+    	
+    	//공정명
+    	for(int i=0; i < procsList.size(); i++){
+    		MrReqProcVO vo = (MrReqProcVO)procsList.get(i);
+    		proc = proc + vo.getMrProcNo() + " " + vo.getMrProcName()+ " ";
+    	}
+    	
+    	
+    	
+		String rslt = "";
+		StringBuffer sb = new StringBuffer();
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' id=body class=FIELD>");
+		sb.append("<TABLE style='BORDER-BOTTOM: 0px; TEXT-ALIGN: center; BORDER-LEFT: 0px; WIDTH: 620px; BORDER-COLLAPSE: collapse; FONT-FAMILY: 조선일보명조; TABLE-LAYOUT: fixed; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: 0px; BORDER-RIGHT: 0px; Design_Time_Lock: true' align=center kaoni='1' free=\"\">");
+		sb.append("<COLGROUP>");
+		sb.append("<COL style='WIDTH: 100%'></COLGROUP>");
+		sb.append("<TBODY>");
+		sb.append("<TR>");
+		sb.append("<TD style='TEXT-ALIGN: left; WIDTH: 100%; FONT-SIZE: 12pt; PADDING-TOP: 20px'>"+mRrqRegisterVO.getPlantNm()+" " +proc+ "에 대한 설비변경요청을 하기와 같이 품의 드리오니<BR>승인하여 주시기 바랍니다.</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='TEXT-ALIGN: center; WIDTH: 100%; FONT-SIZE: 12pt; PADDING-TOP: 20px'>-&nbsp;&nbsp;&nbsp;하&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;기&nbsp;&nbsp;&nbsp;- </TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='TEXT-ALIGN: center; WIDTH: 100%; FONT-SIZE: 12pt; PADDING-TOP: 20px'>");
+		sb.append("<TABLE style='BORDER-BOTTOM: 0px; TEXT-ALIGN: center; BORDER-LEFT: 0px; WIDTH: 100%; BORDER-COLLAPSE: collapse; FONT-FAMILY: 조선일보명조; TABLE-LAYOUT: fixed; HEIGHT: 300px; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: 0px; BORDER-RIGHT: 0px; Design_Time_Lock: true' align=center kaoni='1' FREE>");
+		sb.append("<COLGROUP>");
+		sb.append("<COL style='WIDTH: 13%'>");
+		sb.append("<COL style='WIDTH: 37%'>");
+		sb.append("<COL style='WIDTH: 13%'>");
+		sb.append("<COL style='WIDTH: 37%'></COLGROUP>");
+		sb.append("<TBODY>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>사업명</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3><a href='http://edims.oilbank.co.kr/mr/mrRqRegister.do?mrReqNo=" + mRrqRegisterVO.getMrReqNo()+ "'>"+ mRrqRegisterVO.getMrReqTitle() +"</a></TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>개선대상</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>");
+		sb.append("<P style='TEXT-ALIGN: left; PADDING-LEFT: 5px'>"+ mRrqRegisterVO.getPlantNm() +"</P>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>관련설비</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>");
+		sb.append("<P style='TEXT-ALIGN: left; PADDING-LEFT: 5px'>"+ equips +"</P></TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>요청구분</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+mRrqRegisterVO.getReqClNm()+"&nbsp;&nbsp;"+mRrqRegisterVO.getReqClDtlNm()+"</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>작업시점</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+mRrqRegisterVO.getWorkPsblClNm()+"&nbsp;&nbsp;"+ mRrqRegisterVO.getWorkPsblClRsn()+ "</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>문제내용</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3 FREE>");
+		sb.append("<P style='TEXT-ALIGN: left; PADDING-LEFT: 5px'>"+mRrqRegisterVO.getIssueCtt() +"</P></TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>제안/변경<BR>사항</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3 FREE>");
+		sb.append("<P style='TEXT-ALIGN: left; PADDING-LEFT: 5px'>"+mrInterfaceUtil.strNull(mRrqRegisterVO.getImprvPrpslCtt()) +"</P>");
+		sb.append("</TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE></TD></TR> ");
+
+		System.out.println("MR요청 BODY : "+sb.toString());
+		return rslt = sb.toString();
+	}
+    
+    
+
+    private static String htmlBody_Z0030_Z0110(TechInvestVO techInvestVO) {
+
+		String rslt = "";
+		StringBuffer sb = new StringBuffer();
+		List<MrReqProcVO> procsList = techInvestVO.getProcs();
+		List<MrReqEquipVO> equipsList = techInvestVO.getEquips();
+		String proc = "";
+		String equips = "";
+		
+		//공정명
+		for(int i=0; i < procsList.size(); i++){
+			MrReqProcVO vo = (MrReqProcVO)procsList.get(i);
+    		proc = proc + vo.getMrProcNo() + "&nbsp" + vo.getMrProcName()+ "&nbsp";
+		}
+		//장비
+		for(int i=0; i < equipsList.size(); i++){
+			MrReqEquipVO vo = (MrReqEquipVO)equipsList.get(i);
+			equips = equips + vo.getMrEquipCd() + "&nbsp" + vo.getMrEquipName()+ "<br />";
+		}
+		
+		
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' id=body class=FIELD>");
+		sb.append("<TABLE style='BORDER-BOTTOM: 0px; TEXT-ALIGN: center; BORDER-LEFT: 0px; WIDTH: 620px; BORDER-COLLAPSE: collapse; FONT-FAMILY: 조선일보명조; TABLE-LAYOUT: fixed; HEIGHT: 411px; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: 0px; BORDER-RIGHT: 0px; Design_Time_Lock: true' align=center kaoni='1'>");
+		sb.append("<TBODY>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: medium none; TEXT-ALIGN: left; BORDER-LEFT: medium none; WIDTH: 100%; FONT-SIZE: 12pt; BORDER-TOP: medium none; BORDER-RIGHT: medium none; PADDING-TOP: 20px'>&nbsp;MR요청번호 "+techInvestVO.getMrNo()+"건에 대하여 하기와 같이&nbsp;예상 투자비를 품의 드리오니<BR>&nbsp;승인하여 주시기 바랍니다.</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: medium none; TEXT-ALIGN: center; BORDER-LEFT: medium none; WIDTH: 100%; FONT-SIZE: 12pt; BORDER-TOP: medium none; BORDER-RIGHT: medium none; PADDING-TOP: 20px'>-&nbsp;&nbsp;&nbsp;하&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;기&nbsp;&nbsp;&nbsp;- </TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: medium none; TEXT-ALIGN: center; BORDER-LEFT: medium none; WIDTH: 100%; FONT-SIZE: 11pt; BORDER-TOP: medium none; BORDER-RIGHT: medium none; PADDING-TOP: 20px'>");
+		sb.append("<TABLE style='BORDER-BOTTOM: 0px; TEXT-ALIGN: center; BORDER-LEFT: 0px; WIDTH: 606px; BORDER-COLLAPSE: collapse; FONT-FAMILY: 조선일보명조; TABLE-LAYOUT: fixed; HEIGHT: 301px; FONT-SIZE: 11pt; VERTICAL-ALIGN: top; BORDER-TOP: 0px; BORDER-RIGHT: 0px; Design_Time_Lock: true' align=center FREE kaoni='1'>");
+		sb.append("<COLGROUP>");
+		sb.append("<COL width=96>");
+		sb.append("<COL width=103>");
+		sb.append("<COL width=97>");
+		sb.append("<COL width=103>");
+		sb.append("<COL width=103>");
+		sb.append("<COL width=103></COLGROUP>");
+		sb.append("<TBODY>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>사업명</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=5><a href='http://edims.oilbank.co.kr/mr/mrTechInvest.do?mrReqNo=" + techInvestVO.getMrReqNo()+ "'>" +techInvestVO.getMrReqTitle()+ "</a></TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>개선대상</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>"+techInvestVO.getPlantNm()+"</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>공정명</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>"+proc+"</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: medium none; TEXT-ALIGN: right; BORDER-LEFT: medium none; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: medium none' colSpan=6>단위 : 천원</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>총투자비</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=5>"+techInvestVO.getCostTotalSum()+"</TD></TR>");
+		sb.append("<TR height=34>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>설계비</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techInvestVO.getCostSumC01()+"</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>자재비</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techInvestVO.getCostSumC02()+"</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>공사비</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techInvestVO.getCostSumC03()+"</TD></TR>");
+		sb.append("<TR height=34>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>매입임차비</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techInvestVO.getCostSumC04()+"</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>대여금</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techInvestVO.getCostSumC05()+"</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>기타</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techInvestVO.getCostSumC06()+"</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' rowSpan=2>종합<BR>검토<BR>의견</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' rowSpan=2 colSpan=5 FREE>"+mrInterfaceUtil.strNull(techInvestVO.getTotRvSugg())+"</TD></TR>");
+		sb.append("</TBODY></TABLE></TD></TR></TBODY></TABLE></TD>");
+		
+		System.out.println("MR초기투자비 BODY : "+sb.toString());
+		return rslt = sb.toString();
+	}
+    
+    private static String htmlBody_Z0030_Z0122(TechReviewVO techReviewVO) {
+
+		String rslt = "";
+		StringBuffer sb = new StringBuffer();
+		
+		List<MrReqProcVO> procsList = techReviewVO.getProcs();
+		List<MrReqEquipVO> equipsList = techReviewVO.getEquips();
+		String proc = "";
+		String equips = "";
+		
+		//공정명
+		for(int i=0; i < procsList.size(); i++){
+			MrReqProcVO vo = (MrReqProcVO)procsList.get(i);
+    		proc = proc + vo.getMrProcNo() + "&nbsp"+ vo.getMrProcName()+ "&nbsp";
+		}
+		//장비
+		for(int i=0; i < equipsList.size(); i++){
+			MrReqEquipVO vo = (MrReqEquipVO)equipsList.get(i);
+			equips = equips + vo.getMrEquipCd() + "&nbsp"+ vo.getMrEquipName()+ "<br />";
+		}
+		
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' id=body class=FIELD>");
+		sb.append("<TABLE style='BORDER-BOTTOM: 0px; TEXT-ALIGN: center; BORDER-LEFT: 0px; WIDTH: 620px; BORDER-COLLAPSE: collapse; FONT-FAMILY: 조선일보명조; TABLE-LAYOUT: fixed; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: 0px; BORDER-RIGHT: 0px; Design_Time_Lock: true' align=center kaoni='1'>");
+		sb.append("<COLGROUP>");
+		sb.append("<COL style='WIDTH: 100%'></COLGROUP>");
+		sb.append("<TBODY>");
+		sb.append("<TR>");
+		sb.append("<TD style='TEXT-ALIGN: left; WIDTH: 100%; FONT-SIZE: 12pt; PADDING-TOP: 20px'>MR요청번호 "+techReviewVO.getMrNo()+"건에 대한 타당성 검토를 완료하여 품의 드리오니<BR>승인하여 주시기 바랍니다.</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='TEXT-ALIGN: center; WIDTH: 100%; FONT-SIZE: 12pt; PADDING-TOP: 20px'>-&nbsp;&nbsp;&nbsp;하&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;기&nbsp;&nbsp;&nbsp;- </TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='TEXT-ALIGN: center; WIDTH: 100%; FONT-SIZE: 12pt; PADDING-TOP: 20px'>");
+		sb.append("<TABLE style='BORDER-BOTTOM: 0px; TEXT-ALIGN: center; BORDER-LEFT: 0px; WIDTH: 100%; BORDER-COLLAPSE: collapse; FONT-FAMILY: 조선일보명조; TABLE-LAYOUT: fixed; HEIGHT: 300px; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: 0px; BORDER-RIGHT: 0px; Design_Time_Lock: true' align=center kaoni='1'>");
+		sb.append("<COLGROUP>");
+		sb.append("<COL style='WIDTH: 13%'>");
+		sb.append("<COL style='WIDTH: 35%'>");
+		sb.append("<COL style='WIDTH: 13%'>");
+		sb.append("<COL style='WIDTH: 13%'>");
+		sb.append("<COL style='WIDTH: 26%'></COLGROUP>");
+		sb.append("<TBODY>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>사업명</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2><a href='http://edims.oilbank.co.kr/mr/mrComplete.do&mrReqNo="+techReviewVO.getMrReqNo()+"'>"+techReviewVO.getMrReqTitle()+"<a></TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>MR 번호</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techReviewVO.getMrNo()+"</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>요청구분</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>"+techReviewVO.getReqClCdNm()+"/"+techReviewVO.getReqClDtlCdNm()+"</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>개선대상</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techReviewVO.getPlantNm()+"</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>공정</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>");
+		sb.append("<P style='TEXT-ALIGN: left'>"+proc+"</P></TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>설비</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>");
+		sb.append("<P style='TEXT-ALIGN: left'>"+equips+"</P></TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>투자구분</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+techReviewVO.getInvstNm()+"</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>투자목적</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>"+techReviewVO.getInvstPurpNm()+"</TD></TR>");
+		sb.append("<TR>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: center; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>종합<BR>검토<BR>의견</TD>");
+		sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=4 FREE>");
+		sb.append("<P style='TEXT-ALIGN: left'>"+techReviewVO.getTotRvSugg1()+"</P></TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE></TD>");
+		
+		
+		System.out.println("MR타당성검토 BODY : "+sb.toString());
+		return rslt = sb.toString();
+	}
+    
+    private static String htmlBody_Z0090(CompRptVO compRptVO) {
+
+		String rslt = "";
+		StringBuffer sb = new StringBuffer();
+           sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' id=body class=FIELD>");
+            sb.append("<TABLE style='BORDER-BOTTOM: 0px; TEXT-ALIGN: center; BORDER-LEFT: 0px; WIDTH: 620px; BORDER-COLLAPSE: collapse; FONT-FAMILY: 조선일보명조; TABLE-LAYOUT: fixed; FONT-SIZE: 12pt; VERTICAL-ALIGN: top; BORDER-TOP: 0px; BORDER-RIGHT: 0px; Design_Time_Lock: true' align=center kaoni='1'>");
+            sb.append("<COLGROUP>");
+            sb.append("<COL style='WIDTH: 100%'></COLGROUP>");
+            sb.append("<TBODY>");
+            sb.append("<TR>");
+            sb.append("<TD style='TEXT-ALIGN: left; WIDTH: 100%; FONT-SIZE: 12pt; PADDING-TOP: 20px'>MR요청번호 "+compRptVO.getMrNo()+" 건에 대하여 하기와 같이 MR완료 처리코자 하오니<BR>승인하여 주시기 바랍니다.</TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='TEXT-ALIGN: center; WIDTH: 100%; FONT-SIZE: 12pt; PADDING-TOP: 20px'>-&nbsp;&nbsp;&nbsp;하&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;기&nbsp;&nbsp;&nbsp;- </TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='TEXT-ALIGN: center; WIDTH: 100%; FONT-SIZE: 11pt; PADDING-TOP: 20px'>");
+            sb.append("<TABLE style='BORDER-BOTTOM: 0px; TEXT-ALIGN: center; BORDER-LEFT: 0px; WIDTH: 100%; BORDER-COLLAPSE: collapse; FONT-FAMILY: 조선일보명조; TABLE-LAYOUT: fixed; HEIGHT: 300px; FONT-SIZE: 11pt; VERTICAL-ALIGN: top; BORDER-TOP: 0px; BORDER-RIGHT: 0px; Design_Time_Lock: true' align=center kaoni='1'>");
+            sb.append("<COLGROUP>");
+            sb.append("<COL style='WIDTH: 7%'>");
+            sb.append("<COL style='WIDTH: 7%'>");
+            sb.append("<COL style='WIDTH: 4%'>");
+            sb.append("<COL style='WIDTH: 4%'>");
+            sb.append("<COL style='WIDTH: 9%'>");
+            sb.append("<COL style='WIDTH: 16%'>");
+            sb.append("<COL style='WIDTH: 9%'>");
+            sb.append("<COL style='WIDTH: 9%'>");
+            sb.append("<COL style='WIDTH: 9%'>");
+            sb.append("<COL style='WIDTH: 9%'>");
+            sb.append("<COL style='WIDTH: 17%'></COLGROUP>");
+            sb.append("<TBODY>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>사업명</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=5><a href='http://edims.oilbank.co.kr/mr/compRptRegister.do&mrReqNo"+compRptVO.getMrReqNo()+"'>"+compRptVO.getMrReqTitle()+"</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>변경담당자</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>"+compRptVO.getTechEmpNm()+"</TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>MR 번호</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=5>"+compRptVO.getMrNo()+"</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>CAPEX번호</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>"+compRptVO.getCapexNo()+"</TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' rowSpan=2>사<BR>업<BR>개<BR>요</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>문제점</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=8 FREE>");
+            sb.append("<P style='TEXT-ALIGN: left'>&nbsp;"+compRptVO.getIssueCtt()+"</P></TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>개선안</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=8 FREE>");
+            sb.append("<P style='TEXT-ALIGN: left'>&nbsp;"+compRptVO.getImprvPrpslCtt()+"</P></TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3>시운전 결과</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=8 FREE>"+compRptVO.getTrialRst()+"</TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3>사후관리 방안</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=8 FREE>"+compRptVO.getPostMngPlan()+"</TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' rowSpan=2>기대<BR>효과</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3>실투입비용</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=7>"+compRptVO.getInvstCost()+"</TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3>품의예산</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=7>"+compRptVO.getInvstBudget()+"</TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' rowSpan=2 colSpan=2>수행기간</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3>총수행기간(일)</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>MR 요청일</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>투자품의승인</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>가동개시</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; BORDER-LEFT: black 1px solid; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>완료보고</TD></TR>");
+            sb.append("<TR>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; HEIGHT: 25px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=3>"+compRptVO.getMrTotalPeriod()+"</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; HEIGHT: 25px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+compRptVO.getMrReqDate()+"</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; HEIGHT: 25px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>"+compRptVO.getMrInvDate()+"</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; HEIGHT: 25px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid' colSpan=2>"+compRptVO.getMrSafeDate()+"</TD>");
+            sb.append("<TD style='BORDER-BOTTOM: black 1px solid; TEXT-ALIGN: left; BORDER-LEFT: black 1px solid; PADDING-LEFT: 5px; HEIGHT: 25px; BORDER-TOP: black 1px solid; BORDER-RIGHT: black 1px solid'>"+compRptVO.getMrCompDate()+"</TD></TR></TBODY></TABLE></TD></TR></TBODY></TABLE></TD>");
+            System.out.println("MR완료 BODY : "+sb.toString());
+
+            return rslt = sb.toString();
+	}
+    
+}

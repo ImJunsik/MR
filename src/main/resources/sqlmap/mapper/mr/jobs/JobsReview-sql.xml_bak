@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.jobs">
+    <resultMap id="mrJobsMap" type="com.mr.jobs.domain.JobsReviewVO">
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="plant" column="PLANT" />
+        <result property="plantNm" column="PLANT_NM" />
+        <result property="reqClCd" column="REQ_CL_CD" />
+        <result property="reqClCdNm" column="REQ_CL_CD_NM" />
+        <result property="reqClDtlCd" column="REQ_CL_DTL_CD" />
+        <result property="reqClDtlCdNm" column="REQ_CL_DTL_CD_NM" />
+        <result property="workPsblClCd" column="WORK_PSBL_CL_CD" />
+        <result property="workPsblClCdNm" column="WORK_PSBL_CL_CD_NM" />
+        <result property="workPsblDt" column="WORK_PSBL_DT" />
+        <result property="qualEptEftCtt" column="QUAL_EPT_EFT_CTT" />
+        <result property="quanEptEftCtt" column="QUAN_EPT_EFT_CTT" />
+        <result property="quanEptEftCd" column="QUAN_EPT_EFT_CD" />
+        <result property="quanEptEftCdNm" column="QUAN_EPT_EFT_CD_NM" />
+        <result property="hazopActYn" column="HAZOP_ACT_YN" />
+        <result property="porcActYn" column="PORC_ACT_YN" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <collection property="equips" ofType="com.mr.mrrq.domain.MrReqEquipVO" column="MR_REQ_NO" select="mr.mrReq.selectMrReqEquip" />
+        <collection property="procs" ofType="com.mr.mrrq.domain.MrReqProcVO" column="MR_REQ_NO" select="mr.mrReq.selectMrReqProc" />
+        <collection property="appLine" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD} " select="mr.step.selectJobLine" />
+        <collection property="jobs" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD} " select="mr.step.selectAppLine" />
+        <!-- <collection property="jobs" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_THCH_STEP_CD} " select="mr.step.selectJobLine" /> -->
+    </resultMap>
+
+    <select id="selectJobsReview" resultMap="mrJobsMap" parameterType="map">
+    --직무검토 조회 setJobsComplete 확인
+        SELECT MR.MR_NO,
+               MR.MR_REQ_NO,
+               MR.MR_REQ_TITLE,
+               MR.PLANT,
+               #{mrStepCd} AS MR_STEP_CD,
+               PLANT.MR_COMM_NM AS PLANT_NM,
+               MR.REQ_CL_CD,
+               REQ_CD.MR_COMM_NM AS REQ_CL_CD_NM,
+               MR.REQ_CL_DTL_CD,
+               REQ_DTL_CD.MR_COMM_NM AS REQ_CL_DTL_CD_NM,
+               MR.WORK_PSBL_CL_CD,
+               WORK_CD.MR_COMM_NM AS WORK_PSBL_CL_CD_NM,
+               MR.WORK_PSBL_DT,
+               MR.QUAL_EPT_EFT_CTT,
+               MR.QUAN_EPT_EFT_CTT,
+               MR.QUAN_EPT_EFT_CD,
+               MR.HAZOP_ACT_YN,
+               MR.PORC_ACT_YN,
+               QUAN_CD.MR_COMM_NM AS QUAN_EPT_EFT_CD_NM
+          FROM MR_REQ_MST MR,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'PLANT')PLANT,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'REQ')REQ_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'REQ_DET')REQ_DTL_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'WORK')WORK_CD,
+               (SELECT *
+                  FROM MR_COMM_COD REQ_CD
+                 WHERE MR_COMM_GRP_CD(+) = 'QN_UNIT')QUAN_CD
+         WHERE MR.REQ_CL_CD = REQ_CD.MR_COMM_CD(+)
+           AND MR.REQ_CL_DTL_CD = REQ_DTL_CD.MR_COMM_CD(+)
+           AND MR.WORK_PSBL_CL_CD = WORK_CD.MR_COMM_CD(+)
+           AND MR.QUAN_EPT_EFT_CD = QUAN_CD.MR_COMM_CD(+)
+           AND MR.PLANT = PLANT.MR_COMM_CD(+)
+           AND MR.MR_REQ_NO = #{mrReqNo}
+           AND MR.DEL_YN=0
+    </select>
+
+    <resultMap id="mrJobsPorcMap" type="com.mr.jobs.domain.JobsPorcVO">
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="porcNo" column="PORC_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE"/>
+        <result property="porcYn" column="PORC_YN" />
+        <result property="plant" column="PLANT" />
+        <collection property="appLine" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD} " select="mr.step.selectJobLine" />
+        <collection property="drives" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD, chrgrClCd=Z02L1} " select="mr.step.selectAppLineRvRst" />
+        <collection property="techs" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD, chrgrClCd=Z02L2} " select="mr.step.selectAppLineRvRst" />
+        <collection property="builds" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD, chrgrClCd=Z02L3} " select="mr.step.selectAppLineRvRst" />
+        <collection property="checks" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD, chrgrClCd=Z02L4} " select="mr.step.selectAppLineRvRst" />
+        <collection property="safetys" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD, chrgrClCd=Z02L5} " select="mr.step.selectAppLineRvRst" />
+        <collection property="etcs" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD, chrgrClCd=Z02L6} " select="mr.step.selectAppLineRvRst" />
+    </resultMap>
+
+    <select id="selectJobsPorc" resultMap="mrJobsPorcMap">
+    --Porc위원회 조회
+        SELECT MR.MR_REQ_NO,
+               MR.MR_NO,
+               MR.PORC_NO,
+               MR.MR_REQ_TITLE,
+               DECODE(PORC_NO, NULL ,'N','Y') PORC_YN,
+               'Z00P0' AS MR_STEP_CD,
+               'Z02L1' AS Z02L1,
+               'Z02L2' AS Z02L2,
+               'Z02L3' AS Z02L3,
+               'Z02L4' AS Z02L4,
+               'Z02L5' AS Z02L5,
+               'Z02L6' AS Z02L6,
+               PLANT
+          FROM MR_REQ_MST MR
+         WHERE MR.MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <select id="selectPorcDisagreeCount" resultType="int">
+    --직무검토 반대여부조회(selectPorcDisagreeCount)
+    SELECT NVL(COUNT(DECODE(CL_CD_01,2,1,NULL)),0) AS FALSE_CNT
+      FROM MR_RV_RST
+     WHERE MR_REQ_NO = #{mrReqNo}
+       AND ITEM_CD = 'PORC'
+       AND DEL_YN=0
+    </select>
+
+    <update id="updateMakePorcNo" parameterType="int">
+             UPDATE MR_REQ_MST
+                SET PORC_NO = ('PORC' || (SELECT TO_CHAR(SYSDATE,'YYYY') || RPAD('0',4,TO_NUMBER(NVL(SUBSTR(MAX(PORC_NO),-4),0))+1)
+                               FROM MR_REQ_MST))
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN = 0
+    </update>
+
+</mapper>

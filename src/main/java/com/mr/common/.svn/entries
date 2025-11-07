@@ -1,0 +1,43 @@
+10
+
+dir
+37
+http://61.251.161.213:8080/svn/repos_edims/trunk/src/mr/src/main/java/com/mr/common
+http://61.251.161.213:8080/svn/repos_edims
+
+
+
+2014-11-21T01:20:45.869738Z
+34
+214019
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ec77ac38-ee65-bc4c-a08b-545b44174e6c
+
+repository
+dir
+
+service
+dir
+
+prehandle
+dir
+
+controller
+dir
+
+domain
+dir
+

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.common.file">
+    <resultMap id="attachFileResultMap" type="com.common.file.domain.AttachFile">
+        <result property="path" column="PATH" />
+        <result property="name" column="FILE_NM" />
+        <result property="convertName" column="NEW_FILE" />
+    </resultMap>
+
+    <select id="getAttachFileDrawMngNo"  parameterType="map" resultMap="attachFileResultMap">
+        SELECT CODE.CVALUE || REPLACE(DIR.DIR_PATH,'/','\') PATH,
+               EFILE.NEW_FILE,
+               ATCH.FILE_NM
+          FROM MR_ATCH_FILE ATCH,
+               EDM_DOC DOC,
+               EDM_FILE EFILE,
+               EDM_DIRECTORY DIR,
+               (SELECT CVALUE
+                  FROM EDM_CODE
+                 WHERE CODE_ID = 'SAVE_PATH') CODE
+         WHERE ATCH.DRAW_MNG_NO = DOC.DOC_SEQ
+           AND DOC.FILE_ID = EFILE.FILE_ID
+           AND EFILE.DIR_ID = DIR.DIR_ID
+           AND ATCH.DRAW_MNG_NO = #{drawMngNo}
+           AND ATCH.DEL_YN = 0
+    </select>
+</mapper>

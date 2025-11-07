@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "HTTP://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+    <settings>
+        <setting name="cacheEnabled" value="true"/>
+        <setting name="lazyLoadingEnabled" value="true"/>
+        <setting name="jdbcTypeForNull" value="NULL" />
+    </settings>
+
+    <typeAliases>
+        <typeAlias alias="CamelCaseMap" type="com.base.util.CamelCaseMap" />
+    </typeAliases>
+<!-- 
+    <typeHandlers>
+        <typeHandler handler="com.base.orm.ibatis.type.StringTypeHandler" jdbcType="CHAR" javaType="java.lang.String" />
+        <typeHandler handler="com.base.orm.ibatis.type.StringTypeHandler" jdbcType="VARCHAR" javaType="java.lang.String" />
+        <typeHandler handler="com.base.orm.ibatis.type.StringTypeHandler" javaType="java.lang.String" />
+    </typeHandlers>
+ -->
+</configuration>

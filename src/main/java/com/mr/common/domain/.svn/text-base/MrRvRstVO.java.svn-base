@@ -1,0 +1,628 @@
+package com.mr.common.domain;
+
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.format.annotation.DateTimeFormat;
+
+import com.base.domain.Domain;
+import com.common.file.domain.MrAtchFile;
+import com.mr.step.domain.ChrgrChgHist;
+
+/**
+ * 검토 도메인
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.07 박성룡 최초 작성
+ * </pre>
+ */
+public class MrRvRstVO extends Domain {
+    private Integer mrRvRstNo;
+    private Integer mrReqNo;
+    private String mrNo;
+    private String plant;
+    private int mrReqProcStepDetNo;
+    private String itemCd;
+    private String clCd01;
+    private String clCd02;
+    private String clCd03;
+    private String clCd04;
+    private String clCd05;
+    private String clCd06;
+    private String clCd07;
+    private String clCd08;
+    private String clCd09;
+    private String clCd10;
+    private String clCd11;
+    private String clCd12;
+    private String clCd13;
+    private String clCd14;
+    private String clCd15;
+    private String clCtt01;
+    private String clCtt02;
+    private String clCtt03;
+    private String clCtt04;
+    private String clCtt05;
+    private String clCtt06;
+    private String clCtt07;
+    private String clCtt08;
+    private String clCtt09;
+    private String clCtt10;
+    private String clCtt11;
+    private String clCtt12;
+    private String clCtt13;
+    private String clCtt14;
+    private String clCtt15;
+    private String clCmt01;
+    private String clCmt02;
+    private String clCmt03;
+    private String clCmt04;
+    private String clCmt05;
+    private String clCmt06;
+    private String clCmt07;
+    private String clCmt08;
+    private String clCmt09;
+    private String clCmt10;
+    private String clCmt11;
+    private String clCmt12;
+    private String clCmt13;
+    private String clCmt14;
+    private String clCmt15;
+    private String totRvSugg;
+
+    private String hazopActYn;
+    private String porcActYn;
+
+    private List<ChrgrChgHist> appLine;
+    private List<MrAtchFile> mrAtchFiles;
+    private List<ChrgrChgHist> porcLineList;
+
+    private int delYn;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date fstRgstDt;
+    private String fstRgstr;
+
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    private Date lastChgDt;
+    private String lastChgr;
+
+    private boolean isCheck;
+
+    //201906추가
+    private String porcStCd;	
+    private String stepCd;
+    private String chrgrClCd;    		
+
+    public Integer getMrRvRstNo() {
+        return mrRvRstNo;
+    }
+
+    public void setMrRvRstNo(Integer mrRvRstNo) {
+        this.mrRvRstNo = mrRvRstNo;
+    }
+
+    public Integer getMrReqNo() {
+        return mrReqNo;
+    }
+
+    public void setMrReqNo(Integer mrReqNo) {
+        this.mrReqNo = mrReqNo;
+    }
+
+    public String getMrNo() {
+        return mrNo;
+    }
+
+    public void setMrNo(String mrNo) {
+        this.mrNo = mrNo;
+    }
+
+    public String getPlant() {
+        return plant;
+    }
+
+    public void setPlant(String plant) {
+        this.plant = plant;
+    }
+
+    public int getMrReqProcStepDetNo() {
+        return mrReqProcStepDetNo;
+    }
+
+    public void setMrReqProcStepDetNo(int mrReqProcStepDetNo) {
+        this.mrReqProcStepDetNo = mrReqProcStepDetNo;
+    }
+
+    public String getItemCd() {
+        return itemCd;
+    }
+
+    public void setItemCd(String itemCd) {
+        this.itemCd = itemCd;
+    }
+
+    public String getClCd01() {
+        return clCd01;
+    }
+
+    public void setClCd01(String clCd01) {
+        this.clCd01 = clCd01;
+    }
+
+    public String getClCd02() {
+        return clCd02;
+    }
+
+    public void setClCd02(String clCd02) {
+        this.clCd02 = clCd02;
+    }
+
+    public String getClCd03() {
+        return clCd03;
+    }
+
+    public void setClCd03(String clCd03) {
+        this.clCd03 = clCd03;
+    }
+
+    public String getClCd04() {
+        return clCd04;
+    }
+
+    public void setClCd04(String clCd04) {
+        this.clCd04 = clCd04;
+    }
+
+    public String getClCd05() {
+        return clCd05;
+    }
+
+    public void setClCd05(String clCd05) {
+        this.clCd05 = clCd05;
+    }
+
+    public String getClCd06() {
+        return clCd06;
+    }
+
+    public void setClCd06(String clCd06) {
+        this.clCd06 = clCd06;
+    }
+
+    public String getClCd07() {
+        return clCd07;
+    }
+
+    public void setClCd07(String clCd07) {
+        this.clCd07 = clCd07;
+    }
+
+    public String getClCd08() {
+        return clCd08;
+    }
+
+    public void setClCd08(String clCd08) {
+        this.clCd08 = clCd08;
+    }
+
+    public String getClCd09() {
+        return clCd09;
+    }
+
+    public void setClCd09(String clCd09) {
+        this.clCd09 = clCd09;
+    }
+
+    public String getClCd10() {
+        return clCd10;
+    }
+
+    public void setClCd10(String clCd10) {
+        this.clCd10 = clCd10;
+    }
+
+    public String getClCd11() {
+        return clCd11;
+    }
+
+    public void setClCd11(String clCd11) {
+        this.clCd11 = clCd11;
+    }
+
+    public String getClCd12() {
+        return clCd12;
+    }
+
+    public void setClCd12(String clCd12) {
+        this.clCd12 = clCd12;
+    }
+
+    public String getClCd13() {
+        return clCd13;
+    }
+
+    public void setClCd13(String clCd13) {
+        this.clCd13 = clCd13;
+    }
+
+    public String getClCd14() {
+        return clCd14;
+    }
+
+    public void setClCd14(String clCd14) {
+        this.clCd14 = clCd14;
+    }
+
+    public String getClCd15() {
+        return clCd15;
+    }
+
+    public void setClCd15(String clCd15) {
+        this.clCd15 = clCd15;
+    }
+
+    public String getClCtt01() {
+        return clCtt01;
+    }
+
+    public void setClCtt01(String clCtt01) {
+        this.clCtt01 = clCtt01;
+    }
+
+    public String getClCtt02() {
+        return clCtt02;
+    }
+
+    public void setClCtt02(String clCtt02) {
+        this.clCtt02 = clCtt02;
+    }
+
+    public String getClCtt03() {
+        return clCtt03;
+    }
+
+    public void setClCtt03(String clCtt03) {
+        this.clCtt03 = clCtt03;
+    }
+
+    public String getClCtt04() {
+        return clCtt04;
+    }
+
+    public void setClCtt04(String clCtt04) {
+        this.clCtt04 = clCtt04;
+    }
+
+    public String getClCtt05() {
+        return clCtt05;
+    }
+
+    public void setClCtt05(String clCtt05) {
+        this.clCtt05 = clCtt05;
+    }
+
+    public String getClCtt06() {
+        return clCtt06;
+    }
+
+    public void setClCtt06(String clCtt06) {
+        this.clCtt06 = clCtt06;
+    }
+
+    public String getClCtt07() {
+        return clCtt07;
+    }
+
+    public void setClCtt07(String clCtt07) {
+        this.clCtt07 = clCtt07;
+    }
+
+    public String getClCtt08() {
+        return clCtt08;
+    }
+
+    public void setClCtt08(String clCtt08) {
+        this.clCtt08 = clCtt08;
+    }
+
+    public String getClCtt09() {
+        return clCtt09;
+    }
+
+    public void setClCtt09(String clCtt09) {
+        this.clCtt09 = clCtt09;
+    }
+
+    public String getClCtt10() {
+        return clCtt10;
+    }
+
+    public void setClCtt10(String clCtt10) {
+        this.clCtt10 = clCtt10;
+    }
+
+    public String getClCtt11() {
+        return clCtt11;
+    }
+
+    public void setClCtt11(String clCtt11) {
+        this.clCtt11 = clCtt11;
+    }
+
+    public String getClCtt12() {
+        return clCtt12;
+    }
+
+    public void setClCtt12(String clCtt12) {
+        this.clCtt12 = clCtt12;
+    }
+
+    public String getClCtt13() {
+        return clCtt13;
+    }
+
+    public void setClCtt13(String clCtt13) {
+        this.clCtt13 = clCtt13;
+    }
+
+    public String getClCtt14() {
+        return clCtt14;
+    }
+
+    public void setClCtt14(String clCtt14) {
+        this.clCtt14 = clCtt14;
+    }
+
+    public String getClCtt15() {
+        return clCtt15;
+    }
+
+    public void setClCtt15(String clCtt15) {
+        this.clCtt15 = clCtt15;
+    }
+
+    public String getClCmt01() {
+        return clCmt01;
+    }
+
+    public void setClCmt01(String clCmt01) {
+        this.clCmt01 = clCmt01;
+    }
+
+    public String getClCmt02() {
+        return clCmt02;
+    }
+
+    public void setClCmt02(String clCmt02) {
+        this.clCmt02 = clCmt02;
+    }
+
+    public String getClCmt03() {
+        return clCmt03;
+    }
+
+    public void setClCmt03(String clCmt03) {
+        this.clCmt03 = clCmt03;
+    }
+
+    public String getClCmt04() {
+        return clCmt04;
+    }
+
+    public void setClCmt04(String clCmt04) {
+        this.clCmt04 = clCmt04;
+    }
+
+    public String getClCmt05() {
+        return clCmt05;
+    }
+
+    public void setClCmt05(String clCmt05) {
+        this.clCmt05 = clCmt05;
+    }
+
+    public String getClCmt06() {
+        return clCmt06;
+    }
+
+    public void setClCmt06(String clCmt06) {
+        this.clCmt06 = clCmt06;
+    }
+
+    public String getClCmt07() {
+        return clCmt07;
+    }
+
+    public void setClCmt07(String clCmt07) {
+        this.clCmt07 = clCmt07;
+    }
+
+    public String getClCmt08() {
+        return clCmt08;
+    }
+
+    public void setClCmt08(String clCmt08) {
+        this.clCmt08 = clCmt08;
+    }
+
+    public String getClCmt09() {
+        return clCmt09;
+    }
+
+    public void setClCmt09(String clCmt09) {
+        this.clCmt09 = clCmt09;
+    }
+
+    public String getClCmt10() {
+        return clCmt10;
+    }
+
+    public void setClCmt10(String clCmt10) {
+        this.clCmt10 = clCmt10;
+    }
+
+    public String getClCmt11() {
+        return clCmt11;
+    }
+
+    public void setClCmt11(String clCmt11) {
+        this.clCmt11 = clCmt11;
+    }
+
+    public String getClCmt12() {
+        return clCmt12;
+    }
+
+    public void setClCmt12(String clCmt12) {
+        this.clCmt12 = clCmt12;
+    }
+
+    public String getClCmt13() {
+        return clCmt13;
+    }
+
+    public void setClCmt13(String clCmt13) {
+        this.clCmt13 = clCmt13;
+    }
+
+    public String getClCmt14() {
+        return clCmt14;
+    }
+
+    public void setClCmt14(String clCmt14) {
+        this.clCmt14 = clCmt14;
+    }
+
+    public String getClCmt15() {
+        return clCmt15;
+    }
+
+    public void setClCmt15(String clCmt15) {
+        this.clCmt15 = clCmt15;
+    }
+
+    public String getTotRvSugg() {
+        return totRvSugg;
+    }
+
+    public void setTotRvSugg(String totRvSugg) {
+        this.totRvSugg = totRvSugg;
+    }
+
+    public String getHazopActYn() {
+        return hazopActYn;
+    }
+
+    public void setHazopActYn(String hazopActYn) {
+        this.hazopActYn = hazopActYn;
+    }
+
+    public String getPorcActYn() {
+        return porcActYn;
+    }
+
+    public void setPorcActYn(String porcActYn) {
+        this.porcActYn = porcActYn;
+    }
+
+    public List<ChrgrChgHist> getAppLine() {
+        return appLine;
+    }
+
+    public void setAppLine(List<ChrgrChgHist> appLine) {
+        this.appLine = appLine;
+    }
+
+    public int getDelYn() {
+        return delYn;
+    }
+
+    public void setDelYn(int delYn) {
+        this.delYn = delYn;
+    }
+
+    public Date getFstRgstDt() {
+        return fstRgstDt;
+    }
+
+    public void setFstRgstDt(Date fstRgstDt) {
+        this.fstRgstDt = fstRgstDt;
+    }
+
+    public String getFstRgstr() {
+        return fstRgstr;
+    }
+
+    public void setFstRgstr(String fstRgstr) {
+        this.fstRgstr = fstRgstr;
+    }
+
+    public Date getLastChgDt() {
+        return lastChgDt;
+    }
+
+    public void setLastChgDt(Date lastChgDt) {
+        this.lastChgDt = lastChgDt;
+    }
+
+    public String getLastChgr() {
+        return lastChgr;
+    }
+
+    public void setLastChgr(String lastChgr) {
+        this.lastChgr = lastChgr;
+    }
+
+    public boolean getIsCheck() {
+        return isCheck;
+    }
+
+    public void setIsCheck(boolean isCheck) {
+        this.isCheck = isCheck;
+    }
+
+    public List<MrAtchFile> getMrAtchFiles() {
+        return mrAtchFiles;
+    }
+
+    public void setMrAtchFiles(List<MrAtchFile> mrAtchFiles) {
+        this.mrAtchFiles = mrAtchFiles;
+    }
+
+	public List<ChrgrChgHist> getPorcLineList() {
+		return porcLineList;
+	}
+
+	public void setPorcLineList(List<ChrgrChgHist> porcLineList) {
+		this.porcLineList = porcLineList;
+	}
+	
+    public String getPorcStCd() {
+        return porcStCd;
+    }
+
+    public void setPorcStCd(String porcStCd) {
+        this.porcStCd = porcStCd;
+    }    
+
+    public String getStepCd() {
+        return stepCd;
+    }
+
+    public void setStepCd(String stepCd) {
+        this.stepCd = stepCd;
+    }
+    
+    public String getChrgrClCd() {
+        return chrgrClCd;
+    }
+
+    public void setChrgrClCd(String chrgrClCd) {
+        this.chrgrClCd = chrgrClCd;
+    }
+}

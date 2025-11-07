@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/domain
+END
+Authentication.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/domain/Authentication.java
+END
+EmpInfoVo.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/domain/EmpInfoVo.java
+END
+MrRvRstVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/repos_edims/!svn/ver/189/trunk/src/mr/src/main/java/com/mr/common/domain/MrRvRstVO.java
+END
+UnitVo.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/domain/UnitVo.java
+END
+CommCdVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/domain/CommCdVO.java
+END
+CostCenterVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/domain/CostCenterVO.java
+END

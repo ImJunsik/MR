@@ -1,0 +1,50 @@
+package com.mr.step.repository;
+
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.stereotype.Repository;
+
+import com.base.domain.Domain;
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.base.util.IsOperDistinc;
+import com.mr.step.domain.ChrgrChgHist;
+import com.mr.step.domain.MrMailVO;
+
+@Repository
+public class MrMailDao  extends BaseSqlMapRepository {
+
+
+    public MrMailVO selectMrMailInfo(Integer mrReqNo) {
+    	return selectOne("mr.mail.selectMrMailInfo", mrReqNo);
+    }
+
+    public MrMailVO selectMrTitle(Integer mrReqNo) {
+        return selectOne("mr.mail.selectMrTitle", mrReqNo);
+    }
+
+    public List<String> selectEmailAddr(List<String> tos) {
+        return selectList("mr.mail.selectEmailAddr", tos);
+    }
+
+    public List<ChrgrChgHist> selectIncompleteEmailAddr(String tos) {
+        return selectList("mr.mail.selectIncompleteEmailAddr", tos);
+    }
+    
+    public String selectCapexNo(String tos) {
+        return selectOne("mr.mail.selectCapexNo", tos);
+    }
+    
+    
+    public List<ChrgrChgHist> selectLimitDateMail() {
+    	
+    	return selectList("mr.mail.selectLimitDateMail");
+
+    }
+
+    public void insertMailList(MrMailVO mmeVo){
+    	insert("mr.mail.insertMailLog",mmeVo);
+    	return;
+    }
+  
+}

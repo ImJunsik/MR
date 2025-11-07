@@ -1,0 +1,529 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<%@ include file="/WEB-INF/includes/taglibs.jsp"%>
+<!-- title -->
+<div id="content_header">
+	<h4 class="content_header title">MR완료</h4>
+</div>
+<!-- button -->
+<div class="button_top">
+	<c:forEach var='appLine' items='${register.appLine}' varStatus="loop">
+		<script>
+			//var test5 = "${modeClass}";
+			//alert(test5);
+			//alert("${appLine.chrgrClCd}");
+			//alert("${appLine.ifStatCd}");
+			//alert("${appLine.chrgEmpNo}");
+			//alert("${appLine.loginEmpNo}");
+		</script>
+
+
+		<c:if test="${appLine.chrgrClCd == 'Z02D'}">
+			<c:if
+				test="${appLine.ifStatCd != '1' && appLine.chrgEmpNo == register.loginEmpNo}">
+				<input type="image" src="images/btn_reRequestApproval.png" style="display: none" class="cursor reAppReq IBA" />
+			</c:if>
+		</c:if>
+	</c:forEach>
+	<input type="image" src="images/btn_temp.png" class="save IAA"
+		name="save" style="display: none" />
+	<!-- <input type="image" src="images/btn_completeCapex.png" class="capex IAA" name="capex" style="display:none" />  -->
+	<input type="image" src="images/btn_requestApproval.png" class="appreq IAA" name="appreq" style="display: none" /> 
+	<input type="image" src="images/btn_output.png" class="output IAA IBA ICA" name="output" style="display: none" />
+	<!-- hajewook 수벙 버튼 비활성화 -->
+	<!-- <input type="image" src="images/btn_return.png"  class="return IBA" name="return" style="display:none" /> -->
+	<!-- <input type="image" src="images/btn_approve.png" class="appr IBA" name="appr" style="display:none" /> -->
+	<input type="image" src="images/btn_return.png" class="return " name="return" style="display:none" />
+	<!-- <input type="image" src="images/btn_approve.png" class="appr " name="appr" style="display:none" /> -->
+	
+	
+	<!--승인버튼 강제 활성화
+	<br /><input type="image" src="images/btn_approve.png" name="appr" class="appr " /> -->	
+	<!-- <input type="image" src="images/btn_requestApproval.png" class="appreq IAA" name="appreq" />--><!--승인요청-->	
+</div>
+
+<div id="content_wrap">
+	<form id="registerForm">
+		<input type="hidden" id="mrReqNo" name="mrReqNo"
+			value="<c:out value="${register.mrReqNo}"/>" /> <input type="hidden"
+			id="mrStepCd" name="mrStepCd"
+			value="<c:out value="${register.mrStepCd}"/>" /> <input type="hidden"
+			id="mrNo" name="mrNo" value="<c:out value="${register.mrNo}"/>" /> <input
+			type="hidden" id="capexNo" name="capexNo"
+			value="<c:out value="${register.capexNo}"/>" /> <input type="hidden"
+			id="capexClose" name="capexClose"
+			value="<c:out value="${register.capexClose}"/>" /> <input
+			type="hidden" id="plantNo" name="plant"
+			value="<c:out value="${register.plant}"/>" />
+
+		<table class="table_row" border="1" cellspacing="0">
+			<caption class="blind"></caption>
+			<colgroup>
+				<col width="15%">
+				<col width="35%">
+				<col width="15%">
+				<col width="35%">
+			</colgroup>
+			<tbody>
+				<tr>
+					<td colspan="4" class="topbg"></td>
+				</tr>
+				<tr>
+					<th scope="row">사업명</th>
+					<td><c:out value="${register.mrReqTitle}" /></td>
+					<th scope="row">변경담당자</th>
+					<td><c:out value="${register.techEmpNm}" /></td>
+				</tr>
+				<tr>
+					<th scope="row">MR번호</th>
+					<td><c:out value="${register.mrNo}" /></td>
+					<th scope="row">CAPEX번호</th>
+					<td><c:out value="${register.capexNo}" /> <font
+						color="#004AAD"> <c:if test="${register.capexClose=='Y'}">[CAPEX CLOSE]</c:if>
+							<c:if test="${register.capexClose=='N'}">[CAPEX 사용중]</c:if> <c:if
+								test="${register.capexClose=='E'}">[CAPEX 해당없음]</c:if>
+					</font></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<!-- space non 10 -->
+		<hr class="divider_none_10" />
+
+		<table class="table_row" border="1" cellspacing="0">
+			<caption class="blind"></caption>.
+			<colgroup>
+				<col width="15%">
+				<col width="10%">
+				<col width="15%">
+				<col width="15%">
+				<col width="15%">
+				<col width="15%">
+				<col width="15%">
+			</colgroup>
+			<tbody>
+				<tr>
+					<th scope="row" rowspan="2">사업 개요</th>
+					<th class="dep2" scope="row">문제점</th>
+					<td colspan="5">
+						<div class="form_group">
+							<c:if test="${modeClass=='IAA'}">
+								<textarea name="issueCtt" class="i_text_full issueCtt" rows=""
+									cols=""><c:out value="${register.issueCtt}" /></textarea>
+							</c:if>
+							<c:if test="${modeClass!='IAA'}">
+								<pre>
+									<c:out value="${register.issueCtt}" />
+								</pre>
+							</c:if>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th class="dep2" scope="row">개선안</th>
+					<td colspan="5">
+						<div class="form_group">
+							<c:if test="${modeClass=='IAA'}">
+								<textarea name="imprvPrpslCtt" class="i_text_full imprvPrpslCtt"
+									rows="" cols=""><c:out
+										value="${register.imprvPrpslCtt}" /></textarea>
+							</c:if>
+							<c:if test="${modeClass!='IAA'}">
+								<pre>
+									<c:out value="${register.imprvPrpslCtt}" />
+								</pre>
+							</c:if>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row" rowspan="2">기대 효과</th>
+					<th class="dep2" scope="row">정량적 효과</th>
+					<td colspan="2">
+						<div class="form_group">
+							<input type="text" class="i_input num number quanEptEfCtt"
+								name="quanEptEftCtt"
+								value="<fmt:formatNumber value="${register.quanEptEftCtt}" groupingUsed="true"/>" />
+
+
+							<select class="qnUnit quanEptEftCd IAA" name="quanEptEftCd"
+								disabled="disabled"></select>
+						</div>
+					</td>
+					<th class="dep2" scope="row">정성적 효과</th>
+					<td colspan="2">
+						<div class="form_group">
+							<textarea name="qualEptEftCtt" rows="" cols=""
+								class="i_text_full qualEptEftCtt"><c:out
+									value="${register.qualEptEftCtt}" /></textarea>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th class="dep2" scope="row">실투입비용</th>
+					<td colspan="2">
+						<div class="form_group">
+							<input type="text" class="i_input num number invstCost"
+								name="invstCost"
+								value="<fmt:formatNumber value="${register.invstCost}"/>">
+							천원
+						</div>
+					</td>
+					<th class="dep2" scope="row">품의예산</th>
+					<td colspan="2">
+						<div class="form_group">
+							<input type="textbox" class="i_input num number invstBudget"
+								name="invstBudget"
+								value="<fmt:formatNumber value="${register.invstBudget}"/>">
+							천원
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row" colspan="2" rowspan="2">수행기간</th>
+					<th scope="col">총수행기간(일)</th>
+					<th scope="col">MR요청</th>
+					<th scope="col">투자품의승인</th>
+					<th scope="col">가동개시</th>
+					<th scope="col">완료보고</th>
+				</tr>
+				<tr>
+					<td class="center"><c:out value="${register.mrTotalPeriod}" /></td>
+					<td class="center"><c:out value="${register.mrReqDate}" /></td>
+					<td class="center"><c:out value="${register.mrInvDate}" /></td>
+					<td class="center"><c:out value="${register.mrSafeDate}" /></td>
+					<td class="center"><c:out value="${register.mrCompDate}" /></td>
+				</tr>
+				<tr>
+					<th colspan="2" scope="row">시운전 결과</th>
+					<td colspan="5">
+						<div class="form_group">
+							<c:if test="${modeClass=='IAA'}">
+								<textarea name="trialRst" class="i_text_full trialRst" rows=""
+									cols=""><c:out value="${register.trialRst}" /></textarea>
+							</c:if>
+							<c:if test="${modeClass!='IAA'}">
+								<pre>
+									<c:out value="${register.trialRst}" />
+								</pre>
+							</c:if>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th colspan="2" scope="row">사후관리 방안</th>
+					<td colspan="5">
+						<div class="form_group">
+							<c:if test="${modeClass=='IAA'}">
+								<textarea name="postMngPlan" class="i_text_full postMngPlan"
+									rows="" cols=""><c:out
+										value="${register.postMngPlan}" /></textarea>
+							</c:if>
+							<c:if test="${modeClass!='IAA'}">
+								<pre>
+									<c:out value="${register.postMngPlan}" />
+								</pre>
+							</c:if>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th colspan="2" scope="row" class="vam fileAdd">첨부파일 <img
+						id="addFile" src="images/icon_s_plus.png" border="0"
+						class="cursor IAA fileAdd mt-2" disabled="true" />
+					</th>
+					<td colspan="5" class="section_text pl5 pt5 pb5">
+						<div class="form_group">
+							<table id="fileList" class="table_default_margin" border="1"
+								cellspacing="0">
+								<tr style="display: none">
+									<td></td>
+								</tr>
+								<c:forEach var="mrAtchFiles" items="${register.mrAtchFiles}"
+									varStatus="loop">
+									<tr>
+										<td><input type="text" class="i_input"
+											value="${mrAtchFiles.fileCdNm}" readonly> <input
+											type="text" class="i_input_300" value="${mrAtchFiles.fileNm}"
+											readonly> <img src="images/btn_inFile.png"
+											class="cursor fileDown" /> <img
+											class="cursor IAA removeDownFile" src="images/icon_minus.png"
+											style="display: none" /> <input type="hidden"
+											value="${mrAtchFiles.fileCd}" /> <input type="hidden"
+											class="delFlag" name="mrAtchFiles[${loop.index}].deleted"
+											value="false" /> <input type="hidden" class="insFlag"
+											name="mrAtchFiles[${loop.index}].inserted" value="false" /> <input
+											type="hidden" name="mrAtchFiles[${loop.index}].mrAtchFileNo"
+											value="${mrAtchFiles.mrAtchFileNo}" /> <input type="hidden"
+											class="drawMngNo" name="mrAtchFiles[${loop.index}].drawMngNo"
+											value="${mrAtchFiles.drawMngNo}" /></td>
+									</tr>
+								</c:forEach>
+							</table>
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th colspan="2" scope="row">보완 요청 사항</th>
+					<td colspan="5">
+						<div class="form_group">
+							<c:if test="${modeClass=='IBA'}">
+								<textarea name="compleReq" class="i_text_full compleReq" rows=""
+									cols=""><c:out value="${register.compleReq}" /></textarea>
+							</c:if>
+							<c:if test="${modeClass!='IBA'}">
+								<pre>
+									<c:out value="${register.compleReq}" />
+								</pre>
+							</c:if>
+						</div>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+
+		<!--
+<c:out value="${modeClass}"/>
+ -->
+	</form>
+</div>
+<script>
+	$(window).load(
+			function() {
+				var checkList = new Array();
+				var disabled = true;
+
+				if ($("#writeDate").html() == "") {
+					$("#writeDate").html(currentDate);
+				}
+
+				if ("${modeClass}" == "IAA") {
+					disabled = false;
+				}
+
+				$(".save").click(function() {
+					if (confirm("임시저장 하시겠습니까?")) {
+						$.removeComma();	//
+						$('#pageLoadingWrap').show();
+						$("form").attr("action", "${saveURL}").submit();
+						//
+					}
+				});
+
+				$(".appreq").click(
+						function() {
+							if (($("#capexClose").val() != "Y")
+									&& ($("#capexClose").val() != "E")) {
+								alert("SAP CJ02 CAPEX가 Close되지 않았습니다!");
+								return;
+							}
+							if ($.validation())
+								if (confirm("MR완료 승인요청을 하시겠습니까?")) {
+									$.removeComma();
+									$('#pageLoadingWrap').show();
+									$("form")
+											.attr("action", "compRptAppReq.do")
+											.submit();
+									
+									//202002 she 인터페이스 추가
+								}
+						});
+
+				$(".capex").click(function() {
+					if ($("#capexClose").val() == "Y") {
+						alert("CAPEX가 완료되었습니다.");
+						return;
+					}
+					if (confirm("CAPEX 완료조회를 하시겠습니까?")) {
+						$('#pageLoadingWrap').show();
+						$("form").attr("action", "compRptCapex.do").submit();
+					}
+				});
+
+				$(".output").click(
+						function() {
+							$.popup({
+								url : "popup/compFileManage.do?"
+										+ $("form").serialize(),
+								width : "650",
+								height : "700"
+							});
+						});
+
+				$(".return").click(function() {
+					if ($.validation2())
+						if (confirm("MR완료를 반려 하시겠습니까?")) {
+							$.removeComma();
+							$('#pageLoadingWrap').show();
+							$("form").attr("action", "compRptRet.do").submit();
+						}
+				});
+
+				$(".appr").click(function() {
+					if (confirm("MR완료를 승인 하시겠습니까?")) {
+						$.removeComma();
+						$('#pageLoadingWrap').show();
+						$("form").attr("action", "compRptAppr.do").submit();
+					}
+				});
+
+				$.validation = function() {
+					var isValid = false;
+					isValid = $.validator({
+						issueCtt : {
+							method : "class",
+							type : "text",
+							msg : "문제점을 입력하세요."
+						},
+						imprvPrpslCtt : {
+							method : "class",
+							type : "text",
+							msg : "개선안을 입력하세요."
+						},
+						quanEptEftCtt : {
+							method : "class",
+							type : "text",
+							msg : "정량적효과를 입력하세요."
+						},
+						quanEptEftCd : {
+							method : "class",
+							type : "text",
+							msg : "정량적효과단위를 입력하세요."
+						},
+						qualEptEftCtt : {
+							method : "class",
+							type : "text",
+							msg : "정성적효과를 입력하세요."
+						},
+						invstCost : {
+							method : "class",
+							type : "text",
+							msg : "실투입비용을 입력하세요."
+						},
+						invstBudget : {
+							method : "class",
+							type : "text",
+							msg : "품의예산을 입력하세요."
+						},
+						trialRst : {
+							method : "class",
+							type : "text",
+							msg : "시운전결과를 입력하세요."
+						},
+						postMngPlan : {
+							method : "class",
+							type : "text",
+							msg : "사후관리방안을 입력하세요."
+						},
+					});
+					return isValid;
+				};
+
+				$.validation1 = function() {
+					var isValid = false;
+					isValid = $.validator({
+						fileDiv : {
+							method : "class",
+							type : "text",
+							msg : "파일분류를 입력하세요."
+						},
+						multipartFile : {
+							method : "class",
+							type : "text",
+							msg : "파일을 첨부하세요."
+						},
+					});
+					return isValid;
+				};
+
+				$.validation2 = function() {
+					var isValid = false;
+					isValid = $.validator({
+						compleReq : {
+							method : "class",
+							type : "text",
+							msg : "보완요청사항을 입력하세요."
+						},
+					});
+					return isValid;
+				};
+			});
+
+	$(window)
+			.ready(
+					function() {
+
+						$(".inputLimitDate").datepicker({
+							dateformat : "yyyy-mm-dd",
+							showOn : "button",
+							changeYear : true,
+							changeMonth : true,
+							buttonImage : "images/icon_calendar.gif",
+							buttonImageOnly : true,
+							minDate : "today",
+							maxDate : "+3M"
+						});
+						$("img.ui-datepicker-trigger")
+								.attr(
+										"style",
+										"border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;");
+						$(".ui-datepicker-month").attr("width", "30px");
+
+						$.selectLoad({
+							className : "qnUnit",
+							url : "codeList.do?mrCommGrpCd=QN_UNIT",
+							defaultText : "선택",
+							selectValue : "${register.quanEptEftCd}"
+						});
+
+						if ("${modeClass}" == "IAA" || "${modeClass}" == "IBA"
+								|| "${modeClass}" == "ICA") {
+							if ($("#capexClose").val() == "Y") {
+								$(".capex").hide();
+							} else {
+								$(".capex").show();
+							}
+						}
+
+						/***************************************
+						 * hajewook 추가
+						 * 기안 로직 
+						 ***************************************/
+						//devgian.oilbank.co.kr 개발 결재 서버
+						if ("${mrAction}" == "compRptAppReq") {
+							var url = "http://gian.oilbank.co.kr/connlogin.aspx?"
+									+ "uid="
+									+ "${register.loginEmpNo}"
+									+ "&connkey="
+									+ "${register.mrReqNo}"
+									+ "&connType="
+									+ "WEB"
+									+ "&connName="
+									+ "MR"
+									+ "&connCode="
+									+ "Z0090"
+									+ "&endTime=" + "DRAFT" + "&auto=" + "N"
+							window.open(url, "compRptAppReq");
+						}
+
+					});
+
+	/***************************************
+	 * HSW 추가
+	 * 기안 로직 
+	 ***************************************/
+	/*hajewook 재상신*/
+	$(document).on(
+			"click",
+			".reAppReq",
+			function() {
+
+				var url = "http://gian.oilbank.co.kr/connlogin.aspx?" + "&uid="
+						+ "${register.loginEmpNo}" + "&connkey="
+						+ "${register.mrReqNo}" + "&connType=" + "WEB"
+						+ "&connName=" + "MR" + "&connCode=" + "Z0090"
+						+ "&endTime=" + "DRAFT" + "&auto=" + "N";
+				window.open(url, "compRptAppReq");
+			});
+</script>
+

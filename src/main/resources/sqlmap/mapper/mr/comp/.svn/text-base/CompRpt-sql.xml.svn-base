@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.comp">
+
+    <resultMap id="compRptMap" type="com.mr.comp.domain.CompRptVO">
+        <id property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrTmpNo" column="MR_TMP_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="plant" column="PLANT" />
+        <result property="plantNm" column="PLANT_NM" />
+        <result property="reqClCd" column="REQ_CL_CD" />
+        <result property="reqClDtlCd" column="REQ_CL_DTL_CD" />
+        <result property="workPsblClCd" column="WORK_PSBL_CL_CD" />
+        <result property="workPsblClNm" column="WORK_PSBL_CL_NM" />
+        <result property="workPsblDt" column="WORK_PSBL_DT" />
+        <result property="workPsblClRsn" column="WORK_PSBL_CL_RSN" />
+        <result property="rigionCd" column="RIGION_CD" />
+        <result property="issueCtt" column="ISSUE_CTT" />
+        <result property="inflnceLoss" column="INFLNCE_LOSS" />
+        <result property="incnvCtt" column="INCNV_CTT" />
+        <result property="useCnt" column="USE_CNT" />
+        <result property="useCntPrd" column="USE_CNT_PRD" />
+        <result property="imprvPrpslCtt" column="IMPRV_PRPSL_CTT" />
+        <result property="qualEptEftCtt" column="QUAL_EPT_EFT_CTT" />
+        <result property="quanEptEftCtt" column="QUAN_EPT_EFT_CTT" />
+        <result property="quanEptEftCd" column="QUAN_EPT_EFT_CD" />
+        <result property="cnclEmpNo" column="CNCL_EMP_ID" />
+        <result property="cnclDt" column="CNCL_DT" />
+        <result property="cnclRsnCtt" column="CNCL_RSN_CTT" />
+        <result property="safetyChkDt" column="SAFETY_CHK_DT" />
+        <result property="safetyChkLoc" column="SAFETY_CHK_LOC" />
+        <result property="invstCostNo" column="INVST_COST_NO" />
+        <result property="capexNo" column="CAPEX_NO" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <result property="invstCost" column="INVST_COST" />
+        <result property="invstBudget" column="INVST_BUDGET" />
+        <result property="trialRst" column="TRIAL_RST" />
+        <result property="postMngPlan" column="POST_MNG_PLAN" />
+        <result property="compleReq" column="COMPLE_REQ" />
+        <result property="capexClose" column="CAPEX_CLOSE" />
+        <result property="techEmpNm" column="TECH_EMP_NM" />
+        <result property="mrTotalPeriod" column="MR_TOTAL_PERIOD" />
+        <result property="mrReqDate" column="MR_REQ_DATE" />
+        <result property="mrInvDate" column="MR_INV_DATE" />
+        <result property="mrSafeDate" column="MR_SAFE_DATE" />
+        <result property="mrCompDate" column="MR_COMP_DATE" />
+        <collection property="appLine" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD} " select="mr.step.selectAppLine" />
+    </resultMap>
+
+    <select id="selectCompRpt" resultMap="compRptMap">
+         SELECT A.MR_REQ_NO,
+                A.MR_REQ_TITLE,
+                A.MR_NO,
+                A.MR_TMP_NO,
+                A.MR_STEP_CD,
+                A.PROC_ST_CD,
+                A.PLANT,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='PLANT' AND MR_COMM_CD=A.PLANT) PLANT_NM,
+                A.REQ_CL_CD,
+                A.REQ_CL_DTL_CD,
+                A.WORK_PSBL_CL_CD,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='WORK' AND MR_COMM_CD=A.WORK_PSBL_CL_CD) WORK_PSBL_CL_NM,
+                A.WORK_PSBL_DT,
+                A.WORK_PSBL_CL_RSN,
+                A.RIGION_CD,
+                A.ISSUE_CTT,
+                A.INFLNCE_LOSS,
+                A.INCNV_CTT,
+                A.USE_CNT,
+                A.USE_CNT_PRD,
+                A.IMPRV_PRPSL_CTT,
+                A.QUAL_EPT_EFT_CTT,
+                A.QUAN_EPT_EFT_CTT,
+                A.QUAN_EPT_EFT_CD,
+                A.CNCL_EMP_ID,
+                A.CNCL_DT,
+                A.CNCL_RSN_CTT,
+                A.SAFETY_CHK_DT,
+                A.SAFETY_CHK_LOC,
+                A.INVST_COST_NO,
+                A.CAPEX_NO,
+                A.DEL_YN,
+                A.FST_RGST_DT,
+                A.FST_RGSTR,
+                A.LAST_CHG_DT,
+                A.LAST_CHGR,
+                B.INVST_COST,
+                B.INVST_BUDGET,
+                B.TRIAL_RST,
+                B.POST_MNG_PLAN,
+                B.COMPLE_REQ,
+                B.CAPEX_CLOSE CAPEX_CLOSE,
+                --DECODE(nvl(A.CAPEX_NO,' '),' ','Y',B.CAPEX_CLOSE) B.CAPEX_CLOSE,
+                --DECODE((SELECT SUM(COST_TOT) FROM MR_INVST_COST WHERE B.MR_REQ_NO = 1127 AND DEL_YN=0),0,'Y',B.CAPEX_CLOSE) CAPEX_CLOSE,
+                (SELECT EMP_NAME FROM EDM_EMP WHERE EMP_ID = (SELECT CHRG_EMP_NO FROM MR_REQ_CHRGR_CHG_HIST WHERE MR_REQ_NO=#{mrReqNo} AND CHRGR_CL_CD='Z02D' AND DEL_YN='0' AND ROWNUM=1 ) ) TECH_EMP_NM,
+                TRUNC(NVL(B.LAST_CHG_DT,SYSDATE)-A.FST_RGST_DT)+1 MR_TOTAL_PERIOD,
+                TO_CHAR(A.FST_RGST_DT,'YYYY-MM-DD') MR_REQ_DATE,
+                (SELECT SAP_SEND_DT FROM MR_INVST_COST_RPT WHERE MR_REQ_NO=#{mrReqNo} AND DEL_YN = '0') MR_INV_DATE,
+                TO_CHAR(A.SAFETY_CHK_DT,'YYYY-MM-DD') MR_SAFE_DATE,
+                TO_CHAR(NVL(B.LAST_CHG_DT,SYSDATE),'YYYY-MM-DD') MR_COMP_DATE
+           FROM MR_REQ_MST A, MR_REQ_COMP B
+          WHERE A.MR_REQ_NO = B.MR_REQ_NO(+)
+            AND A.MR_REQ_NO = #{mrReqNo}
+            AND A.DEL_YN=0
+    </select>
+
+    <resultMap id="countCompRptMap" type="com.mr.comp.domain.CompChrgrChgHistVO">
+        <result property="checkCnt" column="CHECK_CNT" />
+    </resultMap>
+
+    <select id="countCompRpt" resultMap="countCompRptMap">
+        SELECT COUNT(*) CHECK_CNT
+          FROM MR_REQ_COMP
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <insert id="insertCompRpt" parameterType="com.mr.comp.domain.CompRptVO">
+        <selectKey keyProperty="mrReqCompNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_REQ_COMP_NO),0)+1
+              FROM MR_REQ_COMP
+        </selectKey>
+        INSERT INTO MR_REQ_COMP (
+                    MR_REQ_COMP_NO,
+                    MR_REQ_NO,
+                    INVST_COST,
+                    INVST_BUDGET,
+                    TRIAL_RST,
+                    POST_MNG_PLAN,
+                    COMPLE_REQ,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+             ) VALUES ( #{mrReqCompNo},
+                        #{mrReqNo},
+                        #{invstCost},
+                        #{invstBudget},
+                        #{trialRst},
+                        #{postMngPlan},
+                        #{compleReq},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+    <update id="updateCompRpt" parameterType="map">
+             UPDATE MR_REQ_COMP
+                SET INVST_COST = #{invstCost},
+                    INVST_BUDGET = #{invstBudget},
+                    TRIAL_RST = #{trialRst},
+                    POST_MNG_PLAN = #{postMngPlan},
+                    COMPLE_REQ = #{compleReq},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+    <update id="updateMrReqMst" parameterType="map">
+             UPDATE MR_REQ_MST
+                SET ISSUE_CTT = #{issueCtt},
+                    IMPRV_PRPSL_CTT = #{imprvPrpslCtt},
+                    QUAL_EPT_EFT_CTT = #{qualEptEftCtt},
+                    QUAN_EPT_EFT_CTT = #{quanEptEftCtt},
+                    QUAN_EPT_EFT_CD = #{quanEptEftCd},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+    <update id="updateCompChrgrEffEnd" parameterType="map">
+        --updateCompChrgrEffEnd(mr완료에서 에서 사용)        
+        UPDATE MR_REQ_CHRGR_CHG_HIST
+           SET EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS'),
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO IN   (SELECT MR_REQ_PROC_STEP_DET_NO
+									           FROM MR_REQ_PROC_STEP_DET
+									          WHERE MR_REQ_NO = #{mrReqNo}
+									            AND MR_STEP_CD = #{mrStepCd}
+									            AND PROC_ST_CD = #{procStCd}            
+									            AND DEL_YN=0)
+            AND EFF_END_DTM = '99991231235959'
+    </update>
+
+    <update id="updateCompRptRet" parameterType="map">
+             UPDATE MR_REQ_COMP
+                SET COMPLE_REQ = #{compleReq},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+    <update id="updateCompRptCapex" parameterType="map">
+             UPDATE MR_REQ_COMP
+                SET CAPEX_CLOSE = #{capexClose},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+  <!-- P&ID, PDF가 있는지 여부 확인해서 있으면 인터페이스 테이블에 인서트 -->
+  <insert id="insertCompRptShe" parameterType="com.mr.comp.domain.CompRptVO">
+  			--P ID, PDF가 있는지 여부 확인해서 있으면 인터페이스 테이블에 인서트
+			INSERT INTO MR_INTERFACE_SHE (MR_REQ_NO, HAZOP_YN, TASK_YN, STATUS_YN, REQ_DATE, REQ_TIME)
+			SELECT MR_REQ_NO, 'N', 'N', 'N', TO_CHAR(SYSDATE,'YYYY-MM-DD'), TO_CHAR(SYSDATE,'hh24:mi:dd') 
+			FROM (SELECT  MR_REQ_NO
+			              ,MAX(DECODE(FILE_CD, '0001',1,0)) AS PNID
+			              ,MAX(DECODE(FILE_CD, '0003',1,0)) AS PFD
+			        FROM   MR_ATCH_FILE
+			       WHERE  1=1
+			         AND  MR_REQ_NO = #{mrReqNo}
+			         AND  FILE_PROC_CD = '2'
+			         AND  FILE_CD IN ('0001','0003')
+			         AND  DEL_YN = '0'
+			         AND  MR_REQ_NO IN (select MR_REQ_NO from mr_req_mst             
+                                        where mr_step_cd in ('Z0070','Z0080', 'Z0090'))
+			    GROUP BY  MR_REQ_NO)
+			WHERE PNID + PFD > 0
+    </insert>
+
+</mapper>

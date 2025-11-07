@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/step/domain
+END
+ChrgrChgHist.java
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svn/repos_edims/!svn/ver/189/trunk/src/mr/src/main/java/com/mr/step/domain/ChrgrChgHist.java
+END
+MrReqProcStaChgHistVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/step/domain/MrReqProcStaChgHistVO.java
+END
+MrStepMstVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/step/domain/MrStepMstVO.java
+END
+MailToInfoVo.java
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/step/domain/MailToInfoVo.java
+END
+MrMailVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svn/repos_edims/!svn/ver/66/trunk/src/mr/src/main/java/com/mr/step/domain/MrMailVO.java
+END
+MrReqProcStepDetVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/76/trunk/src/mr/src/main/java/com/mr/step/domain/MrReqProcStepDetVO.java
+END
+MrReqProcStepVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/step/domain/MrReqProcStepVO.java
+END
+MrReqProcTrmChgHistVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/step/domain/MrReqProcTrmChgHistVO.java
+END
+MrMailForScreenVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/step/domain/MrMailForScreenVO.java
+END

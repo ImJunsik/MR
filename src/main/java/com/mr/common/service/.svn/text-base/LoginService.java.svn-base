@@ -1,0 +1,36 @@
+package com.mr.common.service;
+
+import org.springframework.stereotype.Service;
+
+import com.mr.common.domain.EmpInfoVo;
+/**
+ * 로그인 서비스
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * </pre>
+ */
+@Service
+public interface LoginService{
+
+    /**
+     * 로그인 체크
+     * @param empInfoVo 사원번호, Password
+     * @return 사원정보
+     */
+    EmpInfoVo loginCheck(EmpInfoVo empInfoVo);
+
+    /**
+     * 이미 로그인중인 사용자 정보 SSO 도면관리시스템 사용
+     * @param empInfoVo
+     * @return
+     */
+    EmpInfoVo loginUserInfo(String empNo);
+
+    String encrypt(String str);
+}

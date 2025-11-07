@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common.job">
+    <select id="getJobAttributes" parameterType="string" resultMap="scheduling.jobAttributesResultMap">
+        SELECT job_ser_no
+              ,job_nm
+              ,job_pgm_nm
+              ,job_parm_var
+              ,exec_sta_dt
+              ,exec_end_dt
+              ,exec_st_cd
+              ,err_ctt
+              ,err_trace
+              ,nxt_exec_dt
+          FROM job_schdr_exec_info
+         WHERE job_ser_no = #{id}
+    </select>
+
+    <select id="getJobExecutedList" parameterType="com.common.scheduling.web.JobSearchCondition" resultMap="scheduling.jobAttributesResultMap">
+        <include refid="pagination.header" />
+        SELECT job_ser_no
+              ,job_nm
+              ,job_pgm_nm
+              ,exec_sta_dt
+              ,exec_end_dt
+              ,exec_st_cd
+              ,nxt_exec_dt
+              ,COUNT(job_ser_no) OVER() tot_cnt
+          FROM job_schdr_exec_info
+         WHERE 1 = 1
+         <if test="executionStartDate != null and executionEndDate != null">
+           AND exec_sta_dt BETWEEN #{executionStartDate} AND #{executionEndDate}
+         </if>
+         <if test="state != null">
+           AND exec_st_cd = #{state.value}
+         </if>
+         <if test="jobName != null">
+           AND job_nm LIKE '%' || #{jobName} || '%'
+         </if>
+         ORDER BY job_ser_no DESC
+         <include refid="pagination.footer" />
+    </select>
+</mapper>

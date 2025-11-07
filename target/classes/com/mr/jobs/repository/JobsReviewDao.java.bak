@@ -1,0 +1,140 @@
+package com.mr.jobs.repository;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.springframework.stereotype.Repository;
+
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.mr.comp.domain.CompFileManageVO;
+import com.mr.jobs.domain.JobsCheckMasterVO;
+import com.mr.jobs.domain.JobsCheckVO;
+import com.mr.jobs.domain.JobsPorcVO;
+import com.mr.jobs.domain.JobsReviewVO;
+
+/**
+ * 직무검토 DB처리
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.14 박성룡 최초 작성
+ * </pre>
+ */
+
+@Repository
+public class JobsReviewDao extends BaseSqlMapRepository{
+    /**
+     * 직무검토 조회
+     * @param mrReqNo
+     * @return
+     */
+    public JobsReviewVO selectJobsReview(Map map) {
+        return selectOne("mr.jobs.selectJobsReview", map);
+    }
+
+    /**
+     * Porc 조회
+     * @param mrReqNo
+     * @return
+     */
+    public JobsPorcVO selectJobsPorc(int mrReqNo) {
+        return selectOne("mr.jobs.selectJobsPorc", mrReqNo);
+    }
+
+    /**
+     * Porc 반대여부 조회
+     * @param mrReqNo
+     * @return
+     */
+    public int selectPorcDisagreeCount(int mrReqNo) {
+        return selectOne("mr.jobs.selectPorcDisagreeCount", mrReqNo);
+    }
+
+
+    /**
+     * PORC 넘버 생성 업데이트
+     * @param mrReqNo
+     * @return
+     */
+    public int updateMakePorcNo(int mrReqNo) {
+        return update("mr.jobs.updateMakePorcNo", mrReqNo);
+    }
+
+    /**
+     * Hazop 조회
+     * @param mrReqNo
+     * @return
+     */
+    public JobsCheckMasterVO selectMrCheckMaster(int mrReqNo) {
+        return selectOne("mr.jobs.selectMrCheckMaster", mrReqNo);
+    }
+
+    /**
+     * Hazop CheckList Master 저장
+     * @param mRrqRegisterVO
+     * @return
+     */
+    public int insertMrCheckMaster(JobsCheckMasterVO jobsHazopVO) {
+        return insert("mr.jobs.insertMrCheckMaster", jobsHazopVO);
+    }
+
+    /**
+     * Hazop CheckList Master 논리 삭제
+     * @param mRrqRegisterVO
+     * @return
+     */
+    public int updateMrCheckMasterDelYn(JobsCheckMasterVO jobsHazopVO) {
+        return update("mr.jobs.updateMrCheckMasterDelYn", jobsHazopVO);
+    }
+
+    /**
+     * HAZOP CheckList Master 업데이트
+     * @param jobsHazopVO
+     * @return
+     */
+    public int updateMrCheckMaster(JobsCheckMasterVO jobsHazopVO) {
+        return update("mr.jobs.updateMrCheckMaster", jobsHazopVO);
+    }
+
+    /**
+     * CheckList 저장
+     * @param mRrqRegisterVO
+     * @return
+     */
+    public int insertMrCheck(JobsCheckVO jobsCheckVO) {
+        return insert("mr.jobs.insertMrCheck", jobsCheckVO);
+    }
+
+    /**
+     * CheckList 논리 삭제
+     * @param mRrqRegisterVO
+     * @return
+     */
+    public int updateMrCHeckDelYn(JobsCheckMasterVO jobsHazopVO) {
+        return update("mr.jobs.updateMrCHeckDelYn", jobsHazopVO);
+    }
+
+    /**
+     * 현재 작성된 checklist 갯수 확인
+     * @param mrReqNo
+     * @return
+     */
+    public String selectIsMrCHeck(int mrReqNo) {
+        return selectOne("mr.jobs.selectIsMrCHeck", mrReqNo);
+    }
+    
+    /**
+     * 201912 mr->she 하잡일경우 인터페이스
+     * @param mrReqNo
+     * @return
+     */
+    public int insertMrSheInterface(int mrReqNo){
+        return update("mr.jobs.insertMrSheInterface", mrReqNo);
+    }
+ 
+}

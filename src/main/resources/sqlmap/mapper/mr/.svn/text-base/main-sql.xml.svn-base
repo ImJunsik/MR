@@ -1,0 +1,908 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.main">
+    <resultMap id="summaryMap" type="com.mr.main.domain.MrSummary">
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="col1" column="COL1" />
+        <result property="col2" column="COL2" />
+        <result property="col3" column="COL3" />
+        <result property="col4" column="COL4" />
+        <result property="col5" column="COL5" />
+        <result property="col6" column="COL6" />
+        <result property="col7" column="COL7" />
+        <result property="col8" column="COL8" />
+        <result property="col9" column="COL9" />
+
+    </resultMap>
+
+    <select id="selectSummary" resultMap="summaryMap">
+<!--                                 SUM(CASE WHEN DET.MR_STEP_CD IN ('Z00R0','Z00P0') THEN 1 ELSE 0 END) AS COL6,  -->
+                SELECT PROC_ST_CD,
+                       SUM(COL1) AS COL1,
+                       SUM(COL2) AS COL2,
+                       SUM(COL3) AS COL3,
+                       SUM(COL4) AS COL4,
+                       SUM(COL5) AS COL5,
+                       SUM(COL6) AS COL6,
+                       SUM(COL7) AS COL7,
+                       SUM(COL8) AS COL8
+                  FROM (SELECT CASE WHEN DET.PROC_ST_CD IS NULL THEN 'Z0121'
+                                    WHEN STEP.PROC_ST_CD IS NULL THEN  DET.PROC_ST_CD
+                                    WHEN STEP.MR_STEP_CD = 'Z0030' AND STEP.PROC_ST_CD = 'Z0133' THEN 'Z0110'
+                                    ELSE STEP.PROC_ST_CD END AS PROC_ST_CD,
+                               SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0010' THEN 1 ELSE 0 END) AS COL1,
+                               SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0020' THEN 1 ELSE 0 END) AS COL2,
+                               SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0030' AND STEP.PROC_ST_CD IN ('Z0110','Z0121','Z0141') THEN 1 ELSE 0 END) AS COL3,
+                               SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD IN ('Z0133','Z0122','Z0131') THEN 1 ELSE 0 END) AS COL4,
+                               SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0040' THEN 1 ELSE 0 END) AS COL5,
+                               SUM(DECODE(GRP_HIST.MR_RV_RST_NO,0,(CASE WHEN DET.MR_STEP_CD IN ('Z00R0','Z00P0') THEN 1 ELSE 0 END),0)) AS COL6,
+                               <!-- SUM(CASE WHEN DET.MR_STEP_CD = 'Z00P0' THEN 1 ELSE 0 END) AS COL7, -->
+                               SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0050' THEN 1 ELSE 0 END) AS COL7,
+                               SUM(CASE WHEN STEP.MR_STEP_CD IN ('Z0060','Z0070') THEN 1 ELSE 0 END) AS COL8,
+                               SUM(CASE WHEN STEP.MR_STEP_CD IN ('Z0080','Z0090') THEN 1 ELSE 0 END) AS COL9
+                          FROM MR_REQ_PROC_STEP STEP,
+                               MR_REQ_PROC_STEP_DET DET,
+                              (SELECT CHRG_EMP_NO,
+                                      MIN(HIST.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                                      GRP_STEP.MR_REQ_NO,
+                                      GRP_STEP.MR_STEP_CD,
+                                      1 MR_RV_RST_NO
+                                FROM MR_REQ_CHRGR_CHG_HIST HIST,
+                                     (SELECT STEP.MR_REQ_NO,
+                                             STEP.MR_STEP_CD,
+                                             MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO
+                                        FROM MR_REQ_PROC_STEP STEP,
+                                             MR_REQ_PROC_STEP_DET DET,
+                                             MR_REQ_CHRGR_CHG_HIST HIST
+                                       WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                         AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                         AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                         AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                         AND STEP.PROC_ST_CD != 'Z0143'
+                                         AND STEP.EFF_END_DTM = '99991231235959'
+                                         AND HIST.EFF_END_DTM = '99991231235959'
+                                         AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                         AND DET.MR_REQ_PROC_STEP_DET_NO NOT IN  (SELECT DET.MR_REQ_PROC_STEP_DET_NO 
+						                                                           FROM MR_REQ_PROC_STEP_DET DET
+						                                                           JOIN MR_REQ_CHRGR_CHG_HIST HIST
+						                                                             ON DET.MR_REQ_PROC_STEP_DET_NO =HIST.MR_REQ_PROC_STEP_DET_NO
+						                                                            AND HIST.DEL_YN = 0 
+						                                                            AND HIST.EFF_END_DTM = '99991231235959'
+						                                                            AND HIST.CHRGR_CL_CD IN ('Z02C','Z02F')
+						                                                          WHERE DET.MR_STEP_CD = 'Z0010'
+						                                                            AND DET.DEL_YN = 0) 
+                                         AND DET.DEL_YN=0
+                                         AND HIST.DEL_YN=0
+                                         GROUP BY STEP.MR_REQ_NO, STEP.MR_STEP_CD
+                                      UNION ALL
+                                      SELECT STEP.MR_REQ_NO,
+                                             STEP.MR_STEP_CD,
+                                             MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO
+                                        FROM MR_REQ_PROC_STEP STEP,
+                                             MR_REQ_PROC_STEP_DET DET,
+                                             MR_REQ_CHRGR_CHG_HIST HIST
+                                       WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                         AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                         AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                         AND STEP.MR_STEP_CD IN ('Z0020')
+                                         AND STEP.PROC_ST_CD IN ('Z0121')
+                                         AND STEP.PROC_ST_CD != 'Z0143'
+                                         AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                         AND STEP.EFF_END_DTM = '99991231235959'
+                                         AND HIST.EFF_END_DTM = '99991231235959'
+                                         AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                         AND HIST.CHRGR_CL_CD IN ('Z02F')
+                                         AND DET.DEL_YN=0
+                                         AND HIST.DEL_YN=0
+                                         GROUP BY STEP.MR_REQ_NO, STEP.MR_STEP_CD
+                                      UNION ALL
+                                      SELECT STEP.MR_REQ_NO,
+                                             STEP.MR_STEP_CD,
+                                             MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO
+                                        FROM MR_REQ_PROC_STEP STEP,
+                                             MR_REQ_PROC_STEP_DET DET,
+                                             MR_REQ_CHRGR_CHG_HIST HIST
+                                       WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                         AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                         AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                         AND STEP.MR_STEP_CD IN ('Z0010')
+                                         AND STEP.PROC_ST_CD NOT IN ('Z0110','Z0141','Z0143')
+                                         AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                         AND STEP.EFF_END_DTM = '99991231235959'
+                                         AND HIST.EFF_END_DTM = '99991231235959'
+                                         AND HIST.CHRGR_CL_CD IN ('Z02C')
+                                         AND DET.DEL_YN=0
+                                         AND HIST.DEL_YN=0
+                                         GROUP BY STEP.MR_REQ_NO, STEP.MR_STEP_CD                                      UNION ALL
+                                      SELECT STEP.MR_REQ_NO,
+                                             STEP.MR_STEP_CD,
+                                             DET.MR_REQ_PROC_STEP_DET_NO
+                                        FROM MR_REQ_PROC_STEP STEP,
+                                             MR_REQ_PROC_STEP_DET DET,
+                                             MR_REQ_CHRGR_CHG_HIST HIST
+                                       WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                         AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                         AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                         AND STEP.PROC_ST_CD != 'Z0143'
+                                         AND HIST.CHRGR_CL_CD LIKE 'Z02H%'
+                                         AND STEP.EFF_END_DTM = '99991231235959'
+                                         AND HIST.EFF_END_DTM = '99991231235959'
+                                         AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                         AND DET.DEL_YN=0
+                                         AND HIST.DEL_YN=0
+                                      UNION ALL
+                                      SELECT STEP.MR_REQ_NO,
+                                             STEP.MR_STEP_CD,
+                                             DET.MR_REQ_PROC_STEP_DET_NO
+                                        FROM MR_REQ_PROC_STEP STEP,
+                                             MR_REQ_PROC_STEP_DET DET,
+                                             MR_REQ_CHRGR_CHG_HIST HIST
+                                       WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                             AND DET.MR_STEP_CD = 'Z00I0'
+                                             AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                             AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                             AND STEP.PROC_ST_CD != 'Z0143'
+                                             AND HIST.CHRGR_CL_CD = 'Z02I'
+                                             AND STEP.EFF_END_DTM = '99991231235959'
+                                             AND HIST.EFF_END_DTM = '99991231235959'
+                                             AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                             AND DET.DEL_YN=0
+                                             AND HIST.DEL_YN=0
+                                       UNION ALL
+                                       SELECT STEP.MR_REQ_NO,
+                                             DET.MR_STEP_CD,
+                                             DET.MR_REQ_PROC_STEP_DET_NO
+                                        FROM MR_REQ_PROC_STEP STEP,
+                                             MR_REQ_PROC_STEP_DET DET,
+                                             MR_REQ_CHRGR_CHG_HIST HIST
+                                       WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                             AND STEP.MR_STEP_CD = 'Z0040'
+                                             AND STEP.PROC_ST_CD = 'Z0110'
+                                             AND DET.MR_STEP_CD = 'Z00I0'
+                                             AND DET.PROC_ST_CD IS NULL
+                                             AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                             AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                             AND STEP.PROC_ST_CD != 'Z0143'
+                                             AND HIST.CHRGR_CL_CD = 'Z02C'
+                                             AND STEP.EFF_END_DTM = '99991231235959'
+                                             AND HIST.EFF_END_DTM = '99991231235959'
+                                             AND HIST.CHRG_EMP_NO =  #{loginEmpNo}
+                                             AND DET.DEL_YN=0
+                                             AND HIST.DEL_YN=0
+                                         )GRP_STEP
+                               WHERE HIST.MR_REQ_PROC_STEP_DET_NO = GRP_STEP.MR_REQ_PROC_STEP_DET_NO
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                              GROUP BY GRP_STEP.MR_REQ_NO, HIST.CHRG_EMP_NO, GRP_STEP.MR_STEP_CD
+                              UNION ALL
+                              SELECT HIST.CHRG_EMP_NO,
+                                     MIN(DET.MR_REQ_PROC_STEP_DET_NO) MR_REQ_PROC_STEP_DET_NO,
+                                     DET.MR_REQ_NO,
+                                     DET.MR_STEP_CD,
+                                     NVL(RST.MR_RV_RST_NO,0) MR_RV_RST_NO
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST,
+                                     MR_RV_RST RST
+                               WHERE DET.MR_REQ_NO = STEP.MR_REQ_NO
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                 AND DET.MR_STEP_CD IN ('Z00P0', 'Z00R0')
+                                 AND STEP.PROC_ST_CD != 'Z0143'
+                                 AND STEP.MR_STEP_CD IN ('Z0020', 'Z0030', 'Z0040')
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                 AND DET.DEL_YN=0
+                                 AND STEP.DEL_YN = 0
+                                 AND HIST.DEL_YN=0
+                                 AND RST.MR_REQ_NO(+) = DET.MR_REQ_NO
+                                 AND RST.MR_REQ_PROC_STEP_DET_NO(+) = DET.MR_REQ_PROC_STEP_DET_NO
+                                 AND RST.DEL_YN(+)    = 0
+                               GROUP BY DET.MR_REQ_NO, HIST.CHRG_EMP_NO, DET.MR_STEP_CD, MR_RV_RST_NO
+                               )GRP_HIST
+                         WHERE STEP.MR_REQ_PROC_STEP_NO(+) = DET.MR_REQ_PROC_STEP_NO
+                           AND STEP.MR_STEP_CD(+) = DECODE(DET.MR_STEP_CD,'Z00I0','Z0040',DET.MR_STEP_CD)
+                           AND GRP_HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                           AND GRP_HIST.CHRG_EMP_NO = #{loginEmpNo}
+                         GROUP BY STEP.MR_STEP_CD,STEP.PROC_ST_CD(+), DET.PROC_ST_CD
+                         ORDER BY STEP.PROC_ST_CD(+))
+                GROUP BY PROC_ST_CD
+    </select>
+
+    <select id="selectAppSummary" resultMap="summaryMap">
+<!--                    NVL(SUM(CASE WHEN DET.MR_STEP_CD IN ('Z00R0','Z00P0') THEN 1 ELSE 0 END),0) AS COL6,  -->
+
+                SELECT NVL(SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0010' THEN 1 ELSE 0 END),0) AS COL1,
+                       SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0020' THEN 1 ELSE 0 END) AS COL2,
+                       SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0030' AND STEP.PROC_ST_CD IN ('Z0110','Z0121','Z0141') THEN 1 ELSE 0 END) AS COL3,
+                       SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD IN ('Z0133','Z0122','Z0131') THEN 1 ELSE 0 END) AS COL4,
+                       NVL(SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0040' THEN 1 ELSE 0 END),0) AS COL5,
+                       NVL(SUM(DECODE(GRP_HIST.MR_RV_RST_NO,0,(CASE WHEN DET.MR_STEP_CD IN ('Z00R0','Z00P0') THEN 1 ELSE 0 END),0)),0) AS COL6,
+                       NVL(SUM(CASE WHEN STEP.MR_STEP_CD = 'Z0050' THEN 1 ELSE 0 END),0) AS COL7,
+                       NVL(SUM(CASE WHEN STEP.MR_STEP_CD IN ('Z0060','Z0070') THEN 1 ELSE 0 END),0) AS COL8,
+                       NVL(SUM(CASE WHEN STEP.MR_STEP_CD IN ('Z0080','Z0090') THEN 1 ELSE 0 END),0) AS COL9
+                  FROM MR_REQ_PROC_STEP STEP,
+                       MR_REQ_PROC_STEP_DET DET,
+                      (SELECT CHRG_EMP_NO,
+                              MIN(HIST.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                              GRP_STEP.MR_REQ_NO,
+                              GRP_STEP.MR_STEP_CD,
+                              1 MR_RV_RST_NO
+                        FROM MR_REQ_CHRGR_CHG_HIST HIST,
+                             (SELECT STEP.MR_REQ_NO,
+                                     MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                                     STEP.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                 AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                 AND STEP.PROC_ST_CD != 'Z0143'
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0
+                                 GROUP BY STEP.MR_REQ_NO, STEP.MR_STEP_CD
+                              UNION ALL
+                              SELECT STEP.MR_REQ_NO,
+                                     DET.MR_REQ_PROC_STEP_DET_NO,
+                                     STEP.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND HIST.CHRGR_CL_CD LIKE 'Z02H%'
+                                 AND STEP.PROC_ST_CD != 'Z0143'
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0)GRP_STEP
+                       WHERE HIST.MR_REQ_PROC_STEP_DET_NO = GRP_STEP.MR_REQ_PROC_STEP_DET_NO
+                         AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                      GROUP BY GRP_STEP.MR_REQ_NO, HIST.CHRG_EMP_NO, GRP_STEP.MR_STEP_CD
+                      UNION ALL
+                      SELECT HIST.CHRG_EMP_NO,
+                             MIN(DET.MR_REQ_PROC_STEP_DET_NO) MR_REQ_PROC_STEP_DET_NO,
+                             DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             NVL(RST.MR_RV_RST_NO,0) MR_RV_RST_NO
+                        FROM MR_REQ_PROC_STEP STEP,
+                             MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST,
+                             MR_RV_RST RST
+                       WHERE DET.MR_REQ_NO = STEP.MR_REQ_NO
+                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD IN ('Z00P0', 'Z00R0')
+                         AND STEP.MR_STEP_CD IN ('Z0020', 'Z0030', 'Z0040')
+                         AND STEP.PROC_ST_CD != 'Z0143'
+                         AND STEP.EFF_END_DTM = '99991231235959'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                         AND DET.DEL_YN=0
+                         AND STEP.DEL_YN = 0
+                         AND HIST.DEL_YN=0
+                         AND RST.MR_REQ_NO(+) = DET.MR_REQ_NO
+                         AND RST.MR_REQ_PROC_STEP_DET_NO(+) = DET.MR_REQ_PROC_STEP_DET_NO
+                         AND RST.DEL_YN(+)    = 0
+                       GROUP BY DET.MR_REQ_NO, HIST.CHRG_EMP_NO, DET.MR_STEP_CD, RST.MR_RV_RST_NO
+                       )GRP_HIST
+                 WHERE STEP.MR_REQ_PROC_STEP_NO(+) = DET.MR_REQ_PROC_STEP_NO
+                   AND STEP.MR_STEP_CD(+) = DET.MR_STEP_CD
+                   AND GRP_HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                   AND GRP_HIST.CHRG_EMP_NO = #{loginEmpNo}
+    </select>
+
+
+    <select id="selectTempSummary" resultMap="summaryMap">
+                SELECT SUM(CASE WHEN DET.FST_PROC_TRM_DT >= SYSDATE THEN 1 ELSE 0 END) AS COL1,
+                       SUM(CASE WHEN SYSDATE >  DET.FST_PROC_TRM_DT THEN 1 ELSE 0 END) AS COL2
+                  FROM MR_REQ_MST MR,
+                       MR_REQ_PROC_STEP STEP,
+                       MR_REQ_PROC_STEP_DET DET,
+                      (SELECT CHRG_EMP_NO,
+                              MIN(HIST.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                              GRP_STEP.MR_REQ_NO
+                        FROM MR_REQ_CHRGR_CHG_HIST HIST,
+                             (SELECT STEP.MR_REQ_NO,
+                                     MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                 AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0
+                                 GROUP BY STEP.MR_REQ_NO
+                              UNION ALL
+                              SELECT STEP.MR_REQ_NO,
+                                     DET.MR_REQ_PROC_STEP_DET_NO
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                 AND HIST.CHRGR_CL_CD LIKE 'Z02H%'
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0)GRP_STEP
+                       WHERE HIST.MR_REQ_PROC_STEP_DET_NO = GRP_STEP.MR_REQ_PROC_STEP_DET_NO
+                         AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                      GROUP BY GRP_STEP.MR_REQ_NO, HIST.CHRG_EMP_NO
+                       )GRP_HIST
+                 WHERE MR.MR_REQ_NO = STEP.MR_REQ_NO
+                   AND STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                   AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                   AND GRP_HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                   AND MR.REQ_CL_CD = '0006'
+    </select>
+    <resultMap id="mrListMap" type="com.mr.main.domain.MrListVO">
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="teamNo" column="TEAM_NO" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="teamName" column="TEAM_NAME" />
+        <result property="empName" column="EMP_NAME" />
+        <result property="actTeamName" column="ACT_TEAM_NAME" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="mrStepNm" column="MR_STEP_NM" />
+        <result property="procStNm" column="PROC_ST_NM" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+
+    </resultMap>
+
+    <select id="selectMrList" resultMap="mrListMap">
+                SELECT DISTINCT MR_REQ_NO,
+                       MR_NO,
+                       FST_RGST_DT,
+                       EMP_NAME,
+                       TEAM_NAME,
+                       ACT_TEAM_NAME,
+                       MR_REQ_TITLE,
+                       PROC_ST_NM,
+                       MR_STEP_CD,
+                       PROC_ST_CD
+                  FROM (SELECT MR.MR_REQ_NO,
+                       NVL(MR.MR_NO, MR_TMP_NO) MR_NO,
+                       TO_CHAR(MR.FST_RGST_DT,'YYYY-MM-DD') AS FST_RGST_DT,
+                       EMP.EMP_NAME,
+                       ORG.ORG_NAME TEAM_NAME,
+                       ACT_ORG.ORG_NAME ACT_TEAM_NAME,
+                       MR.MR_REQ_TITLE,
+                       CODE.MR_COMM_NM AS PROC_ST_NM,
+                       NVL(STEP.MR_STEP_CD, DET.MR_STEP_CD) MR_STEP_CD,
+                       NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) PROC_ST_CD
+                  FROM MR_REQ_MST MR,
+                       MR_REQ_PROC_STEP STEP,
+                       MR_REQ_PROC_STEP_DET DET,
+                      (SELECT CHRG_EMP_NO,
+                              MIN(HIST.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                              GRP_STEP.MR_REQ_NO,
+                              GRP_STEP.MR_STEP_CD,
+                              0 MR_RV_RST_NO
+                        FROM MR_REQ_CHRGR_CHG_HIST HIST,
+                             (SELECT STEP.MR_REQ_NO,
+                                     MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                                     STEP.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                 AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                 AND STEP.PROC_ST_CD != 'Z0143'
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO NOT IN  (SELECT DET.MR_REQ_PROC_STEP_DET_NO 
+						                                                    FROM MR_REQ_PROC_STEP_DET DET
+						                                                    JOIN MR_REQ_CHRGR_CHG_HIST HIST
+						                                                      ON DET.MR_REQ_PROC_STEP_DET_NO =HIST.MR_REQ_PROC_STEP_DET_NO
+						                                                     AND HIST.DEL_YN = 0 
+						                                                     AND HIST.EFF_END_DTM = '99991231235959'
+						                                                     AND HIST.CHRGR_CL_CD IN ('Z02C','Z02F')
+						                                                   WHERE DET.MR_STEP_CD = 'Z0010'
+						                                                     AND DET.DEL_YN = 0) 
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0
+                                 GROUP BY STEP.MR_REQ_NO, STEP.MR_STEP_CD
+                               UNION ALL
+                               SELECT STEP.MR_REQ_NO,
+                                      MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                                      STEP.MR_STEP_CD                                             
+                                 FROM MR_REQ_PROC_STEP STEP,
+                                      MR_REQ_PROC_STEP_DET DET,
+                                      MR_REQ_CHRGR_CHG_HIST HIST
+                                WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                  AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                  AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                  AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                  AND STEP.MR_STEP_CD IN ('Z0010')
+                                  AND STEP.PROC_ST_CD NOT IN ('Z0110','Z0141','Z0143')
+                                  AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                  AND STEP.EFF_END_DTM = '99991231235959'
+                                  AND HIST.EFF_END_DTM = '99991231235959'
+                                  AND HIST.CHRGR_CL_CD IN ('Z02C')
+                                  AND DET.DEL_YN=0
+                                  AND HIST.DEL_YN=0
+                                GROUP BY STEP.MR_REQ_NO, STEP.MR_STEP_CD 
+                              UNION ALL
+                              SELECT STEP.MR_REQ_NO,
+                                     MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                                     STEP.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                 AND STEP.MR_STEP_CD = 'Z0020'
+                                 AND STEP.PROC_ST_CD = 'Z0121'                                         
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                 AND HIST.CHRGR_CL_CD = 'Z02F'
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0
+                                 GROUP BY STEP.MR_REQ_NO, STEP.MR_STEP_CD
+                              UNION ALL
+                              SELECT STEP.MR_REQ_NO,
+                                     DET.MR_REQ_PROC_STEP_DET_NO,
+                                     STEP.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                 AND HIST.CHRGR_CL_CD LIKE 'Z02H%'
+                                 AND STEP.PROC_ST_CD != 'Z0143'
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0
+                              UNION ALL
+                              SELECT STEP.MR_REQ_NO,
+                                     DET.MR_REQ_PROC_STEP_DET_NO,
+                                     STEP.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                     AND DET.MR_STEP_CD = 'Z00I0'
+                                     AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                     AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                     AND STEP.PROC_ST_CD != 'Z0143'
+                                     AND HIST.CHRGR_CL_CD = 'Z02I'
+                                     AND STEP.EFF_END_DTM = '99991231235959'
+                                     AND HIST.EFF_END_DTM = '99991231235959'
+                                     AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                                     AND DET.DEL_YN=0
+                                     AND HIST.DEL_YN=0
+                              UNION ALL
+                              SELECT STEP.MR_REQ_NO,
+                                     DET.MR_REQ_PROC_STEP_DET_NO,
+                                     DET.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                     AND STEP.MR_STEP_CD = 'Z0040'
+                                     AND STEP.PROC_ST_CD = 'Z0110'
+                                     AND DET.MR_STEP_CD = 'Z00I0'
+                                     AND DET.PROC_ST_CD IS NULL
+                                     AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                     AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                     AND STEP.PROC_ST_CD != 'Z0143'
+                                     AND HIST.CHRGR_CL_CD = 'Z02C'
+                                     AND STEP.EFF_END_DTM = '99991231235959'
+                                     AND HIST.EFF_END_DTM = '99991231235959'
+                                     AND HIST.CHRG_EMP_NO =  #{loginEmpNo}
+                                     AND DET.DEL_YN=0
+                                     AND HIST.DEL_YN=0
+                                 )GRP_STEP
+                       WHERE HIST.MR_REQ_PROC_STEP_DET_NO = GRP_STEP.MR_REQ_PROC_STEP_DET_NO
+                         AND HIST.CHRG_EMP_NO  = #{loginEmpNo}
+                      GROUP BY GRP_STEP.MR_REQ_NO, HIST.CHRG_EMP_NO, GRP_STEP.MR_STEP_CD
+                      UNION ALL
+                      SELECT HIST.CHRG_EMP_NO,
+                             MIN(DET.MR_REQ_PROC_STEP_DET_NO) MR_REQ_PROC_STEP_DET_NO,
+                             DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             NVL(RST.MR_RV_RST_NO,0) MR_RV_RST_NO
+                        FROM MR_REQ_PROC_STEP STEP,
+                             MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST,
+                             MR_RV_RST RST
+                       WHERE DET.MR_REQ_NO = STEP.MR_REQ_NO
+                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.FST_PROC_TRM_DT IS NOT NULL
+                         AND DET.MR_STEP_CD IN ('Z00P0', 'Z00R0')
+                         AND STEP.MR_STEP_CD IN ('Z0020', 'Z0030', 'Z0040')
+                         AND STEP.PROC_ST_CD != 'Z0143'
+                         AND STEP.EFF_END_DTM = '99991231235959'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                         AND DET.DEL_YN  =0
+                         AND STEP.DEL_YN = 0
+                         AND HIST.DEL_YN =0
+                         AND RST.MR_REQ_NO(+) = DET.MR_REQ_NO
+                         AND RST.MR_REQ_PROC_STEP_DET_NO(+) = DET.MR_REQ_PROC_STEP_DET_NO
+                         AND RST.DEL_YN(+)    = 0
+                       GROUP BY DET.MR_REQ_NO, HIST.CHRG_EMP_NO, DET.MR_STEP_CD, MR_RV_RST_NO
+                       )GRP_HIST,
+                       MR_COMM_COD CODE,					   
+                       (SELECT DISTINCT HIST.MR_REQ_NO
+                              ,HIST.CHRG_EMP_NO
+                          FROM MR_REQ_PROC_STEP_DET DET
+                          JOIN MR_REQ_CHRGR_CHG_HIST HIST
+                            ON HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                           AND HIST.DEL_YN = 0
+                           AND HIST.EFF_END_DTM = '99991231235959'
+                           AND HIST.CHRGR_CL_CD = 'Z02A'
+                         WHERE DET.MR_STEP_CD   = 'Z0010'
+                           AND DET.DEL_YN = 0) REQ_INFO,
+                       EDM_EMP EMP,
+                       EDM_ORG ORG,
+                       (SELECT DISTINCT HIST.MR_REQ_NO
+                              ,HIST.CHRG_EMP_NO
+                          FROM MR_REQ_PROC_STEP_DET DET
+                          JOIN MR_REQ_CHRGR_CHG_HIST HIST
+                            ON HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                           AND HIST.DEL_YN = 0
+                           AND HIST.EFF_END_DTM = '99991231235959'
+                           AND HIST.CHRGR_CL_CD = 'Z02I'
+                         WHERE DET.MR_STEP_CD   = 'Z0030'
+                           AND DET.DEL_YN = 0) ACT_INFO,
+                      EDM_EMP ACT_EMP,
+                      EDM_ORG ACT_ORG
+                 WHERE STEP.MR_REQ_PROC_STEP_NO(+) = DET.MR_REQ_PROC_STEP_NO
+                   AND STEP.MR_STEP_CD(+) = DECODE(DET.MR_STEP_CD,'Z00I0','Z0040',DET.MR_STEP_CD)
+                   AND GRP_HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                   AND MR.MR_REQ_NO = NVL(STEP.MR_REQ_NO,DET.MR_REQ_NO)
+                   AND MR.MR_REQ_NO = REQ_INFO.MR_REQ_NO(+)
+                   AND REQ_INFO.CHRG_EMP_NO = EMP.EMP_ID(+)
+                   AND EMP.ORG_ID   = ORG.ORG_ID(+)
+<!--                   AND MR.FST_RGSTR = EMP.EMP_ID(+)  -->
+<!--                   AND EMP.ORG_ID   = ORG.ORG_ID(+)  -->
+                   AND MR.MR_REQ_NO = DET.MR_REQ_NO
+                   AND NVL(STEP.PROC_ST_CD,DET.PROC_ST_CD) = CODE.MR_COMM_CD
+                   AND GRP_HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                   AND STEP.MR_STEP_CD(+) = DECODE(DET.MR_STEP_CD,'Z00I0','Z0040',DET.MR_STEP_CD)
+                   AND STEP.PROC_ST_CD(+) != 'Z0143'
+                   AND STEP.MR_STEP_CD(+) != 'Z00Z0'
+                   AND MR.MR_REQ_NO = ACT_INFO.MR_REQ_NO(+)
+                   AND ACT_INFO.CHRG_EMP_NO = ACT_EMP.EMP_ID(+)
+                   AND ACT_EMP.ORG_ID = ACT_ORG.ORG_ID(+)
+                <if test="mrStepCd == 'C1'">
+                    AND STEP.MR_STEP_CD = 'Z0010'
+                </if>
+
+                <if test="mrStepCd == 'C2'">
+                    AND STEP.MR_STEP_CD = 'Z0020'
+                </if>
+
+                <if test="mrStepCd == 'C3'">
+                    AND STEP.MR_STEP_CD = 'Z0030'
+                </if>
+
+
+                <if test="mrStepCd == 'C4'">
+                    AND STEP.MR_STEP_CD = 'Z0030'
+                </if>
+
+                <if test="mrStepCd == 'C5'">
+                    AND STEP.MR_STEP_CD ='Z0040'
+                </if>
+
+                <if test="mrStepCd == 'C6'">
+                    AND DET.MR_STEP_CD IN ('Z00R0','Z00P0')
+                    AND GRP_HIST.MR_RV_RST_NO = 0
+                </if>
+
+<!--                 <if test="mrStepCd == 'C7'">
+                    AND DET.MR_STEP_CD = 'Z00P0'
+                </if>
+ -->
+                <if test="mrStepCd == 'C7'">
+                    AND STEP.MR_STEP_CD ='Z0050'
+                </if>
+
+                <if test="mrStepCd == 'C8'">
+                    AND STEP.MR_STEP_CD IN('Z0060','Z0070')
+                </if>
+
+                <if test="mrStepCd == 'C9'">
+                    AND STEP.MR_STEP_CD IN('Z0080','Z0090')
+                </if>
+
+
+                <if test="procStCd == 'R1'">
+                <choose>
+                 <when test="mrStepCd == 'C3'">
+                    AND NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) IN ('Z0110','Z0141')
+                 </when>
+                 <when test="mrStepCd == 'C5'">
+                    AND (NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) = 'Z0110' AND DET.PROC_ST_CD IS NOT NULL)
+                 </when>
+                 <when test="mrStepCd == 'C4'">
+                    AND (NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) = 'Z0133' AND DET.PROC_ST_CD IS NOT NULL)
+                 </when>
+                 <otherwise>
+                    AND NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) = 'Z0110'
+                 </otherwise>
+                </choose> 
+                </if>
+
+                <if test="procStCd == 'R2'">
+                <choose>
+                 <when test="mrStepCd == 'C3'">
+                    AND NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) = 'Z0121'
+                 </when>
+                 <when test="mrStepCd == 'C4'">
+                    AND NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) IN ('Z0122','Z0131')
+                 </when>
+                 <when test="mrStepCd == 'C5'">
+                    AND (NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) IN ('Z0121','Z0122','Z0131','Z0132','Z0133')
+                        OR (STEP.MR_sTEP_CD = 'Z0040' AND DET.MR_STEP_CD = 'Z00I0' AND DET.PROC_ST_CD IS NULL))
+                 </when>
+                 <when test="mrStepCd == 'C6'">
+                    AND DET.PROC_ST_CD IN ('Z0121','Z0122','Z0131','Z0132','Z0133')
+                 </when>
+                 <otherwise>
+                    AND NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) IN ('Z0121','Z0122','Z0131','Z0132','Z0133')
+                 </otherwise>
+                </choose> 
+                </if>
+
+                <if test="procStCd == 'R3'">
+                    AND NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) = 'Z0141'
+                </if>
+
+                <if test="mrStepCd == 'T1'">
+                    AND MR.REQ_CL_CD = '0006'
+                    AND DET.FST_PROC_TRM_DT >= SYSDATE
+                </if>
+
+                <if test="mrStepCd == 'T2'">
+                    AND MR.REQ_CL_CD = '0006'
+                    AND SYSDATE > DET.FST_PROC_TRM_DT
+                </if>
+
+            ORDER BY MR.FST_RGST_DT DESC,MR.MR_REQ_NO DESC) A
+    </select>
+
+
+    <select id="selectAppMrList" resultMap="mrListMap">
+                SELECT DISTINCT MR_REQ_NO,
+                       MR_NO,
+                       FST_RGST_DT,
+                       EMP_NAME,
+                       TEAM_NAME,
+                       MR_REQ_TITLE,
+                       PROC_ST_NM,
+                       MR_STEP_CD,
+                       PROC_ST_CD
+                  FROM (SELECT MR.MR_REQ_NO,
+                       NVL(MR.MR_NO, MR_TMP_NO) MR_NO,
+                       TO_CHAR(MR.FST_RGST_DT,'YYYY-MM-DD') AS FST_RGST_DT,
+                       EMP.EMP_NAME,
+                       ORG.ORG_NAME TEAM_NAME,
+                       MR.MR_REQ_TITLE,
+                       CODE.MR_COMM_NM AS PROC_ST_NM,
+                       NVL(STEP.MR_STEP_CD, DET.MR_STEP_CD) MR_STEP_CD,
+                       NVL(STEP.PROC_ST_CD, DET.PROC_ST_CD) PROC_ST_CD
+                  FROM MR_REQ_MST MR,
+                       MR_REQ_PROC_STEP STEP,
+                       MR_REQ_PROC_STEP_DET DET,
+                      (SELECT CHRG_EMP_NO,
+                              MIN(HIST.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                              GRP_STEP.MR_REQ_NO,
+                              GRP_STEP.MR_STEP_CD,
+                              0 MR_RV_RST_NO
+                        FROM MR_REQ_CHRGR_CHG_HIST HIST,
+                             (SELECT STEP.MR_REQ_NO,
+                                     MIN(DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO,
+                                     STEP.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND DET.FST_PROC_TRM_DT IS NOT NULL
+                                 AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                                 AND STEP.PROC_ST_CD != 'Z0143'
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO  = #{loginEmpNo}
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0
+                                 GROUP BY STEP.MR_REQ_NO, STEP.MR_STEP_CD
+                              UNION ALL
+                              SELECT STEP.MR_REQ_NO,
+                                     DET.MR_REQ_PROC_STEP_DET_NO,
+                                     STEP.MR_STEP_CD
+                                FROM MR_REQ_PROC_STEP STEP,
+                                     MR_REQ_PROC_STEP_DET DET,
+                                     MR_REQ_CHRGR_CHG_HIST HIST
+                               WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                                 AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                                 AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                                 AND HIST.CHRGR_CL_CD LIKE 'Z02H%'
+                                 AND STEP.PROC_ST_CD != 'Z0143'
+                                 AND STEP.EFF_END_DTM = '99991231235959'
+                                 AND HIST.EFF_END_DTM = '99991231235959'
+                                 AND HIST.CHRG_EMP_NO  = #{loginEmpNo}
+                                 AND DET.DEL_YN=0
+                                 AND HIST.DEL_YN=0)GRP_STEP
+                       WHERE HIST.MR_REQ_PROC_STEP_DET_NO = GRP_STEP.MR_REQ_PROC_STEP_DET_NO
+                         AND HIST.CHRG_EMP_NO  = #{loginEmpNo}
+                      GROUP BY GRP_STEP.MR_REQ_NO, HIST.CHRG_EMP_NO, GRP_STEP.MR_STEP_CD
+                      UNION ALL
+                      SELECT HIST.CHRG_EMP_NO,
+                             MIN(DET.MR_REQ_PROC_STEP_DET_NO) MR_REQ_PROC_STEP_DET_NO,
+                             DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             NVL(RST.MR_RV_RST_NO,0) MR_RV_RST_NO
+                        FROM MR_REQ_PROC_STEP STEP,
+                             MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST,
+                             MR_RV_RST RST
+                       WHERE DET.MR_REQ_NO = STEP.MR_REQ_NO
+                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD IN ('Z00P0', 'Z00R0')
+                         AND STEP.MR_STEP_CD IN ('Z0020', 'Z0030', 'Z0040')
+                         AND STEP.PROC_ST_CD != 'Z0143'
+                         AND STEP.EFF_END_DTM = '99991231235959'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+                         AND DET.DEL_YN  = 0
+                         AND STEP.DEL_YN = 0
+                         AND HIST.DEL_YN = 0
+                         AND RST.MR_REQ_NO(+) = DET.MR_REQ_NO
+                         AND RST.MR_REQ_PROC_STEP_DET_NO(+) = DET.MR_REQ_PROC_STEP_DET_NO
+                         AND RST.DEL_YN(+)    = 0
+                       GROUP BY DET.MR_REQ_NO, HIST.CHRG_EMP_NO, DET.MR_STEP_CD, MR_RV_RST_NO
+                       )GRP_HIST,
+                       MR_COMM_COD CODE,
+                       EDM_EMP EMP,
+                       EDM_ORG ORG
+                 WHERE STEP.MR_REQ_PROC_STEP_NO(+) = DET.MR_REQ_PROC_STEP_NO
+                   AND STEP.MR_STEP_CD(+) = DET.MR_STEP_CD
+                   AND GRP_HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                   AND MR.MR_REQ_NO = NVL(STEP.MR_REQ_NO,DET.MR_REQ_NO)
+                   AND MR.FST_RGSTR = EMP.EMP_ID(+)
+                   AND EMP.ORG_ID = ORG.ORG_ID(+)
+                   AND MR.MR_REQ_NO = DET.MR_REQ_NO
+                   AND NVL(STEP.PROC_ST_CD,DET.PROC_ST_CD) = CODE.MR_COMM_CD
+                   AND GRP_HIST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO
+                   AND GRP_HIST.CHRG_EMP_NO = #{loginEmpNo}
+                   AND STEP.MR_STEP_CD(+) = DET.MR_STEP_CD
+                   AND STEP.PROC_ST_CD(+) != 'Z0143'
+                   AND STEP.MR_STEP_CD(+) != 'Z00Z0'
+                <if test="mrStepCd == 'C1'">
+                    AND STEP.MR_STEP_CD = 'Z0010'
+                </if>
+
+                <if test="mrStepCd == 'C2'">
+                    AND STEP.MR_STEP_CD = 'Z0020'
+                </if>
+
+                <if test="mrStepCd == 'C3'">
+                    AND STEP.MR_STEP_CD = 'Z0030'
+                    AND STEP.PROC_ST_CD IN ('Z0110','Z0121','Z0141')
+                </if>
+
+
+                <if test="mrStepCd == 'C4'">
+                    AND DET.MR_STEP_CD = 'Z0030'
+                    AND DET.PROC_ST_CD IN ('Z0133','Z0122','Z0131')
+                </if>
+
+                <if test="mrStepCd == 'C5'">
+                    AND STEP.MR_STEP_CD ='Z0040'
+                </if>
+
+                <if test="mrStepCd == 'C6'">
+                    AND DET.MR_STEP_CD IN ('Z00R0','Z00P0')
+                    AND GRP_HIST.MR_RV_RST_NO = 0
+                </if>
+
+                <if test="mrStepCd == 'C7'">
+                    AND STEP.MR_STEP_CD ='Z0050'
+                </if>
+
+                <if test="mrStepCd == 'C8'">
+                    AND STEP.MR_STEP_CD IN('Z0060','Z0070')
+                </if>
+
+                <if test="mrStepCd == 'C9'">
+                    AND STEP.MR_STEP_CD IN('Z0080','Z0090')
+                </if>
+
+
+                <if test="procStCd == 'R1'">
+                  <choose>
+                    <when test="mrStepCd=='C4'">
+                    AND STEP.PROC_ST_CD = 'Z0133'
+                    </when>
+                    <otherwise>
+                     AND STEP.PROC_ST_CD = 'Z0110'
+                    </otherwise>
+                  </choose>
+                </if>
+
+                <if test="procStCd == 'R2'">
+                  <choose>
+                    <when test="mrStepCd=='C4'">
+                    AND STEP.PROC_ST_CD IN ('Z0121','Z0122','Z0131')
+                    </when>
+                    <otherwise>
+                    AND STEP.PROC_ST_CD IN ('Z0121','Z0122','Z0131','Z0133')
+                    </otherwise>
+                  </choose>
+                </if>
+
+                <if test="procStCd == 'R3'">
+                    AND STEP.PROC_ST_CD = 'Z0141'
+                </if>
+
+            ORDER BY MR.FST_RGST_DT DESC,MR.MR_REQ_NO DESC)
+    </select>
+
+    <select id="getTechInvestCnt" resultType="int">
+        SELECT COUNT(*) AS CNT
+          FROM MR_REQ_MST MST
+          JOIN MR_REQ_PROC_STEP STEP
+            ON MST.MR_REQ_NO = STEP.MR_REQ_NO
+           AND STEP.MR_STEP_CD = 'Z0030'
+           AND STEP.PROC_ST_CD = 'Z0110' 
+           AND STEP.DEL_YN = 0
+           AND EFF_END_DTM = '99991231235959'
+          JOIN MR_REQ_PROC_STEP_DET DET
+            ON STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_STEP_CD = 'Z0030'
+           AND DET.PROC_ST_CD = 'Z0110' 
+           AND DET.DEL_YN = 0
+          JOIN MR_REQ_CHRGR_CHG_HIST HIST
+            ON DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND HIST.DEL_YN = 0
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND HIST.CHRGR_CL_CD LIKE 'Z02G%'
+           AND HIST.CHRG_EMP_NO = #{loginEmpNo}
+         WHERE MST.MR_STEP_CD = 'Z0030'
+           AND MST.PROC_ST_CD = 'Z0110'
+           AND MST.DEL_YN = 0  
+          
+    </select>
+
+</mapper>

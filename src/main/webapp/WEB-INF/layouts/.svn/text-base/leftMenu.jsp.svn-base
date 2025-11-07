@@ -1,0 +1,31 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+<div class="progress_top"></div>
+<div class="progress_bottom">
+    <ul>
+        <li><a href="main.do"><img src="images/btn_pro_main.png"></a></li>
+        <li><a href="detailSearch.do"><img src="images/btn_pro_inquiry.png"></a></li>
+        <li><a href="mrRqRegister.do"><img src="images/btn_pro_write.png"></a></li>
+    </ul>
+</div>
+<div class="leftmenu">
+    <ul>
+        <li class="menu">1. MR요청</li>
+        <li class="smenu cursor leftSubStep Z0010" data-role="mrRqRegister"><div class="leftmenu_over"></div><span class="span_title">MR요청서</span><span class="span_progress"></span></li>
+        <li class="menu">2. MR검토</li>
+        <li class="smenu cursor leftSubStep Z0020" data-role="mrTech"><div class="leftmenu_over"></div><span class="span_title">기술검토항목</span><span class="span_progress"></span></li>
+        <li class="smenu cursor leftSubStep Z0030" data-role="mrTechInvest"><div class="leftmenu_over"></div><span class="span_title">초기 투자비 산정</span><span class="span_progress"></span></li>
+        <li class="smenu cursor leftSubStep Z0030-A" data-role="mrComplete"><div class="leftmenu_over"></div><span class="span_title">타당성검토 확인</span><span class="span_progress"></span></li>
+        <li class="smenu cursor leftSubStep Z0040" data-role="mrJobsReview"><div class="leftmenu_over"></div><span class="span_title">직무검토</span><span class="span_progress"></span></li>
+        <li class="smenu cursor leftSubStep Z0020-A" data-role="mrRiskCheck"><div class="leftmenu_over"></div><span class="span_title">위험성검토/PORC</span><span class="span_progress"></span></li>
+        <li class="menu">3. 투자승인</li>
+        <li class="smenu cursor leftSubStep Z0050" data-role="ivstCostRegister"><div class="leftmenu_over"></div><span class="span_title">투자 지출 품의</span><span class="span_progress"></span></li>
+        <li class="menu">4. 사업수행</li>
+        <li class="smenu cursor leftSubStep Z0060" data-role="safeCheckExe"><div class="leftmenu_over"></div><span class="span_title">MR수행</span><span class="span_progress"></span></li>
+        <li class="smenu cursor leftSubStep Z0070" data-role="safeCheckRegister"><div class="leftmenu_over"></div><span class="span_title">가동전 안전점검</span><span class="span_progress"></span></li>
+        <li class="menu">5. MR완료</li>
+        <li class="smenu cursor leftSubStep Z0080" data-role="compFileManage"><div class="leftmenu_over"></div><span class="span_title">자료등록</span><span class="span_progress"></span></li>
+        <li class="smenu cursor leftSubStep Z0090" data-role="compRptRegister"><div class="leftmenu_over"></div><span class="span_title">완료</span><span class="span_progress"></span></li>
+        <li class="menu"></li>
+    </ul>
+</div>

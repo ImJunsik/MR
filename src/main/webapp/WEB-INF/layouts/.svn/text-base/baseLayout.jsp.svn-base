@@ -1,0 +1,206 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <base href="${pageContext.request.contextPath}/">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+
+    <title>MR</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="css/common.css" rel="stylesheet">
+    <link href="css/layout.css" rel="stylesheet">
+    <link href="css/popup.css" rel="stylesheet">
+
+    <!-- jquery-ui css -->
+    <link href="css/widgets/jquery-ui.css" rel="stylesheet">
+
+    <!-- jquery script -->
+    <script src="js/jquery/jquery-1.10.2.min.js"></script>
+
+    <!-- jquery-ui script & datepicker i18n -->
+    <script src="js/widgets/jquery-ui.min.js"></script>
+    <script src="js/widgets/i18n/jquery.ui.datepicker-ko.js"></script>
+
+    <!-- timepicker script & i18n -->
+    <script src="js/widgets/addon/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script src="js/widgets/addon/timepicker/i18n/jquery-ui-timepicker-ko.js"></script>
+
+    <!-- common scripts -->
+    <script src="js/common/common.js"></script>
+    <script src="js/common/common.ajax.js"></script>
+    <script src="js/common/common.validation.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function(){
+
+
+            var failMessage = "${failMessage}";
+            if (failMessage != "") {
+                alert(failMessage);
+            }
+
+            $('#pageLoadingWrap').css('width' ,  $(window).width());
+            $('#pageLoadingWrap').css('height' ,  $(window).height());
+            $(window).resize(function() {
+              $('#pageLoadingWrap').css('width' ,  $(window).width());
+              $('#pageLoadingWrap').css('height' ,  $(window).height());
+            });
+
+            $.removeComma = function(){
+                $('.number').each(function(){
+                      $(this).val($(this).val().replace(/[,]/g, ""));
+                });
+            };
+
+        	$(".inputDate").datepicker({
+        	    dateformat:"yyyy-mm-dd",
+        	    showOn:"button",
+        	    changeYear: true,
+        	    changeMonth: true,
+        	    buttonImage:"images/icon_calendar.png",
+        	    buttonImageOnly:true,
+        	    minDate: "today"
+            });
+
+            $(".inputBeforeDate").datepicker({
+                dateformat:"yyyy-mm-dd",
+                showOn:"button",
+                changeYear: true,
+                changeMonth: true,
+                buttonImage:"images/icon_calendar.png",
+                buttonImageOnly:true,
+                maxDate: "today"
+            });
+
+        	$("img.ui-datepicker-trigger").attr("style", "border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;");
+        	$(".ui-datepicker-month").attr("width", "30px");
+
+        	$(document).on("focusout",".number",function(event) {
+                $(this).val($.separator($(this).val()));
+            });
+
+            $(document).on("focusin",".number",function(event) {
+                  var value = $(this).val().replace(/[^0-9]/g, '');
+                  value = value*1;
+                  $(this).val(value);
+            });
+
+        	$(".leftMenu").mouseover(function() {
+                $(this).css("background","#fcf8e3");
+             }).mouseleave(function() {
+                $(this).css("background","#ffffff");
+             }).click(function(){
+        		location.replace($(this).attr("data-role")+".do");
+        	});
+
+            $(".leftSubStep").mouseover(function() {
+                $(this).css("background","#fcf8e3");
+             }).mouseleave(function() {
+                $(this).css("background","#ffffff");
+             }).click(function(){
+            	if($(this).children("td:eq(1)").html() =="") {
+            		alert("완료, 진행중인 단계가 아닙니다.");
+            	} else if ($("#mrReqNo").val()!="" && $("#mrReqNo").val()!="0" ){
+            	    location.replace($(this).attr("data-role")+".do?mrReqNo="+$("#mrReqNo").val());
+            	}
+            });
+
+
+            $(window).ajaxStart(function() {
+            	$('#pageLoadingWrap').show();
+            }).ajaxStop(function() {
+            	$('#pageLoadingWrap').hide();
+            }).ajaxComplete(function() {
+                $('#pageLoadingWrap').hide();
+            }).ajaxError(function() {
+                $('#pageLoadingWrap').hide();
+            }).ajaxSuccess(function() {
+                $('#pageLoadingWrap').hide();
+            });
+        });
+    </script>
+
+  </head>
+  <body>
+  <div id="pageLoadingWrap" style="position:absolute; top:0px;left:0px; display:none; background-color:white; z-index:1000; filter: alpha(opacity=50); -khtml-opacity: 0.5; -moz-opacity:0.5; opacity: 0.5;">
+    <div id="pageLoading" style="position:absolute;top:50%;left:50%;z-index:999">
+         <img src="images/ajax_progress.gif" />
+    </div>
+  </div>
+  <s:eval var="authenticationKey" expression="T(com.mr.common.domain.Authentication).SESSION_ATTRIBUTE_KEY"/>
+  <div id="header">
+      <div class="navbar_brand"><a href="main.do"><img id="logo" src="images/logo.png"></a></div>
+      <div class="navbar_nav">
+            <ul>
+            <li><a href="main.do">메인</a></li>
+            <li><a href="detailSearch.do">상세조회</a></li>
+            <li><a href="mrRqRegister.do">MR요청서 작성</a></li>
+            <li>현재 로그인 사용자 : <c:out value="${sessionScope[authenticationKey].empName}"/> / </li>
+            <li> <a style="font-color:white" href="logout.do">로그아웃</a></li>
+            </ul>
+      </div>
+  </div>
+  <div id="container">
+          <%-- Contents 내용을 들어올 자리 --%>
+          <div style="margin:100px">
+          <tiles:insertAttribute name="content" />
+          </div>
+  </div>
+<!--     <div id="footer">
+      <p class="text-muted"><b>Modification Request Management</b></p>
+    </div> -->
+  <script type="text/javascript">
+    $(document).ready(function(){
+    	alert("baseLayout.jsp jewook");
+    	if("${modeClass}"!="") {
+        $('.${modeClass}').attr('disabled',false);
+        $('.${modeClass}').attr('readonly',false);
+        $('.${modeClass}').show();
+     }
+
+     "<c:forEach var='mrStep' items='${mrSteps}'>";
+
+
+        $(".${mrStep.mrStepCd}").children("td:eq(1)").html("${mrStep.procStNm}");
+
+        if("${mrStep.procStCd}"=="Z0143"){
+        	 $(".${mrStep.mrStepCd}").children("td:eq(1)").html("사업취소");
+        }
+        if("${mrStep.mrStepCd}"=="Z0030" && "${mrStep.procStCd}"=="Z0133") {
+        	$(".${mrStep.mrStepCd}").children("td:eq(1)").html("<fmt:formatDate value='${mrStep.lastChgDt}' pattern='yyyy-MM-dd' />");
+        	$(".${mrStep.mrStepCd}-A").children("td:eq(1)").html("확인요청");
+        } else if ("${mrStep.mrStepCd}"=="Z0030" && ("${mrStep.procStCd}"=="Z0122" || "${mrStep.procStCd}"=="Z0131")) {
+            $(".${mrStep.mrStepCd}").children("td:eq(1)").html("<fmt:formatDate value='${mrStep.lastChgDt}' pattern='yyyy-MM-dd' />");
+            $(".${mrStep.mrStepCd}-A").children("td:eq(1)").html("${mrStep.procStNm}");
+        }
+
+        if("${mrStep.mrStepCd}"=="Z0030" && "${mrStep.procStCd}"=="Z0132") {
+        	$(".${mrStep.mrStepCd}-A").children("td:eq(1)").html("<fmt:formatDate value='${mrStep.lastChgDt}' pattern='yyyy-MM-dd' />");
+        }
+        if("${mrStep.mrStepCd}"=="Z0050" && "${mrStep.procStCd}"=="Z0131") {
+            $(".${mrStep.mrStepCd}").children("td:eq(1)").html("<fmt:formatDate value='${mrStep.lastChgDt}' pattern='yyyy-MM-dd' />");
+        }
+        if("${mrStep.mrStepCd}"=="Z0060" && "${mrStep.procStCd}"=="Z0110") {
+            $(".${mrStep.mrStepCd}").children("td:eq(1)").html("<fmt:formatDate value='${mrStep.lastChgDt}' pattern='yyyy-MM-dd' />");
+        }
+        if("${mrStep.mrStepCd}"=="Z0070" && "${mrStep.procStCd}"=="Z0131") {
+            $(".${mrStep.mrStepCd}").children("td:eq(1)").html("<fmt:formatDate value='${mrStep.lastChgDt}' pattern='yyyy-MM-dd' />");
+        }
+        if("${mrStep.mrStepCd}"=="Z0080" && "${mrStep.procStCd}"=="Z0131") {
+            $(".${mrStep.mrStepCd}").children("td:eq(1)").html("<fmt:formatDate value='${mrStep.lastChgDt}' pattern='yyyy-MM-dd' />");
+        }
+
+        "</c:forEach>";
+    });
+  </script>
+  </body>
+</html>

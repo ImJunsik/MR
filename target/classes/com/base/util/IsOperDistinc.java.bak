@@ -1,0 +1,88 @@
+package com.base.util;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
+
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
+import org.apache.log4j.Logger;
+
+public class IsOperDistinc {
+	
+    public static boolean m_bOper = true;
+    public static boolean m_bOperDatabaseConfig = true;
+    public static int init_count = -1;
+    private final Logger logger = Logger.getLogger(this.getClass());
+    
+    
+    private static IsOperDistinc ipd = new IsOperDistinc();
+
+    private IsOperDistinc()
+    {
+    	isOperServer();
+    	readDBconfig();
+    }
+    
+    public static IsOperDistinc getInstance() {
+        return ipd;
+    }
+
+    
+	public boolean isOperServer()
+    {
+    	// Yoo 운영 서버 일때만 돌게 한다
+		try {
+			InetAddress ip = InetAddress.getLocalHost();
+			System.out.println("IP : [" + ip + "]");
+			String host_id = ip.getHostAddress().trim();
+			System.out.println("ID : [" + host_id + "]");
+			//logger.debug(host_id + ":" + host_id, 0);
+			logger.debug("IP : [" + ip + "]");
+			logger.debug("ID : [" + host_id + "]");
+			String OperSrvIp = "172.18.61.159";
+			//String OperSrvIp = "172.17.59.20";
+			if(host_id.equals(OperSrvIp))		
+				m_bOper = true;
+			else
+				m_bOper = false;
+			
+		} catch (UnknownHostException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		logger.debug("m_bOper : [" + m_bOper + "]");
+		System.out.println("m_bOper : [" + m_bOper + "]");
+		return m_bOper;
+    }
+    
+    public void readDBconfig()
+    {
+    	//Yoo
+    	InitialContext context;
+		try {
+			context = new InitialContext();
+			Context xmlNode = (Context) context.lookup("java:comp/env");
+			DataSource ds = (DataSource)xmlNode.lookup("jdbc/mrdb");
+
+			String dbUrl = "";
+	    	dbUrl = ds.toString();			//ds.getConnection().getMetaData().getURL();
+			int n = dbUrl.indexOf(".10.10");
+			if(n > -1)
+				m_bOperDatabaseConfig = true;
+			else
+				m_bOperDatabaseConfig = false;
+			//System.out.println(dbUrl);
+			System.out.println("m_bOperDatabaseConfig : [" + m_bOperDatabaseConfig + "]");
+          
+
+		} catch (NamingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    	
+    }
+
+}

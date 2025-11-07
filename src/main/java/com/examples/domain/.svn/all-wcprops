@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/examples/domain
+END
+Authentication.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/examples/domain/Authentication.java
+END
+Employee.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/examples/domain/Employee.java
+END
+Career.java
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/examples/domain/Career.java
+END
+Department.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/examples/domain/Department.java
+END
+AcademicCareer.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/examples/domain/AcademicCareer.java
+END

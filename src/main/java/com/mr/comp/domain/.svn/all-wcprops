@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/comp/domain
+END
+CompProcStepDetVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/comp/domain/CompProcStepDetVO.java
+END
+CompChrgrChgHistVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/comp/domain/CompChrgrChgHistVO.java
+END
+CompFileVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svn/repos_edims/!svn/ver/106/trunk/src/mr/src/main/java/com/mr/comp/domain/CompFileVO.java
+END
+CompRptVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svn/repos_edims/!svn/ver/76/trunk/src/mr/src/main/java/com/mr/comp/domain/CompRptVO.java
+END
+CompFileManageVO.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svn/repos_edims/!svn/ver/106/trunk/src/mr/src/main/java/com/mr/comp/domain/CompFileManageVO.java
+END

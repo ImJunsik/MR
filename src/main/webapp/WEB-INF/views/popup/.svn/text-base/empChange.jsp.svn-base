@@ -1,0 +1,152 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+
+<form method="post">
+<table class="table_pop_row" border="1" cellspacing="0">
+    <caption class="blind"></caption>
+    <colgroup>
+    <col width="15%">
+    <col width="35%">
+    <col width="15%">
+    <col width="35%">
+    </colgroup>
+    <tbody>
+    <tr>
+    <th scope="row">이름</th>
+    <td>
+        <div class="form_group">
+        <input type="text" id="empName" name="empName" class="i_input">
+        </div>
+    </td>
+    <th scope="row">부서</th>
+    <td>
+    <div class="form_group">
+        <input type="text" id="teamName" name="teamName" class="i_input">
+
+        <input type="hidden" name="empNo" value="${empNo}">
+        <input type="hidden" id="empNo" name="chrgEmpNo" value="${chrgrChgHist.chrgEmpNo}">
+        <input type="hidden" id="thdayTeam" name="thdayTeam" value="${chrgrChgHist.thdayTeam}">
+        <input type="hidden" id="thdayPos" name="thdayPos" value="${chrgrChgHist.thdayPos}">
+        <input type="hidden" id="chrgTeamNo" name="chrgTeamNo" value="${chrgrChgHist.thdayPos}">
+        <input type="hidden" id="mrReqNo" name="mrReqNo" value="${mrReqNo}">
+        <input type="hidden" id="mrReqProcStepDetNo" name="mrReqProcStepDetNo" value="${mrReqProcStepDetNo}">
+    </div>
+</td>
+</tr>
+</tbody>
+</table>
+</form>
+<!-- space non 10 -->
+<hr class="divider_none_10" />
+<input class="search" type="image" src="../images/btn_inquiry.png">
+<!-- space non 10 -->
+<hr class="divider_none_10" />
+
+
+
+<table class="table_pop_row" border="1" cellspacing="0">
+    <caption class="blind"></caption>
+    <colgroup>
+    <col width="15%">
+    <col width="35%">
+    <col width="15%">
+    <col width="35%">
+    </colgroup>
+    <tbody>
+    <tr>
+    <th scope="row">현재 담당자</th>
+    <td><c:out value="${chrgrChgHist.thdayTeam}"/> / <c:out value="${chrgrChgHist.thdayPos}"/> / <c:out value="${chrgrChgHist.chrgEmpName}"/></td>
+    <th scope="row">변경 담당자</th>
+    <td><b><span id="changeEmp"></span></b></td>
+    </tr>
+    </tbody>
+</table>
+<!-- space non 10 -->
+<hr class="divider_none_10" />
+<div class="pop_list_280 single">
+<table class="table_pop_col" border="1" cellspacing="0">
+    <caption class="blind"></caption>
+    <colgroup>
+    <col width="25%">
+    <col width="25%">
+    <col width="25%">
+    <col width="25%">
+    </colgroup>
+    <tbody>
+    <tr>
+        <th scope="col">사원번호</th>
+        <th scope="col">부서</th>
+        <th scope="col">직책</th>
+        <th scope="col">이름</th>
+    </tr>
+    <c:forEach var="empInfo" items="${empInfoList}" >
+      <tr class="cursor selectEmp">
+          <td><c:out value="${empInfo.empNo}"/></td>
+          <td><c:out value="${empInfo.teamName}"/></td>
+          <td><c:out value="${empInfo.dutyName}"/></td>
+          <td><c:out value="${empInfo.empName}"/></td>
+          <td style="display:none"><c:out value="${empInfo.teamNo}"/></td>
+      </tr>
+    </c:forEach>
+    </tbody>
+</table>
+</div>
+
+<!-- footer -->
+<div id="pop_footer">
+    <input type="image" class="save" name="" src="../images/btn_p_save.png" alt="저장" />
+</div>
+<!-- //footer -->
+<script>
+$(window).ready(function() {
+	$.popupTitle("담당자 변경");
+	var jobLine = new Array();
+    "<c:forEach var='job' items='${jobLine}'>";
+    jobLine.push("${job.chrgEmpNo}");
+    "</c:forEach>";
+
+    $(".search").click(function(){
+        if(($("#empName").val() == null || $("#empName").val() == "") && ($("#teamName").val() == null || $("#teamName").val() == "")){
+
+            alert("이름 부서중 하나는 반드시 입력하여야 합니다.");
+            return;
+
+        }
+        $("form").attr("action", "jobEmpChange.do").submit();
+    });
+
+    $(".selectEmp").mouseover(function() {
+        $(this).css("background","#fcf8e3");
+    }).mouseleave(function() {
+       $(this).css("background","#ffffff");
+    }).click(function(){
+       for (var empNo in jobLine) {
+    		if(jobLine[empNo]==$(this).children("td:eq(0)").html()) {
+    			alert("중복되는 직무검토 담당자 입니다.");
+    			return;
+    		}
+       }
+       $("#changeEmp").html($(this).children("td:eq(1)").html() + " / " + $(this).children("td:eq(2)").html() + " / " + $(this).children("td:eq(3)").html());
+       $("#empNo").val($(this).children("td:eq(0)").html());
+       $("#thdayTeam").val($(this).children("td:eq(1)").html());
+       $("#thdayPos").val($(this).children("td:eq(2)").html());
+       $("#chrgTeamNo").val($(this).children("td:eq(4)").html());
+    });
+
+
+    $(".save").click(function(){
+    	if(confirm("담당자를 변경하시겠습니까?")) {
+            if(($("#changeEmp").html() == null || $("#changeEmp").html() == "")){
+
+                alert("변경할 담당자를 선택하세요.");
+                return;
+
+            }
+            $("form").attr("action", "jobEmpChangeSave.do").submit();
+            window.opener.location.reload();
+            window.open("", "_self").close();
+    	}
+    });
+
+});
+</script>

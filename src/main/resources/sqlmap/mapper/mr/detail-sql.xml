@@ -1,0 +1,830 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.detail">
+    <resultMap id="mrDetailListMap" type="com.mr.main.domain.MrListVO">
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="plant" column="PLANT" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="teamNo" column="TEAM_NO" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="teamName" column="TEAM_NAME" />
+        <result property="empName" column="EMP_NAME" />
+        <result property="actEmpName" column="ACT_EMP_NAME" />
+        <result property="reqEmpName" column="REQ_EMP_NAME" />
+        <result property="jobEmpName" column="JOB_EMP_NAME" />
+        <result property="proEmpName" column="PRO_EMP_NAME" />
+        <result property="actTeamName" column="ACT_TEAM_NAME" />
+        <result property="reqTeamName" column="REQ_TEAM_NAME" />
+        <result property="jobTeamName" column="JOB_TEAM_NAME" />
+        <result property="proTeamName" column="PRO_TEAM_NAME" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="mrStepNm" column="MR_STEP_NM" />
+        <result property="procStNm" column="PROC_ST_NM" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+        <result property="workPsblClNm" column="WORK_PSBL_CL_NM" />
+        <result property="capexNo" column="CAPEX_NO" />
+        <result property="sapCostTot" column="SAP_COST_TOT" />
+        <result property="clCd06" column="CL_CD_06" />
+        <result property="costTotalSum" column="COST_TOTAL_SUM" />
+        <result property="totalCount" column="TOTAL_COUNT" />                  
+    </resultMap>
+    
+	<resultMap id="mrAlter" type="com.mr.mrrq.domain.MrAlterVO">
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="invstCostNo" column="INVST_COST_NO" />
+        <result property="capexNo" column="CAPEX_NO" />
+        <result property="sapCostTot" column="SAP_COST_TOT" />             
+    </resultMap>
+    
+	<!-- 20171031 wj 수정. 상세조회 화면에서 중복으로 조회되는 현상 수정 -->
+    <select id="selectDetailSearch" resultMap="mrDetailListMap">
+    --mr상세조회,mr정보리스트
+        SELECT ROW_DATA.TOTAL_COUNT
+              ,ROW_DATA.MR_REQ_NO
+              ,ROW_DATA.MR_STEP_CD
+              ,ROW_DATA.PROC_ST_CD
+              ,ROW_DATA.MR_NO
+              ,ROW_DATA.MR_REQ_TITLE
+              ,ROW_DATA.PLANT
+              ,ROW_DATA.ACT_EMP_NAME
+              ,ROW_DATA.REQ_EMP_NAME
+              ,ROW_DATA.JOB_EMP_NAME
+              ,ROW_DATA.PRO_EMP_NAME
+              ,ROW_DATA.ACT_TEAM_NAME
+              ,ROW_DATA.REQ_TEAM_NAME
+              ,ROW_DATA.JOB_TEAM_NAME
+              ,ROW_DATA.PRO_TEAM_NAME
+              ,ROW_DATA.WORK_PSBL_CL_NM
+              ,ROW_DATA.MR_STEP_NM
+              ,ROW_DATA.PROC_ST_NM
+              ,ROW_DATA.FST_RGST_DT
+              ,ROW_DATA.CAPEX_NO
+          FROM (
+              SELECT DISTINCT
+                     ROW_NUMBER() OVER(ORDER BY MR.FST_RGST_DT DESC) RN
+                    ,COUNT(MR.MR_REQ_NO) OVER() AS TOTAL_COUNT
+                    ,MR.MR_REQ_NO
+                    ,MR.MR_STEP_CD
+                    ,MR.PLANT
+                    ,STEP.PROC_ST_CD
+                    ,DECODE(MR.MR_NO, NULL, MR.MR_TMP_NO, MR.MR_NO) MR_NO
+                    ,MR.MR_REQ_TITLE
+                    ,ACT_EI.EMP_NAME ACT_EMP_NAME
+                    ,REQ_EI.EMP_NAME REQ_EMP_NAME
+                    ,JOB_EI.EMP_NAME JOB_EMP_NAME
+                    ,PRO_EI.EMP_NAME PRO_EMP_NAME
+                    ,ACT_INFO.THDAY_TEAM ACT_TEAM_NAME
+                    ,REQ_INFO.THDAY_TEAM REQ_TEAM_NAME
+                    ,JOB_INFO.THDAY_TEAM JOB_TEAM_NAME
+                    ,PRO_INFO.THDAY_TEAM PRO_TEAM_NAME
+                    ,NVL(WPCC.MR_COMM_NM, ' ') WORK_PSBL_CL_NM
+                    ,ESCCC.MR_COMM_NM  || DECODE(STEP.PROC_ST_CD,'Z0143', '(' || PSCCC.MR_COMM_NM || ')', '')  MR_STEP_NM
+                    ,PSCCC.MR_COMM_NM PROC_ST_NM
+                    ,MR.FST_RGST_DT
+                    ,MR.CAPEX_NO
+                FROM MR_REQ_MST MR
+                    ,MR_REQ_PROC_STEP STEP
+                    ,MR_COMM_COD WPCC
+                    ,MR_COMM_COD ESCCC
+                    ,MR_COMM_COD PSCCC
+                    ,EDM_EMP ACT_EI
+                    ,EDM_EMP REQ_EI
+                    ,EDM_EMP PRO_EI
+                    ,EDM_EMP JOB_EI
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02A'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) REQ_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_NO = (SELECT MAX(MR_REQ_PROC_STEP_NO)
+                                                          FROM MR_REQ_PROC_STEP STEP
+                                                         WHERE STEP.MR_REQ_NO  = HIST.MR_REQ_NO
+                                                           AND STEP.MR_STEP_CD = 'Z0020'
+                                                           AND STEP.DEL_YN     = '0')
+                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0020' 
+                         AND HIST.CHRGR_CL_CD = 'Z02D'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) JOB_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0020'
+                         AND HIST.CHRGR_CL_CD = 'Z02G'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0                         
+                         AND DET.DEL_YN=0) ACT_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0030'
+                         AND HIST.CHRGR_CL_CD = 'Z02I'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) PRO_INFO
+               WHERE MR.MR_REQ_NO = STEP.MR_REQ_NO
+                 AND MR.MR_REQ_NO = REQ_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = JOB_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = ACT_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = PRO_INFO.MR_REQ_NO(+)
+                 AND ACT_INFO.CHRG_EMP_NO = ACT_EI.EMP_ID(+)
+                 AND REQ_INFO.CHRG_EMP_NO = REQ_EI.EMP_ID(+)
+                 AND JOB_INFO.CHRG_EMP_NO = JOB_EI.EMP_ID(+)
+                 AND PRO_INFO.CHRG_EMP_NO = PRO_EI.EMP_ID(+)
+                 AND MR.WORK_PSBL_CL_CD = WPCC.MR_COMM_CD(+)
+                 AND STEP.MR_STEP_CD = ESCCC.MR_COMM_CD(+)
+                 AND STEP.PROC_ST_CD = PSCCC.MR_COMM_CD(+)
+                 AND NVL(WPCC.MR_COMM_GRP_CD,'WORK') = 'WORK'
+                 AND NVL(ESCCC.MR_COMM_GRP_CD,'MR_PROC') = 'MR_PROC'
+                 AND NVL(PSCCC.MR_COMM_GRP_CD,'MR_PROC') = 'MR_PROC'
+
+                    <if test="fromDate != null and toDate != null ">
+                         AND TO_CHAR(MR.FST_RGST_DT, 'YYYY-MM-DD') BETWEEN  #{fromDate} AND #{toDate}
+                    </if>
+
+                    <if test="mrNo != null">
+                         AND (MR.MR_NO = #{mrNo} OR MR.MR_TMP_NO = UPPER(#{mrNo}))
+                    </if>
+                    <if test="businessCencel == null">
+                        AND STEP.PROC_ST_CD != 'Z0143'
+                    </if>
+
+                    <if test="myMrSearch != null">
+                         AND MR.MR_REQ_NO IN (SELECT DISTINCT(MR_REQ_NO)
+                                               FROM MR_REQ_CHRGR_CHG_HIST
+                                              WHERE CHRG_EMP_NO = #{loginEmpNo}
+                                                AND DEL_YN = 0
+                                                AND EFF_END_DTM ='99991231235959')
+                    </if>
+
+                    <if test="mrStepCd != null">
+                         AND MR.MR_STEP_CD = #{mrStepCd}
+                    </if>
+
+                    <if test="requestTeamNo != null">
+                        AND REQ_INFO.CHRG_TEAM_NO = #{requestTeamNo}
+                    </if>
+
+                    <if test="requestEmpNo != null">
+                        AND REQ_INFO.CHRG_EMP_NO = #{requestEmpNo}
+                    </if>
+
+                    <if test="drawNo != null">
+                         AND MR.MR_REQ_NO IN (SELECT DISTINCT(MR_REQ_NO)
+                                                FROM MR_ATCH_FILE
+                                               WHERE DRAW_MNG_NO = #{drawNo}
+                                                 AND DEL_YN = 0)
+                    </if>
+
+                    <if test="jobEmpNo != null">
+                        AND JOB_INFO.CHRG_EMP_NO = #{jobEmpNo}
+                    </if>
+
+                    <if test="actionTeamNo != null">
+                        AND ACT_INFO.CHRG_TEAM_NO = #{actionTeamNo}
+                    </if>
+
+                    <if test="projectEmpNo != null">
+                        AND PRO_INFO.CHRG_EMP_NO = #{projectEmpNo}
+                    </if>
+
+                    <if test="projectTitle != null">
+                         AND UPPER(MR.MR_REQ_TITLE) LIKE '%' || UPPER(#{projectTitle}) || '%'
+                    </if>
+
+                    <if test="procs != null">
+                         AND 'TRUE' = (SELECT CASE WHEN NVL(COUNT(MR_PROC_NO),0)>0 THEN 'TRUE' ELSE 'FALSE' END IS_EQUIP
+                                         FROM MR_REQ_PROC
+                                        WHERE MR_REQ_NO = MR.MR_REQ_NO
+                                          AND MR_PROC_NO IN
+                                         <foreach item="proc" index="index" collection="procs" open="(" separator="," close=")">
+                                            #{proc.mrProcNo}
+                                         </foreach>
+                                          AND DEL_YN = 0)
+                    </if>
+
+                    <if test="equips != null">
+                         AND 'TRUE' = (SELECT CASE WHEN NVL(COUNT(MR_EQUIP_CD),0)>0 THEN 'TRUE' ELSE 'FALSE' END IS_EQUIP
+                                         FROM MR_REQ_EQUIP
+                                        WHERE MR_REQ_NO = MR.MR_REQ_NO
+                                          AND MR_EQUIP_CD IN
+                                         <foreach item="equip" index="index" collection="equips" open="(" separator="," close=")">
+                                            #{equip.mrEquipCd}
+                                         </foreach>
+                                          AND DEL_YN = 0)
+                    </if>
+
+                    <if test="reqType != null">
+                         AND MR.REQ_CL_CD = #{reqType}
+                    </if>
+
+                    <if test="work != null">
+                         AND MR.WORK_PSBL_CL_CD = #{work}
+                    </if>
+
+                    <if test="capexNo != null">
+                         AND MR.CAPEX_NO = #{capexNo}
+                    </if>
+
+
+                 AND STEP.EFF_END_DTM = '99991231235959'
+                 AND MR.DEL_YN=0
+                 AND STEP.DEL_YN = 0
+                 AND NVL(WPCC.DEL_YN, 0) = 0
+                 AND NVL(PSCCC.DEL_YN, 0) = 0
+                 AND NVL(ESCCC.DEL_YN, 0) = 0
+               ORDER BY FST_RGST_DT DESC, MR_REQ_NO DESC) ROW_DATA
+         WHERE CEIL(RN/#{ROWLIMIT}) = DECODE(#{page},null,1,#{page})
+
+    </select>
+    
+    
+    <select id="alterSearch" resultMap="mrAlter">
+    --alterSearch
+        SELECT M.MR_REQ_NO, MR_NO, MR_REQ_TITLE, INVST_COST_NO, CAPEX_NO, SAP_COST_TOT								
+  		FROM MR_REQ_MST M, MR_INVST_COST_RPT I								
+ 		WHERE 1=1 
+ 		<if test="mrNo != null">
+           AND M.MR_NO  LIKE '%' || #{mrNo} || '%' 
+        </if>
+        <if test="mrTmpNo != null">
+           AND M.MR_TMP_NO  LIKE '%' || #{mrTmpNo} || '%' 
+        </if>
+ 		<if test="projectTitle != null">
+           AND MR_REQ_TITLE LIKE '%' || #{projectTitle} || '%'		
+        </if>
+   		AND M.MR_REQ_NO = I.MR_REQ_NO AND M.DEL_YN = 0
+    </select>
+    
+    <select id="selectDetailSearchTotal" resultMap="mrDetailListMap">
+    --상세검색1  		distinct 
+SELECT DISTINCT     '' as rn,
+                    COUNT(MR.MR_REQ_NO) OVER() AS TOTAL_COUNT
+                    ,MR.MR_REQ_NO
+                    ,MR.MR_STEP_CD
+                    ,STEP.PROC_ST_CD
+                    ,DECODE(MR.MR_NO, NULL, MR.MR_TMP_NO, MR.MR_NO) MR_NO
+                    ,MR.MR_REQ_TITLE
+                    ,ACT_EI.EMP_NAME ACT_EMP_NAME
+                    ,REQ_EI.EMP_NAME REQ_EMP_NAME
+                    ,JOB_EI.EMP_NAME JOB_EMP_NAME
+                    ,PRO_EI.EMP_NAME PRO_EMP_NAME
+                    ,ACT_INFO.THDAY_TEAM ACT_TEAM_NAME
+                    ,REQ_INFO.THDAY_TEAM REQ_TEAM_NAME
+                    ,JOB_INFO.THDAY_TEAM JOB_TEAM_NAME
+                    ,PRO_INFO.THDAY_TEAM PRO_TEAM_NAME
+                    ,NVL(WPCC.MR_COMM_NM, ' ') WORK_PSBL_CL_NM
+                    <!-- ,ESCCC.MR_COMM_NM  || DECODE(STEP.PROC_ST_CD,'Z0143', '(' || PSCCC.MR_COMM_NM || ')', '') || DECODE(MR40.RESULT,1,' (미진행)','')  MR_STEP_NM-->
+                     ,ESCCC.MR_COMM_NM || DECODE(STEP.PROC_ST_CD,'Z0143', '(' || PSCCC.MR_COMM_NM || ')', '') || CASE WHEN MR40.RESULT > 0 THEN ' (미진행)' ELSE '' END MR_STEP_NM 
+                    ,PSCCC.MR_COMM_NM PROC_ST_NM
+                    ,MR.FST_RGST_DT
+                    ,MR.CAPEX_NO
+                    ,TO_CHAR( COSTI.COST_TOTAL_SUM , '999,999,999,999,999') AS COST_TOTAL_SUM                    
+                    ,TO_CHAR( COSTR.SAP_COST_TOT , '999,999,999,999,999') AS SAP_COST_TOT 
+                    ,CL_CD_06
+                FROM MR_REQ_MST MR
+                      <choose>
+				        <when test="mrStepCd == 'Z0040'">
+				          , (SELECT * FROM V_MR_PROC_STEP WHERE MR_STEP_CD = #{mrStepCd}) STEP
+				        </when>
+				        <otherwise>
+				          , MR_REQ_PROC_STEP STEP
+				        </otherwise>
+				      </choose>
+                    ,MR_COMM_COD WPCC
+                    ,MR_COMM_COD ESCCC
+                    ,MR_COMM_COD PSCCC
+                    ,EDM_EMP ACT_EI
+                    ,EDM_EMP REQ_EI
+                    ,EDM_EMP PRO_EI
+                    ,EDM_EMP JOB_EI
+                    ,(SELECT MR_REQ_NO,                             
+                             (CASE WHEN  SAP_COST_TOT > 1 THEN SAP_COST_TOT / 1000 ELSE SAP_COST_TOT END) AS SAP_COST_TOT                             
+                        FROM MR_INVST_COST_RPT WHERE DEL_YN = 0) COSTR
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02A'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) REQ_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST                         
+                       WHERE DET.MR_REQ_PROC_STEP_NO = (SELECT MAX(MR_REQ_PROC_STEP_NO)
+                                                          FROM (SELECT * FROM 
+															      <choose>
+															        <when test="mrStepCd == 'Z0040'">
+															          (SELECT * FROM V_MR_PROC_STEP WHERE MR_STEP_CD = #{mrStepCd})
+															        </when>
+															        <otherwise>
+															          MR_REQ_PROC_STEP
+															        </otherwise>
+															      </choose>) STEP
+                                                         WHERE STEP.MR_REQ_NO  = HIST.MR_REQ_NO
+                                                           AND STEP.MR_STEP_CD = 'Z0020'
+                                                           AND STEP.DEL_YN     = '0')
+                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0020' 
+                         AND HIST.CHRGR_CL_CD = 'Z02D'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) JOB_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0020'
+                         AND HIST.CHRGR_CL_CD = 'Z02G'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0                         
+                         AND DET.DEL_YN=0) ACT_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0030'
+                         AND HIST.CHRGR_CL_CD = 'Z02I'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) PRO_INFO
+                   ,(SELECT MR_REQ_NO,
+                            SUM(COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12) AS COST_TOTAL_SUM
+                       FROM MR_INVST_COST 
+                      WHERE DEL_YN=0
+                   GROUP BY MR_REQ_NO) COSTI
+                   , (SELECT MRC.MR_REQ_NO
+                   			 , DECODE(CL_CD_06,'1','','2','공용자산') AS CL_CD_06
+						FROM MR_REQ_CHRGR_CHG_HIST MRC, MR_RV_RST MRV
+					   WHERE MRC.MR_REQ_NO = MRV.MR_REQ_NO
+						 AND MRC.MR_REQ_PROC_STEP_DET_NO = MRV.MR_REQ_PROC_STEP_DET_NO
+						 AND MRC.CHRGR_CL_CD = 'Z02H1'
+						 AND MRC.DEL_YN = '0'
+						 AND MRV.DEL_YN = '0') MRV,
+						 ( WITH BASE0 AS ( 
+			 SELECT STEP.MR_REQ_NO, DET.MR_REQ_PROC_STEP_DET_NO 
+			 FROM (SELECT * FROM 
+				      <choose>
+				        <when test="mrStepCd == 'Z0040'">
+				          (SELECT * FROM V_MR_PROC_STEP WHERE MR_STEP_CD = #{mrStepCd})
+				        </when>
+				        <otherwise>
+				          MR_REQ_PROC_STEP
+				        </otherwise>
+				      </choose>) STEP
+			 , MR_REQ_PROC_STEP_DET DET, MR_REQ_CHRGR_CHG_HIST HIST, EDM_EMP EMP, EDM_ORG TEAM, 
+			 EDM_DUTY DUTY WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO AND HIST.CHRG_EMP_NO = EMP.EMP_ID 
+			 AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+) AND EMP.DUTY_ID = DUTY.DUTY_ID AND DET.MR_STEP_CD = 'Z0040' /**P*/ AND HIST.CHRGR_CL_CD LIKE 'Z02H%' AND HIST.EFF_END_DTM = '99991231235959' 
+			 AND HIST.DEL_YN=0 AND DET.DEL_YN=0 AND STEP.DEL_YN=0 AND HIST.CHRG_EMP_NO = #{loginEmpNo} AND DET.MR_REQ_NO IN (select mr_req_no from MR_REQ_MST where MR_STEP_CD = 'Z0040')
+			 ) 
+			 , BASE1 AS (
+			 SELECT HIST.MR_REQ_NO, RST.LAST_CHG_DT AS LAST_CHG_DT, HIST.MR_REQ_PROC_STEP_DET_NO AS MR_REQ_PROC_STEP_DET_NO 
+			 FROM MR_REQ_CHRGR_CHG_HIST HIST, MR_RV_RST RST, (SELECT MR_REQ_PROC_STEP_DET_NO FROM BASE0) BASE0 WHERE HIST.MR_REQ_PROC_STEP_DET_NO = BASE0.MR_REQ_PROC_STEP_DET_NO 
+			 AND RST.MR_REQ_PROC_STEP_DET_NO(+) = BASE0.MR_REQ_PROC_STEP_DET_NO
+			 ) , BASE2 AS (
+			 SELECT MR_REQ_NO, 
+			 CASE WHEN LAST_CHG_DT IS NULL AND MR_REQ_PROC_STEP_DET_NO IS NOT NULL THEN 1 
+			 ELSE 0 
+			 END RESULT FROM BASE1)
+			 SELECT MR_REQ_NO, SUM(RESULT) AS RESULT FROM BASE2 GROUP BY MR_REQ_NO) MR40 
+               WHERE MR.MR_REQ_NO = STEP.MR_REQ_NO
+                 AND MR.MR_REQ_NO = REQ_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = JOB_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = ACT_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = PRO_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = MR40.MR_REQ_NO(+)
+                 AND ACT_INFO.CHRG_EMP_NO = ACT_EI.EMP_ID(+)
+                 AND REQ_INFO.CHRG_EMP_NO = REQ_EI.EMP_ID(+)
+                 AND JOB_INFO.CHRG_EMP_NO = JOB_EI.EMP_ID(+)
+                 AND PRO_INFO.CHRG_EMP_NO = PRO_EI.EMP_ID(+)
+                 AND MR.WORK_PSBL_CL_CD = WPCC.MR_COMM_CD(+)
+                 AND STEP.MR_STEP_CD = ESCCC.MR_COMM_CD(+)
+                 AND STEP.PROC_ST_CD = PSCCC.MR_COMM_CD(+)
+                 AND MR.MR_REQ_NO = COSTR.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = COSTI.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = MRV.MR_REQ_NO(+)
+                 AND NVL(WPCC.MR_COMM_GRP_CD,'WORK') = 'WORK'
+                 AND NVL(ESCCC.MR_COMM_GRP_CD,'MR_PROC') = 'MR_PROC'
+                 AND NVL(PSCCC.MR_COMM_GRP_CD,'MR_PROC') = 'MR_PROC'
+                 
+                    <if test="fromDate != null and toDate != null ">
+                         AND TO_CHAR(MR.FST_RGST_DT, 'YYYY-MM-DD') BETWEEN  #{fromDate} AND #{toDate}
+                    </if>
+
+                    <if test="mrNo != null">
+                         AND (MR.MR_NO = #{mrNo} OR MR.MR_TMP_NO = UPPER(#{mrNo}))
+                    </if>
+                    
+                    <if test="businessCencel == null">
+                        AND STEP.PROC_ST_CD != 'Z0143'
+                    </if>
+
+                    <if test="myMrSearch != null">
+                         AND MR.MR_REQ_NO IN (SELECT DISTINCT(MR_REQ_NO)
+                                               FROM MR_REQ_CHRGR_CHG_HIST
+                                              WHERE CHRG_EMP_NO = #{loginEmpNo}
+                                                AND DEL_YN = 0
+                                                AND EFF_END_DTM ='99991231235959')
+                    </if>
+
+                    <if test="mrStepCd != null">
+                         AND MR.MR_STEP_CD = #{mrStepCd}
+                    </if>
+
+                    <if test="requestTeamNo != null">
+                        AND REQ_INFO.CHRG_TEAM_NO = #{requestTeamNo}
+                    </if>
+
+                    <if test="requestEmpNo != null">
+                        AND REQ_INFO.CHRG_EMP_NO = #{requestEmpNo}
+                    </if>
+
+                    <if test="drawNo != null">
+                         AND MR.MR_REQ_NO IN (SELECT DISTINCT(MR_REQ_NO)
+                                                FROM MR_ATCH_FILE
+                                               WHERE DRAW_MNG_NO = #{drawNo}
+                                                 AND DEL_YN = 0)
+                    </if>
+
+                    <if test="jobEmpNo != null">
+                        AND JOB_INFO.CHRG_EMP_NO = #{jobEmpNo}
+                    </if>
+
+                    <if test="actionTeamNo != null">
+                        AND ACT_INFO.CHRG_TEAM_NO = #{actionTeamNo}
+                    </if>
+
+                    <if test="projectEmpNo != null">
+                        AND PRO_INFO.CHRG_EMP_NO = #{projectEmpNo}
+                    </if>
+
+                    <if test="projectTitle != null">
+                         AND UPPER(MR.MR_REQ_TITLE) LIKE '%' || UPPER(#{projectTitle}) || '%'
+                    </if>
+
+                    <if test="procs != null">
+                         AND 'TRUE' = (SELECT CASE WHEN NVL(COUNT(MR_PROC_NO),0)>0 THEN 'TRUE' ELSE 'FALSE' END IS_EQUIP
+                                         FROM MR_REQ_PROC
+                                        WHERE MR_REQ_NO = MR.MR_REQ_NO
+                                          AND MR_PROC_NO IN
+                                         <foreach item="proc" index="index" collection="procs" open="(" separator="," close=")">
+                                            #{proc.mrProcNo}
+                                         </foreach>
+                                          AND DEL_YN = 0)
+                    </if>
+
+                    <if test="equips != null">
+                         AND 'TRUE' = (SELECT CASE WHEN NVL(COUNT(MR_EQUIP_CD),0)>0 THEN 'TRUE' ELSE 'FALSE' END IS_EQUIP
+                                         FROM MR_REQ_EQUIP
+                                        WHERE MR_REQ_NO = MR.MR_REQ_NO
+                                          AND MR_EQUIP_CD IN
+                                         <foreach item="equip" index="index" collection="equips" open="(" separator="," close=")">
+                                            #{equip.mrEquipCd}
+                                         </foreach>
+                                          AND DEL_YN = 0)
+                    </if>
+
+                    <if test="reqType != null">
+                         AND MR.REQ_CL_CD = #{reqType}
+                    </if>
+
+                    <if test="work != null">
+                         AND MR.WORK_PSBL_CL_CD = #{work}
+                    </if>
+
+                    <if test="capexNo != null">
+                         AND MR.CAPEX_NO = #{capexNo}
+                    </if>
+
+                 AND STEP.EFF_END_DTM = '99991231235959'
+                 AND MR.DEL_YN=0
+                 AND STEP.DEL_YN = 0
+                 AND NVL(WPCC.DEL_YN, 0) = 0
+                 AND NVL(PSCCC.DEL_YN, 0) = 0
+                 AND NVL(ESCCC.DEL_YN, 0) = 0
+               ORDER BY FST_RGST_DT DESC, MR_REQ_NO DESC
+
+    </select>    
+    
+    <select id="selectDetailSearchCode" resultMap="mrDetailListMap">
+    --상세검색2  distinct 
+SELECT DISTINCT     '' as rn,
+                    COUNT(MR.MR_REQ_NO) OVER() AS TOTAL_COUNT
+                    ,MR.MR_REQ_NO
+                    ,MR.MR_STEP_CD
+                    ,STEP.PROC_ST_CD
+                    ,DECODE(MR.MR_NO, NULL, MR.MR_TMP_NO, MR.MR_NO) MR_NO
+                    ,MR.MR_REQ_TITLE
+                    ,ACT_EI.EMP_NAME ACT_EMP_NAME
+                    ,REQ_EI.EMP_NAME REQ_EMP_NAME
+                    ,JOB_EI.EMP_NAME JOB_EMP_NAME
+                    ,PRO_EI.EMP_NAME PRO_EMP_NAME
+                    ,ACT_INFO.THDAY_TEAM ACT_TEAM_NAME
+                    ,REQ_INFO.THDAY_TEAM REQ_TEAM_NAME
+                    ,JOB_INFO.THDAY_TEAM JOB_TEAM_NAME
+                    ,PRO_INFO.THDAY_TEAM PRO_TEAM_NAME
+                    ,NVL(WPCC.MR_COMM_NM, ' ') WORK_PSBL_CL_NM
+                    <!-- ,ESCCC.MR_COMM_NM  || DECODE(STEP.PROC_ST_CD,'Z0143', '(' || PSCCC.MR_COMM_NM || ')', '') || DECODE(MR40.RESULT,1,' (미진행)','')  MR_STEP_NM-->
+                     ,ESCCC.MR_COMM_NM || DECODE(STEP.PROC_ST_CD,'Z0143', '(' || PSCCC.MR_COMM_NM || ')', '') || CASE WHEN MR40.RESULT > 0 THEN ' (미진행)' ELSE '' END MR_STEP_NM 
+                    ,PSCCC.MR_COMM_NM PROC_ST_NM
+                    ,MR.FST_RGST_DT
+                    ,MR.CAPEX_NO
+                    ,TO_CHAR( COSTI.COST_TOTAL_SUM , '999,999,999,999,999') AS COST_TOTAL_SUM                    
+                    ,TO_CHAR( COSTR.SAP_COST_TOT , '999,999,999,999,999') AS SAP_COST_TOT 
+                    ,CL_CD_06
+                FROM MR_REQ_MST MR
+                    ,MR_REQ_PROC_STEP STEP
+                    ,MR_COMM_COD WPCC
+                    ,MR_COMM_COD ESCCC
+                    ,MR_COMM_COD PSCCC
+                    ,EDM_EMP ACT_EI
+                    ,EDM_EMP REQ_EI
+                    ,EDM_EMP PRO_EI
+                    ,EDM_EMP JOB_EI
+                    ,(SELECT MR_REQ_NO,                             
+                             (CASE WHEN  SAP_COST_TOT > 1 THEN SAP_COST_TOT / 1000 ELSE SAP_COST_TOT END) AS SAP_COST_TOT                             
+                        FROM MR_INVST_COST_RPT WHERE DEL_YN = 0) COSTR
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02A'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) REQ_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST                         
+                       WHERE DET.MR_REQ_PROC_STEP_NO = (SELECT MAX(MR_REQ_PROC_STEP_NO)
+                                                          FROM MR_REQ_PROC_STEP STEP
+                                                         WHERE STEP.MR_REQ_NO  = HIST.MR_REQ_NO
+                                                           AND STEP.MR_STEP_CD = 'Z0020'
+                                                           AND STEP.DEL_YN     = '0')
+                         AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0020' 
+                         AND HIST.CHRGR_CL_CD = 'Z02D'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) JOB_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0020'
+                         AND HIST.CHRGR_CL_CD = 'Z02G'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0                         
+                         AND DET.DEL_YN=0) ACT_INFO
+                    ,(SELECT DET.MR_REQ_NO,
+                             DET.MR_STEP_CD,
+                             DET.PROC_ST_CD,
+                             HIST.CHRGR_CL_CD,
+                             HIST.CHRG_EMP_NO,
+                             HIST.CHRG_TEAM_NO,
+                             HIST.THDAY_TEAM,
+                             HIST.THDAY_POS
+                        FROM MR_REQ_PROC_STEP_DET DET,
+                             MR_REQ_CHRGR_CHG_HIST HIST
+                       WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                         AND DET.MR_STEP_CD = 'Z0030'
+                         AND HIST.CHRGR_CL_CD = 'Z02I'
+                         AND HIST.EFF_END_DTM = '99991231235959'
+                         AND HIST.DEL_YN=0
+                         AND DET.DEL_YN=0) PRO_INFO
+                   ,(SELECT MR_REQ_NO,
+                            SUM(COST_01 + COST_02 + COST_03 + COST_04 + COST_05 + COST_06 + COST_07 + COST_08 + COST_09 + COST_10 + COST_11 + COST_12) AS COST_TOTAL_SUM
+                       FROM MR_INVST_COST 
+                      WHERE DEL_YN=0
+                   GROUP BY MR_REQ_NO) COSTI
+                   , (SELECT MRC.MR_REQ_NO
+                   			 , DECODE(CL_CD_06,'1','','2','공용자산') AS CL_CD_06
+						FROM MR_REQ_CHRGR_CHG_HIST MRC, MR_RV_RST MRV
+					   WHERE MRC.MR_REQ_NO = MRV.MR_REQ_NO
+						 AND MRC.MR_REQ_PROC_STEP_DET_NO = MRV.MR_REQ_PROC_STEP_DET_NO
+						 AND MRC.CHRGR_CL_CD = 'Z02H1'
+						 AND MRC.DEL_YN = '0'
+						 AND MRV.DEL_YN = '0') MRV,
+						 (WITH BASE0 AS ( 
+			 SELECT STEP.MR_REQ_NO, DET.MR_REQ_PROC_STEP_DET_NO FROM MR_REQ_PROC_STEP STEP, MR_REQ_PROC_STEP_DET DET, MR_REQ_CHRGR_CHG_HIST HIST, EDM_EMP EMP, EDM_ORG TEAM, 
+			 EDM_DUTY DUTY WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO AND HIST.CHRG_EMP_NO = EMP.EMP_ID 
+			 AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+) AND EMP.DUTY_ID = DUTY.DUTY_ID AND DET.MR_STEP_CD = 'Z0040' /**P*/ AND HIST.CHRGR_CL_CD LIKE 'Z02H%' AND HIST.EFF_END_DTM = '99991231235959' 
+			 AND HIST.DEL_YN=0 AND DET.DEL_YN=0 AND STEP.DEL_YN=0 AND HIST.CHRG_EMP_NO = #{loginEmpNo} AND DET.MR_REQ_NO IN (select mr_req_no from MR_REQ_MST where MR_STEP_CD = 'Z0040')
+			 ) 
+			 , BASE1 AS (
+			 SELECT HIST.MR_REQ_NO, RST.LAST_CHG_DT AS LAST_CHG_DT, HIST.MR_REQ_PROC_STEP_DET_NO AS MR_REQ_PROC_STEP_DET_NO 
+			 FROM MR_REQ_CHRGR_CHG_HIST HIST, MR_RV_RST RST, (SELECT MR_REQ_PROC_STEP_DET_NO FROM BASE0) BASE0 WHERE HIST.MR_REQ_PROC_STEP_DET_NO = BASE0.MR_REQ_PROC_STEP_DET_NO 
+			 AND RST.MR_REQ_PROC_STEP_DET_NO(+) = BASE0.MR_REQ_PROC_STEP_DET_NO
+			 ) , BASE2 AS (
+			 SELECT MR_REQ_NO, 
+			 CASE WHEN LAST_CHG_DT IS NULL AND MR_REQ_PROC_STEP_DET_NO IS NOT NULL THEN 1 
+			 ELSE 0 
+			 END RESULT FROM BASE1)
+			 SELECT MR_REQ_NO, SUM(RESULT) AS RESULT FROM BASE2 GROUP BY MR_REQ_NO) MR40 
+               WHERE MR.MR_REQ_NO = STEP.MR_REQ_NO
+                 AND MR.MR_REQ_NO = REQ_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = JOB_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = ACT_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = PRO_INFO.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = MR40.MR_REQ_NO(+)
+                 AND ACT_INFO.CHRG_EMP_NO = ACT_EI.EMP_ID(+)
+                 AND REQ_INFO.CHRG_EMP_NO = REQ_EI.EMP_ID(+)
+                 AND JOB_INFO.CHRG_EMP_NO = JOB_EI.EMP_ID(+)
+                 AND PRO_INFO.CHRG_EMP_NO = PRO_EI.EMP_ID(+)
+                 AND MR.WORK_PSBL_CL_CD = WPCC.MR_COMM_CD(+)
+                 AND STEP.MR_STEP_CD = ESCCC.MR_COMM_CD(+)
+                 AND STEP.PROC_ST_CD = PSCCC.MR_COMM_CD(+)
+                 AND MR.MR_REQ_NO = COSTR.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = COSTI.MR_REQ_NO(+)
+                 AND MR.MR_REQ_NO = MRV.MR_REQ_NO(+)
+                 AND NVL(WPCC.MR_COMM_GRP_CD,'WORK') = 'WORK'
+                 AND NVL(ESCCC.MR_COMM_GRP_CD,'MR_PROC') = 'MR_PROC'
+                 AND NVL(PSCCC.MR_COMM_GRP_CD,'MR_PROC') = 'MR_PROC'
+                 
+                    <if test="fromDate != null and toDate != null ">
+                         AND TO_CHAR(MR.FST_RGST_DT, 'YYYY-MM-DD') BETWEEN  #{fromDate} AND #{toDate}
+                    </if>
+					<if test="mrNo != null">
+                         AND (MR.MR_NO = (select mr_no from MR_REQ_MST where mr_req_no = #{mrNo}) OR MR.MR_TMP_NO = (select MR_TMP_NO from MR_REQ_MST where mr_req_no = #{mrNo}))
+                    </if>
+
+                    
+                    <if test="businessCencel == null">
+                        AND STEP.PROC_ST_CD != 'Z0143'
+                    </if>
+
+                    <if test="myMrSearch != null">
+                         AND MR.MR_REQ_NO IN (SELECT DISTINCT(MR_REQ_NO)
+                                               FROM MR_REQ_CHRGR_CHG_HIST
+                                              WHERE CHRG_EMP_NO = #{loginEmpNo}
+                                                AND DEL_YN = 0
+                                                AND EFF_END_DTM ='99991231235959')
+                    </if>
+
+                    <if test="mrStepCd != null">
+                         AND MR.MR_STEP_CD = #{mrStepCd}
+                    </if>
+
+                    <if test="requestTeamNo != null">
+                        AND REQ_INFO.CHRG_TEAM_NO = #{requestTeamNo}
+                    </if>
+
+                    <if test="requestEmpNo != null">
+                        AND REQ_INFO.CHRG_EMP_NO = #{requestEmpNo}
+                    </if>
+
+                    <if test="drawNo != null">
+                         AND MR.MR_REQ_NO IN (SELECT DISTINCT(MR_REQ_NO)
+                                                FROM MR_ATCH_FILE
+                                               WHERE DRAW_MNG_NO = #{drawNo}
+                                                 AND DEL_YN = 0)
+                    </if>
+
+                    <if test="jobEmpNo != null">
+                        AND JOB_INFO.CHRG_EMP_NO = #{jobEmpNo}
+                    </if>
+
+                    <if test="actionTeamNo != null">
+                        AND ACT_INFO.CHRG_TEAM_NO = #{actionTeamNo}
+                    </if>
+
+                    <if test="projectEmpNo != null">
+                        AND PRO_INFO.CHRG_EMP_NO = #{projectEmpNo}
+                    </if>
+
+                    <if test="projectTitle != null">
+                         AND UPPER(MR.MR_REQ_TITLE) LIKE '%' || UPPER(#{projectTitle}) || '%'
+                    </if>
+
+                    <if test="procs != null">
+                         AND 'TRUE' = (SELECT CASE WHEN NVL(COUNT(MR_PROC_NO),0)>0 THEN 'TRUE' ELSE 'FALSE' END IS_EQUIP
+                                         FROM MR_REQ_PROC
+                                        WHERE MR_REQ_NO = MR.MR_REQ_NO
+                                          AND MR_PROC_NO IN
+                                         <foreach item="proc" index="index" collection="procs" open="(" separator="," close=")">
+                                            #{proc.mrProcNo}
+                                         </foreach>
+                                          AND DEL_YN = 0)
+                    </if>
+
+                    <if test="equips != null">
+                         AND 'TRUE' = (SELECT CASE WHEN NVL(COUNT(MR_EQUIP_CD),0)>0 THEN 'TRUE' ELSE 'FALSE' END IS_EQUIP
+                                         FROM MR_REQ_EQUIP
+                                        WHERE MR_REQ_NO = MR.MR_REQ_NO
+                                          AND MR_EQUIP_CD IN
+                                         <foreach item="equip" index="index" collection="equips" open="(" separator="," close=")">
+                                            #{equip.mrEquipCd}
+                                         </foreach>
+                                          AND DEL_YN = 0)
+                    </if>
+
+                    <if test="reqType != null">
+                         AND MR.REQ_CL_CD = #{reqType}
+                    </if>
+
+                    <if test="work != null">
+                         AND MR.WORK_PSBL_CL_CD = #{work}
+                    </if>
+
+                    <if test="capexNo != null">
+                         AND MR.CAPEX_NO = #{capexNo}
+                    </if>
+
+                 AND STEP.EFF_END_DTM = '99991231235959'
+                 AND MR.DEL_YN=0
+                 AND STEP.DEL_YN = 0
+                 AND NVL(WPCC.DEL_YN, 0) = 0
+                 AND NVL(PSCCC.DEL_YN, 0) = 0
+                 AND NVL(ESCCC.DEL_YN, 0) = 0
+               ORDER BY FST_RGST_DT DESC, MR_REQ_NO DESC
+
+    </select>    
+</mapper>

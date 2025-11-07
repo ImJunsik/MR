@@ -1,0 +1,72 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+<%@ page import="com.base.util.IsOperDistinc" %>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles"%>
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <base href="${pageContext.request.contextPath}/">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../mr/docs-assets/ico/favicon.ico">
+    <title>MR</title>
+
+    <link href="css/style.css" rel="stylesheet">
+    <!-- Bootstrap core CSS -->
+    <link href="css/common.css" rel="stylesheet">
+    <% if(IsOperDistinc.m_bOperDatabaseConfig){ %>
+      <link href="css/layout.css" rel="stylesheet">
+      <% }else { %>
+      <link href="css/layout_dev.css" rel="stylesheet">
+      <% } %>
+    <link href="css/popup.css" rel="stylesheet">
+
+    <!-- jquery-ui css -->
+    <link href="css/widgets/jquery-ui.css" rel="stylesheet">
+
+    <!-- jquery script -->
+    <script src="js/jquery/jquery-1.10.2.min.js"></script>
+
+    <!-- jquery-ui script & datepicker i18n -->
+    <script src="js/widgets/jquery-ui.min.js"></script>
+    <script src="js/widgets/i18n/jquery.ui.datepicker-ko.js"></script>
+
+    <!-- timepicker script & i18n -->
+    <script src="js/widgets/addon/timepicker/jquery-ui-timepicker-addon.js"></script>
+    <script src="js/widgets/addon/timepicker/i18n/jquery-ui-timepicker-ko.js"></script>
+
+    <!-- common scripts -->
+    <script src="js/common/common.js"></script>
+    <script src="js/common/common.ajax.js"></script>
+
+
+    <script type="text/javascript">
+        if (typeof jQuery == "undefined") {
+            document.write(unescape("%3Cscript src='js/jquery/jquery-1.10.2.min.js' type='text/javascript'%3E%3C/script%3E"));
+        }
+    </script>
+    <script type="text/javascript">
+        if (typeof jQuery.ui == "undefined") {
+            document.write(unescape("%3Cscript src='js/widgets/jquery-ui.min.js' type='text/javascript'%3E%3C/script%3E"));
+            document.write(unescape("%3Cscript src='js/widgets/i18n/jquery.ui.datepicker-ko.js' type='text/javascript'%3E%3C/script%3E"));
+            document.write(unescape("%3Clink href='css/widgets/jquery-ui.min.css' rel='stylesheet' type='text/css'%3E"));
+        }
+    </script>
+
+    <script type="text/javascript">
+        if (typeof jQuery.fn.validate == "undefined") {
+            document.write(unescape("%3Cscript src='js/validate/jquery.validate.min.js' type='text/javascript'%3E%3C/script%3E"));
+            document.write(unescape("%3Cscript src='js/validate/additional-methods.min.js' type='text/javascript'%3E%3C/script%3E"));
+            document.write(unescape("%3Cscript src='js/validate/i18n/messages_ko.js' type='text/javascript'%3E%3C/script%3E"));
+        }
+    </script>
+  </head>
+
+  <body>
+    <tiles:insertAttribute name="content" />
+  </body>
+</html>

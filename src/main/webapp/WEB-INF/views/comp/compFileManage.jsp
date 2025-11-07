@@ -1,0 +1,2027 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<%@ page import="com.mr.common.domain.Authentication"%>
+<%@ include file="/WEB-INF/includes/taglibs.jsp"%>
+<% Authentication auth  = (Authentication) request.getSession().getAttribute(Authentication.SESSION_ATTRIBUTE_KEY); %>
+<!-- title -->
+<div id="content_header">
+	<h4 class="content_header title">자료등록 관리</h4>
+</div>
+<!-- button -->
+<script>
+	    /* alert("${modeClass}");
+	    alert("${appLine.chrgrClCd}");
+	    alert("${appLine.ifStatCd}");
+	    alert("${appLine.chrgEmpNo}");
+	    alert("${register.loginEmpNo}");
+	    alert("${register.chrgrDiv}"); */
+    </script>
+<div class="button_top">
+<!-- 임시저장 -->
+	<input type="image" src="images/btn_temp.png" class="save HAA"
+		name="save" style="display: none" />
+	
+<!-- 완료 -->
+	<c:if test="${register.chrgrDiv=='Z02I'}">
+		<input type="image" src="images/btn_complete.png" class="comp HAA"
+			name="comp" style="display: none" />
+		
+	</c:if>
+<!-- 문서등록요청 -->
+	<c:if test="${register.chrgrDiv=='Z02D' and register.useCnt != 8282}">
+		<input type="image" src="images/btn_requestSignup.png"
+			class="send HAA" name="send" style="display: none" />
+		
+	</c:if>
+	<input type="image" src="images/btn_requestDoc.png"
+		class="requestDoc HAA" name="requestDoc" style="display: none" />
+	<!-- 자료등록확인요청 -->
+	<!-- 테스트용 버튼 -->
+	<!-- <br><input type="image" src="images/btn_temp.png" class="save HAA" name="save"  /> -->
+	<!-- <br><input type="image" src="images/btn_requestSignup.png" class="send HAA" name="send" /> -->
+	<!--<br><input type="image" src="images/btn_complete.png" class="comp HAA" name="comp" />-->
+	<!-- 완료 -->
+
+	<%if(auth!=null && auth.getEmpNo().equals("admin")) {  %>
+	<input type="button" class="re-send" name="re-send" value="문서등록 재요청" />
+	<% } %>
+</div>
+
+<div id="content_wrap">
+	<form id="registerForm" method="post">
+		<input type="hidden" id="mrReqNo" name="mrReqNo"
+			value="<c:out value="${register.mrReqNo}"/>" /> <input type="hidden"
+			id="mrNo" name="mrNo" value="<c:out value="${register.mrNo}"/>" /> <input
+			type="hidden" id="plantNo" name="plant"
+			value="<c:out value="${register.plant}"/>" /> <input type="hidden"
+			id="pRtnCode" name="pRtnCode"
+			value="<c:out value="${register.chrgrDiv}"/>" /> <input type="hidden"
+			id="useCnt" name="useCnt" value="<c:out value="${register.useCnt}"/>" />
+		<input type="hidden" id="pRtnMsg" name="pRtnMsg" value="" />
+		<table class="table_row" border="1" cellspacing="0">
+			<caption class="blind"></caption>
+			<colgroup>
+				<col width="15%">
+				<col width="85%">
+			</colgroup>
+			<tbody>
+				<tr>
+					<td colspan="2" class="topbg"></td>
+				</tr>
+				<tr>
+					<th scope="row">기술문서고 담당자</th>
+					<td>
+						<div class="form_group">
+							<c:if test="${modeClass=='HAA'}">
+								<input type="text" class="i_input Z02QText" value="" readOnly />
+							</c:if>
+							<c:if test="${modeClass!='HAA'}">
+								<input type="text" class="i_input Z02QText" value="" readOnly />
+							</c:if>
+							<input type="hidden" class="Z02QValue"
+								name="compChrgr[0].chrgEmpNo" /> <input type="hidden"
+								name="compChrgr[0].chrgrClCd" value="Z02Q" /> <input
+								type="hidden" class="Z02QDutyText" name="compChrgr[0].thdayPos" />
+							<input type="hidden" class="Z02QTeamText"
+								name="compChrgr[0].thdayTeam" /> <input type="hidden"
+								class="Z02QTeamValue" name="compChrgr[0].chrgTeamNo" /> <img
+								src="images/icon_search.png" class="vam cursor empSearch HAA"
+								style="display: none" data-role="Z02Q" /> <input type="hidden"
+								class="Z02QEndDate" name="compChrgr[0].endDate"
+								value="9999-12-31" readOnly />
+						</div>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">MR번호</th>
+					<td colspan="3"><c:out value="${register.mrNo}" /></td>
+				</tr>
+				<tr>
+					<th scope="row">사업명</th>
+					<td colspan="3"><c:out value="${register.mrReqTitle}" /></td>
+				</tr>
+			</tbody>
+		</table>
+
+		<!-- space non 10 -->
+		<hr class="divider_none_10" />
+
+		<table class="table_col" border="1" cellspacing="0">
+			<caption class="blind"></caption>
+			<colgroup>
+				<col width="8%">
+				<col width="7%">
+				<col width="15%">
+				<col width="15%">
+				<col width="15%">
+				<col width="30%">
+				<col width="10%">
+				<col width="0%">
+			</colgroup>
+			<tbody id="files_list">
+				<tr>
+					<th scope="col">문서등록</th>
+					<th scope="col">파일삭제</th>
+					<th scope="col">파일구분</th>
+					<th scope="col">진행단계</th>
+					<th scope="col">상세단계</th>
+					<th scope="col">파일명</th>
+					<th scope="col">등록상태</th>
+					<th scope="col" style="display: none">파일명</th>
+				</tr>
+				<c:forEach var='fileManage' items='${fileManage}'>
+					<tr>
+						<td><input class="docCheck HAA" type="checkbox"
+							<c:if test="${fileManage.fileProcCd>'0'}">checked</c:if> disabled></td>
+						<td><input class="delCheck HAA" type="checkbox" disabled></td>
+						<td>${fileManage.fileCdNm}</td>
+						<td>${fileManage.mrStepCdNm}</td>
+						<td>${fileManage.fileStepNm}</td>
+						<td>${fileManage.fileNm}&nbsp;<img
+							src="images/btn_inFile.png" class="cursor fileMngDown" />
+						</td>
+						<td class="i_text"><c:if test="${fileManage.fileProcCd=='0'}">미등록</c:if><font
+							color="#FF003B"><c:if test="${fileManage.fileProcCd=='1'}">등록요청</c:if></font><font
+							color="#004AAD"><c:if test="${fileManage.fileProcCd=='2'}">등록완료</c:if>
+								<c:if test="${fileManage.fileProcCd=='3'}">등록불필요</c:if></font></td>
+						<td><input type="hidden" class="mrAtchFileNo"
+							value="${fileManage.mrAtchFileNo}"> <input type="hidden"
+							value="${fileManage.fileCd}"> <input type="hidden"
+							value="${fileManage.mrStepCd}"> <input type="hidden"
+							value="${fileManage.mrReqProcStepDetNo}"> <input
+							type="hidden" value="${fileManage.fileProcCd}"> <input
+							type="hidden" class="drawMngNoFile"
+							value="${fileManage.drawMngNo}"> <input type="hidden"
+							class="fileProcCd" value="${fileManage.fileProcCd}"></td>
+					</tr>
+				</c:forEach>
+			</tbody>
+
+		</table>
+
+		<!-- space non 10 -->
+		<hr class="divider_none_10" />
+
+		<table class="table_row" border="1" cellspacing="0">
+			<caption class="blind"></caption>
+			<colgroup>
+				<col width="15%">
+				<col width="85%">
+			</colgroup>
+			<tr>
+
+				<th scope="row" class="vam fileAdd">첨부파일 <img id="addFileMng"
+					src="images/icon_s_plus.png" border="0"
+					class="cursor HAA fileAdd mt-2" disabled="true" />
+				</th>
+				<td class="section_text pl5 pt5 pb5" colspan="3">
+					<div class="form_group">
+						<table id="fileList" class="table_default_margin" border="1"
+							cellspacing="0">
+							<tr style="display: none">
+								<td></td>
+							</tr>
+						</table>
+					</div>
+				</td>
+
+			</tr>
+		</table>
+
+		<!-- space non 10 -->
+		<hr class="divider_none_10" />
+
+		<table class="table_pop_row" border="1" cellspacing="0" summary="">
+			<caption class="blind"></caption>
+			<colgroup>
+				<col width="5%">
+				<col width="5%">
+				<col width="70%">
+				<col width="5%">
+				<col width="5%">
+			</colgroup>
+			<thead>
+				<tr>
+					<th rowspan="2" scope="col">담당자</th>
+					<th rowspan="2" scope="col">파일구분</th>
+					<th rowspan="2" scope="col">PSM/SMS 문서종류</th>
+					<th colspan="2" scope="col">해당유무</th>
+					<th colspan="2" scope="col">자료등록여부</th>
+				</tr>
+				<tr>
+					<th scope="col">Yes</th>
+					<th scope="col">No</th>
+					<th scope="col">Yes</th>
+					<th scope="col">No</th>
+				</tr>
+			</thead>
+		</table>
+
+
+		<table class="table_pop_row Z02A" border="1" cellspacing="0"
+			summary="">
+			<caption class="blind"></caption>
+			<colgroup>
+				<col width="5%">
+				<col width="5%">
+				<col width="70%">
+				<col width="5%">
+				<col width="5%">
+			</colgroup>
+			<thead>
+
+			</thead>
+			<tbody>
+				<tr>
+					<th scope="row" rowspan="5" class="fff">요청자</th>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">기타</th>
+					<td>1. 가동전 점검결과</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[0].itemCd" value="ATCH01" /> <input type="radio"
+						name="rvRsts[0].clCd01" class="i_radio HAA ATCH01" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[0].clCd01"
+						class="i_radio HAA ATCH01" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[100].itemCd" value="ATCH_D01" /> <input type="radio"
+						name="rvRsts[100].clCd01" class="d_radio HAA ATCH_D01" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[100].clCd01" class="d_radio HAA ATCH_D01" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">기타</th>
+					<td>2. 변경관리 교육결과</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[1].itemCd" value="ATCH02" /> <input type="radio"
+						name="rvRsts[1].clCd01" class="i_radio HAA ATCH02" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[1].clCd01"
+						class="i_radio HAA ATCH02" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[101].itemCd" value="ATCH_D02" /> <input type="radio"
+						name="rvRsts[101].clCd01" class="d_radio HAA ATCH_D02" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[101].clCd01" class="d_radio HAA ATCH_D02" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">DBM</th>
+					<td>3. DBM</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[2].itemCd" value="ATCH03" /> <input type="radio"
+						name="rvRsts[2].clCd01" class="i_radio HAA ATCH03" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[2].clCd01"
+						class="i_radio HAA ATCH03" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[102].itemCd" value="ATCH_D03" /> <input type="radio"
+						name="rvRsts[102].clCd01" class="d_radio HAA ATCH_D03" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[102].clCd01" class="d_radio HAA ATCH_D03" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">기타</th>
+					<td>4. 운전표준 변경사항</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[3].itemCd" value="ATCH04" /> <input type="radio"
+						name="rvRsts[3].clCd01" class="i_radio HAA ATCH04" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[3].clCd01"
+						class="i_radio HAA ATCH04" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[103].itemCd" value="ATCH_D04" /> <input type="radio"
+						name="rvRsts[103].clCd01" class="d_radio HAA ATCH_D04" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[103].clCd01" class="d_radio HAA ATCH_D04" value="2"
+						disabled="disabled" /></td>
+				</tr>
+			</tbody>
+		</table>
+
+
+		<table class="table_pop_row Z02I" border="1" cellspacing="0"
+			summary="">
+			<caption class="blind"></caption>
+			<colgroup>
+				<col width="5%">
+				<col width="5%">
+				<col width="70%">
+				<col width="5%">
+				<col width="5%">
+			</colgroup>
+			<thead>
+			</thead>
+			<tbody>
+				<tr>
+					<th scope="row" rowspan="8" class="fff">Project Engineer</th>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">도면</th>
+					<td>5. 건축 및 설비 배치도면, 입면도, 평면도, 소화설비도면, 화재감지기 배치도면</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[4].itemCd" value="ATCH05" /> <input type="radio"
+						name="rvRsts[4].clCd01" class="i_radio HAA ATCH05" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[4].clCd01"
+						class="i_radio HAA ATCH05" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[104].itemCd" value="ATCH_D05" /> <input type="radio"
+						name="rvRsts[104].clCd01" class="d_radio HAA ATCH_D05" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[104].clCd01" class="d_radio HAA ATCH_D05" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">설계JOB</th>
+					<td>6. 방폭지역 구분도 및 계산 근거자료</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[5].itemCd" value="ATCH06" /> <input type="radio"
+						name="rvRsts[5].clCd01" class="i_radio HAA ATCH06" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[5].clCd01"
+						class="i_radio HAA ATCH06" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[105].itemCd" value="ATCH_D06" /> <input type="radio"
+						name="rvRsts[105].clCd01" class="d_radio HAA ATCH_D06" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[105].clCd01" class="d_radio HAA ATCH_D06" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">기타</th>
+					<td>7. 내화구조 검사성적서, 내화구조 공사시방서, 도막두께 측정결과, 내화구조 철골도면/배치도면</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[6].itemCd" value="ATCH07" /> <input type="radio"
+						name="rvRsts[6].clCd01" class="i_radio HAA ATCH07" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[6].clCd01"
+						class="i_radio HAA ATCH07" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[106].itemCd" value="ATCH_D07" /> <input type="radio"
+						name="rvRsts[106].clCd01" class="d_radio HAA ATCH_D07" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[106].clCd01" class="d_radio HAA ATCH_D07" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">기타</th>
+					<td>8. 가스감지기 명세서, 가스감지기 배치도면</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[7].itemCd" value="ATCH08" /> <input type="radio"
+						name="rvRsts[7].clCd01" class="i_radio HAA ATCH08" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[7].clCd01"
+						class="i_radio HAA ATCH08" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[107].itemCd" value="ATCH_D08" /> <input type="radio"
+						name="rvRsts[107].clCd01" class="d_radio HAA ATCH_D08" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[107].clCd01" class="d_radio HAA ATCH_D08" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">도면</th>
+					<td>9. 전기도면 (단선도, 접지, 피뢰도면 및 용량/저항/피뢰반경 계산서 등)</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[8].itemCd" value="ATCH09" /> <input type="radio"
+						name="rvRsts[8].clCd01" class="i_radio HAA ATCH09" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[8].clCd01"
+						class="i_radio HAA ATCH09" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[108].itemCd" value="ATCH_D09" /> <input type="radio"
+						name="rvRsts[108].clCd01" class="d_radio HAA ATCH_D09" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[108].clCd01" class="d_radio HAA ATCH_D09" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">기타</th>
+					<td>10. 검사 결과 (내압, 기밀, 비파괴검사, I/O Check, 접지점검, 긴급차단장치 및 안전밸브
+						작동검사 등)</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[9].itemCd" value="ATCH10" /> <input type="radio"
+						name="rvRsts[9].clCd01" class="i_radio HAA ATCH10" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio" name="rvRsts[9].clCd01"
+						class="i_radio HAA ATCH10" value="2" disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[109].itemCd" value="ATCH_D10" /> <input type="radio"
+						name="rvRsts[109].clCd01" class="d_radio HAA ATCH_D10" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[109].clCd01" class="d_radio HAA ATCH_D10" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">Data Sheet</th>
+					<td>11. 기타 기술검토 (가스 기술검토서, Data Sheet 등)</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[10].itemCd" value="ATCH11" /> <input type="radio"
+						name="rvRsts[10].clCd01" class="i_radio HAA ATCH11" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[10].clCd01" class="i_radio HAA ATCH11" value="2"
+						disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[110].itemCd" value="ATCH_D11" /> <input type="radio"
+						name="rvRsts[110].clCd01" class="d_radio HAA ATCH_D11" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[110].clCd01" class="d_radio HAA ATCH_D11" value="2"
+						disabled="disabled" /></td>
+				</tr>
+			</tbody>
+		</table>
+
+
+		<table class="table_pop_row Z02D" border="1" cellspacing="0"
+			summary="">
+			<caption class="blind"></caption>
+			<colgroup>
+				<col width="5%">
+				<col width="5%">
+				<col width="70%">
+				<col width="5%">
+				<col width="5%">
+			</colgroup>
+			<thead>
+			</thead>
+			<tbody>
+				<tr>
+					<th scope="row" rowspan="9" class="fff">Job Engineer</th>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">기타</th>
+					<td>12. 신규 GHS-MSDS 자료 및 유해화학물질 목록</td>
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[11].itemCd" value="ATCH12" /> <input type="radio"
+						name="rvRsts[11].clCd01" class="i_radio HAA ATCH12" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[11].clCd01" class="i_radio HAA ATCH12" value="2"
+						disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[111].itemCd" value="ATCH_D12" /> <input type="radio"
+						name="rvRsts[111].clCd01" class="d_radio HAA ATCH_D12" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[111].clCd01" class="d_radio HAA ATCH_D12" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">기타</th>
+					<td>13. 장치 및 설비 명세서, 동력기계목록, 안전밸브 및 파열판 명세, 배관 및 가스켓 명세</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[12].itemCd" value="ATCH13" /> <input type="radio"
+						name="rvRsts[12].clCd01" class="i_radio HAA ATCH13" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[12].clCd01" class="i_radio HAA ATCH13" value="2"
+						disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[112].itemCd" value="ATCH_D13" /> <input type="radio"
+						name="rvRsts[112].clCd01" class="d_radio HAA ATCH_D13" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[112].clCd01" class="d_radio HAA ATCH_D13" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">도면</th>
+					<td>14. PFD 및 P&ID, UFD</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[13].itemCd" value="ATCH14" /> <input type="radio"
+						name="rvRsts[13].clCd01" class="i_radio HAA ATCH14" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[13].clCd01" class="i_radio HAA ATCH14" value="2"
+						disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[113].itemCd" value="ATCH_D14" /> <input type="radio"
+						name="rvRsts[113].clCd01" class="d_radio HAA ATCH_D14" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[113].clCd01" class="d_radio HAA ATCH_D14" value="2"
+						disabled="disabled" /></td>
+				</tr>
+
+				<tr>
+					<th scope="row" class="fff">HAZOP</th>
+					<td>15. 공정 위험성평가 Master File 반영한 위험성 평가 자료</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[14].itemCd" value="ATCH15" /> <input type="radio"
+						name="rvRsts[14].clCd01" class="i_radio HAA ATCH15" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[14].clCd01" class="i_radio HAA ATCH15" value="2"
+						disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[114].itemCd" value="ATCH_D15" /> <input type="radio"
+						name="rvRsts[114].clCd01" class="d_radio HAA ATCH_D15" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[114].clCd01" class="d_radio HAA ATCH_D15" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">정량적 평가</th>
+					<td>16. 정량적 위험성평가 Phast 결과자료</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[15].itemCd" value="ATCH16" /> <input type="radio"
+						name="rvRsts[15].clCd01" class="i_radio HAA ATCH16" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[15].clCd01" class="i_radio HAA ATCH16" value="2"
+						disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[115].itemCd" value="ATCH_D16" /> <input type="radio"
+						name="rvRsts[115].clCd01" class="d_radio HAA ATCH_D16" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[115].clCd01" class="d_radio HAA ATCH_D16" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">PORC</th>
+					<td>17. PORC 관련자료</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[16].itemCd" value="ATCH17" /> <input type="radio"
+						name="rvRsts[16].clCd01" class="i_radio HAA ATCH17" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[16].clCd01" class="i_radio HAA ATCH17" value="2"
+						disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[116].itemCd" value="ATCH_D17" /> <input type="radio"
+						name="rvRsts[116].clCd01" class="d_radio HAA ATCH_D17" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[116].clCd01" class="d_radio HAA ATCH_D17" value="2"
+						disabled="disabled" /></td>
+				</tr>
+				<tr>
+					<th scope="row" class="fff">Data Sheet</th>
+					<td>18. 기타 기술검토 (Vender Print 안전밸브 배출용량 계산, Flare Load 검토)</td>
+
+
+					<td class="center"><input type="hidden"
+						name="rvRsts[17].itemCd" value="ATCH18" /> <input type="radio"
+						name="rvRsts[17].clCd01" class="i_radio HAA ATCH18" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[17].clCd01" class="i_radio HAA ATCH18" value="2"
+						disabled="disabled" /></td>
+					<td class="center"><input type="hidden"
+						name="rvRsts[117].itemCd" value="ATCH_D18" /> <input type="radio"
+						name="rvRsts[117].clCd01" class="d_radio HAA ATCH_D18" value="1"
+						disabled="disabled" /></td>
+					<td class="center"><input type="radio"
+						name="rvRsts[117].clCd01" class="d_radio HAA ATCH_D18" value="2"
+						disabled="disabled" /></td>
+				</tr>
+			</tbody>
+		</table>
+
+	</form>
+
+	<!--
+<div class="form_group">
+  <table id="fileTemp" class="table_row" border="1" cellspacing="0" style="display:none">
+      <tr>
+      <td>
+        <select class="fileDiv fileCd" name="mrAtchFiles[0].fileCd"></select>
+        <select class="stepDiv fileStepCd" name="mrAtchFiles[0].fileStepCd"></select>
+        <input type="file" class="i_input_300 multipartFile" name="mrAtchFiles[0].fileNm">
+          <img id="deleteFile" class="cursor removeFile" src="images/icon_minus.png" />
+        <input type="hidden" class="i_input_200 insFlag" name="mrAtchFiles[0].inserted" value="true"/>
+        <input type="hidden" class="i_input_200 delFlag" name="mrAtchFiles[0].deleted" value="false"/>
+        <input type="hidden" class="i_input_200 mrAtchFileNo" name="mrAtchFiles[0].mrAtchFileNo" />
+      </td>
+      </tr>
+  </table>
+</div>
+ -->
+
+	<!--
+<div class="form_group">
+  <table id="fileTemp" class="table_row" border="1" cellspacing="0" style="display:none">
+      <tr>
+      <td>
+        <select class="fileDiv fileCd" name="mrAtchFiles[0].fileCd"></select>
+        <select class="stepDiv fileStepCd" name="mrAtchFiles[0].fileStepCd"></select>
+        <input type="file" class="realPath" multiple>
+        <input type="text" class="i_input_300 multipartFile" name="mrAtchFiles[0].fileNm">
+        <img src="images/btn_search.png" class="inputFileMng cursor"/>
+        <img id="deleteFile" class="cursor removeFile" src="images/icon_minus.png" />
+        <input type="hidden" class="i_input_200 insFlag" name="mrAtchFiles[0].inserted" value="false"/>
+        <input type="hidden" class="i_input_200 delFlag" name="mrAtchFiles[0].deleted" value="false"/>
+        <input type="hidden" class="mrAtchFileNo" name="mrAtchFiles[0].mrAtchFileNo" value=""/>
+        <input type="hidden" class="drawMngNo" name="mrAtchFiles[0].drawMngNo" value=""/>
+      </td>
+      </tr>
+  </table>
+</div>
+ -->
+
+	<div class="form_group">
+		<table id="fileTemp" class="table_row" border="1" cellspacing="0"
+			style="display: none">
+			<tr>
+				<td><select class="fileDiv fileCd" name="mrAtchFiles[0].fileCd"></select>
+					<select class="stepDiv fileStepCd" name="mrAtchFiles[0].fileStepCd"></select>
+					<input type="file" class="fileForm" multiple> <input
+					type="hidden" class="realPath i_input_300"> <input
+					type="text" class="i_input_300 multipartFile"
+					name="mrAtchFiles[0].fileNm"> <img
+					src="images/btn_search.png" class="inputFileMng cursor" /> <img
+					id="deleteFile" class="cursor removeFile"
+					src="images/icon_minus.png" /> <input type="hidden"
+					class="i_input_200 insFlag" name="mrAtchFiles[0].inserted"
+					value="false" /> <input type="hidden" class="i_input_200 delFlag"
+					name="mrAtchFiles[0].deleted" value="false" /> <input type="hidden"
+					class="mrAtchFileNo" name="mrAtchFiles[0].mrAtchFileNo" value="" />
+					<input type="hidden" class="drawMngNo"
+					name="mrAtchFiles[0].drawMngNo" value="" /></td>
+			</tr>
+		</table>
+	</div>
+	<br /> <br />
+</div>
+<!--
+<c:out value="${modeClass}"/>
+ -->
+
+<script>
+$(window).load(function() {
+    var checkList = new Array();
+    var disabled = true;
+	var clcd = "";
+	$(".save").attr("src","images/btn_temp.png");
+	var message = '임시저장 하시겠습니까?';
+    if($("#writeDate").html()=="") {
+        $("#writeDate").html(currentDate);
+    }
+
+    if("${modeClass}"=="HAA"){
+        disabled = false;
+    }
+
+    //var count  = activeYNradioControll(false);		// yoo 240626 라디오 버튼 활성화 
+    var count  = activeYNradioControll(true);		// yoo 240619 라디오 버튼 비활성화 
+    console.log('--------------- Z02A:Z02I:Z02D -------------   ' + count);		//8:14:14
+    var d_radio = document.getElementsByClassName("d_radio");
+    var i_radio = document.getElementsByClassName("i_radio");
+    
+	var prev = null;
+	for (var i = 0; i < d_radio.length; i++) {
+		
+	    d_radio[i].addEventListener('change', function() {
+	        (prev) ? console.log(prev.value): null;
+	        if (this !== prev) {
+	            prev = this;
+	        }
+	        console.log(this.className + ':' + this.value)
+	        var arr = this.className.split(' ');
+	        console.log(arr[2] + ':' + this.value)
+	        var str = arr[2].replace('ATCH_D','');
+	        console.log(str + ':' + this.value)
+	        var n = Number(str) - 1;
+	        var i_radio = $('input[name="rvRsts[' + n + '].clCd01"]:checked');
+	        console.log(i_radio + ':' + i_radio.val())
+	        if(this.value == '2' && i_radio.val() == '1')
+	        {
+	        	alert('해당 문서는 자료 등록이 필요한 사항입니다.\n자료 등록 여부를 확인해 주시기 바랍니다.');
+	        	var nn = n + 100;
+	        	$('input[name="rvRsts[' + nn + '].clCd01"]').val([0]);
+	        }
+
+	    });
+	    
+	
+			
+	    i_radio[i].addEventListener('change', function() {
+	        (prev) ? console.log(prev.value): null;
+	        if (this !== prev) {
+	            prev = this;
+	        }
+	        console.log(this.className + ':' + this.value)
+	        var arr = this.className.split(' ');
+	        console.log(arr[2] + ':' + this.value)
+	        var str = arr[2].replace('ATCH','');
+	        console.log(str + ':' + this.value)
+	        var n = Number(str) + 99;
+	        var n_radio = $('input[name="rvRsts[' + n + '].clCd01"]:checked');
+	        console.log(n_radio + ':' + n_radio.val())
+	        if(this.value == '1' && n_radio.val() == '2')
+	        {
+	        	if(confirm('저장된 해당 유무의 일부 항목이 수정되었습니다.\n해당 유무 항목을 새로 저장 하시겠습니까?'))
+	        	{
+	        		$('input[name="rvRsts[' + n + '].clCd01"]').val([0]);
+	        		$(".send").hide();
+	        	}
+	        }
+	    });
+	    
+
+        var ii_radio = $('input[name="rvRsts[' + i + '].clCd01"]:checked');
+        console.log(ii_radio + ':' + ii_radio.val())
+        
+        var nn = i + 100;
+        var n_radio = $('input[name="rvRsts[' + nn + '].clCd01"]:checked');
+        if(n_radio.val() == '2' && ii_radio.val() == '1')
+        {
+        	$('input[name="rvRsts[' + nn + '].clCd01"]').val([0]);
+        }
+       
+	}
+    var bSaveBtn = false;
+    "<c:forEach var='appLine' items='${register.appLine}'>";
+    switch ("${appLine.chrgrClCd}") {
+	    //yoo 240529 Z02D, Z02A, Z02I 추가
+	    //${appLine.chrgrClCd}:${appLine.chrgEmpName}:${appLine.chrgEmpNo}
+		    	
+	    
+	    case "Z02D":
+	    	{
+		    	if("${register.loginEmpNo}"=="${appLine.chrgEmpNo}") {
+		    		appClass = "Z02D";
+		    		clcd = "Z02D";
+		    		bSaveBtn = true;
+		    		$(".save").attr("src","images/btn_temp.png");
+		    		message = '임시저장 하시겠습니까?';
+		    		$("#pRtnCode").val(clcd);
+		    		
+		    		console.log('--------------- Z02A:Z02I:Z02D -------------   ' + count);		//8:14:14
+		    		var useCnt = $('input[name="useCnt"]');
+		            console.log('useCnt :' + useCnt.val())
+		            if(count == '0:0:0')
+		    		{
+		            	$(".send").hide();		//문서등록 요청
+		    			$("[name='requestDoc']").show();			// 자료등록요청
+		    		}
+		            else if(useCnt.val() == '1800')
+		    		{
+		    			$(".send").show();		//문서등록 요청
+		    			$("[name='requestDoc']").hide();	//자료등록 요청
+		    		}else{
+		    			$(".send").hide();		//문서등록 요청
+		    			$("[name='requestDoc']").show();			// 자료등록요청
+		    		}
+		    		
+		            $("."+appClass).children("tbody").children("tr:gt(0)").each(function (){
+		            	console.log(this);
+		            	$(".save").show();
+		                $(this).show();
+		                $(this).find("input").each(function (){
+		                	var className = $(this).attr('class');
+		                	console.log('className1 : ' + className);
+		                	var classType = typeof className;
+		                	console.log('classType : ' + classType);
+		                	if(classType == 'string')
+		                	{
+			                	if(className.indexOf('i_radio') > -1)
+			                    	$(this).attr("disabled",false);//활성화
+			                	if(className.indexOf('d_radio') > -1)
+			                    	$(this).attr("disabled",false);//활성화
+			                }
+		                });
+		            })
+		            appClass = "Z02A";
+		            $("."+appClass).children("tbody").children("tr:gt(0)").each(function (){
+			            	console.log(this);
+			            	$(".save").show();
+			                $(this).show();
+			                $(this).find("input").each(function (){
+			                	var className = $(this).attr('class');
+			                	console.log('className1 : ' + className);
+			                	var classType = typeof className;
+			                	console.log('classType : ' + classType);
+			                	if(classType == 'string')
+			                	{
+				                	if(className.indexOf('d_radio') > -1)
+				                    	$(this).attr("disabled",true);	//비활성화
+				                	if(className.indexOf('i_radio') > -1)
+				                    	$(this).attr("disabled",false);	//활성화
+			                	}
+			                });
+		
+			            })
+			            appClass = "Z02I";
+			            $("."+appClass).children("tbody").children("tr:gt(0)").each(function (){
+				            	console.log(this);
+				            	$(".save").show();
+				                $(this).show();
+				                $(this).find("input").each(function (){
+				                	var className = $(this).attr('class');
+				                	console.log('className1 : ' + className);
+				                	var classType = typeof className;
+				                	console.log('classType : ' + classType);
+				                	if(classType == 'string')
+				                	{
+					                	if(className.indexOf('d_radio') > -1)
+					                    	$(this).attr("disabled",true);	//비활성화
+					                	if(className.indexOf('i_radio') > -1)
+					                    	$(this).attr("disabled",false);	//활성화
+				                	}
+				                });
+			
+				            })
+		            
+		    	};
+		     
+	    	}
+	    	break;
+	    case "Z02A":
+    	{
+	    	
+    	
+	    	if("${register.loginEmpNo}"=="${appLine.chrgEmpNo}") {
+	    		appClass = "Z02A";
+	    		clcd = "Z02A";
+	    		$(".save").attr("src","images/btn_save.png");
+	    		message = '저장 하시겠습니까?';
+	    		$("#pRtnCode").val(clcd);
+	            $("."+appClass).children("tbody").children("tr:gt(0)").each(function (){
+	            	console.log(this);
+	            	$(".save").show();
+	            	bSaveBtn = true;
+	                $(this).show();
+	                $(this).find("input").each(function (){
+	                	var className = $(this).attr('class');
+	                	console.log('className1 : ' + className);
+	                	var classType = typeof className;
+	                	console.log('classType : ' + classType);
+	                	if(classType == 'string')
+	                	{
+		                	if(className.indexOf('d_radio') > -1)
+		                	{
+		                		var i_radio = $('input[name="rvRsts[0].clCd01"]:checked');
+							    console.log(i_radio + ':' + i_radio.val())
+							    if(i_radio.val() === undefined)
+							    	$(this).attr("disabled",true);	//비활성화
+							    else
+		                    		$(this).attr("disabled",false);	//활성화
+		                    }
+	                	}
+	                });
+
+	            })};
+    	}
+    	break;
+	    case "Z02I":
+	    	
+	    	if("${register.loginEmpNo}"=="${appLine.chrgEmpNo}") {
+	    		appClass = "Z02I";
+	    		clcd = "Z02I";
+	    		bSaveBtn = true;
+	    		$(".save").attr("src","images/btn_save.png");
+	    		message = '저장 하시겠습니까?';
+	    		$("#pRtnCode").val(clcd);
+	            $("."+appClass).children("tbody").children("tr:gt(0)").each(function (){
+
+	            	$(".save").show();
+	                $(this).show();
+	                $(this).find("input").each(function (){
+	                	var className = $(this).attr('class');
+	                	console.log('className1 : ' + className);
+	                	var classType = typeof className;
+	                	console.log('classType : ' + classType);
+	                	if(classType == 'string')
+		                	if(className.indexOf('d_radio') > -1)
+		                	{
+		                		var i_radio = $('input[name="rvRsts[0].clCd01"]:checked');
+							    console.log(i_radio + ':' + i_radio.val())
+							    if(i_radio.val() === undefined)
+							    	$(this).attr("disabled",true);	//비활성화
+							    else
+		                    		$(this).attr("disabled",false);	//활성화	
+		                	}
+		                    
+	                });
+
+	            })};
+	    	break;
+	    case "Z02Q":
+	    	{
+		        appClass = "Z02Q";
+		        $.appLineSet({className:appClass, dutyText:"${appLine.thdayPos}",
+		            text:"${appLine.chrgEmpName}", value:"${appLine.chrgEmpNo}",
+		            teamText:"${appLine.thdayTeam}" , teamValue:"${appLine.chrgTeamNo}",
+		            endDate:"<fmt:formatDate value='${appLine.fstProcTrmDt}' pattern='yyyy-MM-dd' />",
+		            date:"<fmt:formatDate value='${appLine.lastChgDt}' pattern='yyyy-MM-dd' />"});
+	    	}
+	        break;
+	        
+	    
+	        
+            //$("."+jobClass).children("tbody").children("tr:eq(0)").children("td:eq(0)").children(".empChange").show();
+            //$("."+jobClass).find(".addJobFile").show();
+            //$("."+jobClass).find(".removeDownFile").show();
+    }
+
+    
+    "</c:forEach>";
+    
+    "<c:forEach var='mrStep' items='${mrSteps}'>";
+
+    if("${mrStep.mrStepCd}" == "Z0080") {
+    	if("${mrStep.procStCd}"!="Z0110") {
+        	activeYNradioControll(true);		// yoo 240619 라디오 버튼 비활성화
+        	$(".save").hide();
+        	$(".send").hide();
+        }
+    }
+
+    
+    "</c:forEach>";
+    
+	if(!bSaveBtn)
+		$(".save").hide();
+    $(".empSearch").click(function() {
+        $.popup({url:"popup/empSearch.do", width:"500", height:"500", targetName:$(this).attr("data-role")});
+    });
+
+    $(".teamSearch").click(function() {
+        $.popup({url:"popup/teamSearch.do", width:"500", height:"500", targetName:$(this).attr("data-role")});
+    });
+
+    $(".save").click(function() {
+    	
+    	
+    	appClass = "Z02D";
+        $("."+appClass).children("tbody").children("tr:gt(0)").each(function (){
+        	console.log(this);
+        	$(".save").show();
+            $(this).show();
+            $(this).find("input").each(function (){
+            	var className = $(this).attr('class');
+            	console.log('className1 : ' + className);
+            	var classType = typeof className;
+            	console.log('classType : ' + classType);
+            	if(classType == 'string')
+                	if(className.indexOf('_radio') > -1)
+                    	$(this).attr("disabled",false);		//	활성화
+            });
+        })
+        appClass = "Z02A";
+        $("."+appClass).children("tbody").children("tr:gt(0)").each(function (){
+            	console.log(this);
+            	$(".save").show();
+                $(this).show();
+                $(this).find("input").each(function (){
+                	var className = $(this).attr('class');
+                	console.log('className1 : ' + className);
+                	var classType = typeof className;
+                	console.log('classType : ' + classType);
+                	if(classType == 'string')
+	                	if(className.indexOf('_radio') > -1)
+	                    	$(this).attr("disabled",false);		//	활성화
+                });
+
+            })
+            
+            appClass = "Z02I";
+            $("."+appClass).children("tbody").children("tr:gt(0)").each(function (){
+	            	console.log(this);
+	            	$(".save").show();
+	                $(this).show();
+	                $(this).find("input").each(function (){
+	                	var className = $(this).attr('class');
+	                	console.log('className1 : ' + className);
+	                	var classType = typeof className;
+	                	console.log('classType : ' + classType);
+	                	if(classType == 'string')
+		                	if(className.indexOf('_radio') > -1)
+		                    	$(this).attr("disabled",false);		//	활성화
+	                });
+
+	            })
+	            
+        if(!$.validation())
+        {
+        	activeYNradioControll(true);		// yoo 240619 라디오 버튼 비활성화
+        	radioControll();
+        }
+        else
+        	{
+        		
+        		var Z02Dval = $.Z02D_validation();
+        		var arr = Z02Dval.split(':');
+	        	if(arr[0] == '0')
+	        	{
+	        		message = '해당 항목  ' + arr[1] + '번 자료등록 여부가 No입니다. 계속진행하시겠습니까?\nMR요청자와 Project Engineer의 항목에 Yes로 변경한 경우 \n자료등록확인요청 메일을 보내시기 바랍니다.';
+	        	}
+	        	if(!confirm(message))
+	        		radioControll();
+	        	else {
+	        		
+	        		
+	        		
+	        		
+	        		
+	        		
+	        		
+	        		
+	        		//yoo 241223 파일 첨부 콤보 박스 선택이 되어야 업로드 되게 처리 함. 선택이 안되면 업로드 막음
+	            	var fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+	            	console.log('fileCnt : ' + fileCnt);
+	            	
+	            	if( fileCnt > 0)
+	            	{
+	        	    	var fileDivs = document.getElementsByClassName("fileDiv");
+	        			var fileDivsCount = 0;
+	        	    	for (var i = 0; i < fileDivs.length; i++) {
+	        	    		console.log('1111 ' + fileDivs[i].selectedIndex);
+	        	    		fileDivsCount += fileDivs[i].selectedIndex;
+	        	    		
+	        	    	}
+	        	    	console.log('fileDivsCount ' + fileDivsCount);
+	        	    	if(fileDivsCount < 1 )
+	        	    	{
+	        	    		alert('파일 구분을 선택하여 주세요!');	
+	        	    		return;
+	        	    	}
+	        	    	var stepDivs = document.getElementsByClassName("stepDiv");
+	        	    	var stepDivsCount = 0;
+	        	    	for (var i = 0; i < stepDivs.length; i++) {
+	        	    		console.log('2222 ' + stepDivs[i].selectedIndex);
+	        	    		stepDivsCount += stepDivs[i].selectedIndex;
+	        	    	}
+	        	    	console.log('stepDivsCount ' + stepDivsCount);
+	        	    	if(stepDivsCount < 1 )
+	        	    	{
+	        	    		alert('파일 Step 정보를 선택하여 주세요!');	
+	        	    		return;
+	        	    	}
+	            	}
+	            	
+	            	
+	            	
+	            	
+	            	
+	            	
+	            	
+	            	
+	            	
+	            	
+	        		
+	        		
+	        		
+	        	
+		            $('#pageLoadingWrap').show();
+		            
+		            $('#files_list tr').each(function() {
+		            	  //var describe = $(this).val();
+		            	  console.log('-');
+		            	});
+		            
+		            var nodes = $('#files_list tr');		//yoo 240711 파일 삭제 문제로 변경함
+
+					//nodes의 갯수를 alert
+					console.log(nodes.length);
+		
+		            //$(".table_col").children("tbody").children("tr:gt(0)").each(function () { //기존 코드
+		            nodes.each(function(){
+		                if($(this).children("td:eq(1)").children(".delCheck").is(":checked")) {
+		                	//alert($(this).children("td:eq(7)").children(".mrAtchFileNo").val());
+		                    fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+		                    $("#fileTemp").children("tbody").children("tr").children("td").children(".multipartFile").attr("name","mrAtchFiles["+fileCnt+"].fileNm").val("NA");
+		                    $("#fileTemp").children("tbody").children("tr").children("td").children(".fileCd").attr("name","mrAtchFiles["+fileCnt+"].fileCd").val("NA");
+		                    $("#fileTemp").children("tbody").children("tr").children("td").children(".fileStepCd").attr("name","mrAtchFiles["+fileCnt+"].fileStepCd").val("NA");
+		                    $("#fileTemp").children("tbody").children("tr").children("td").children(".insFlag").attr("name","mrAtchFiles["+fileCnt+"].inserted").val("false");
+		                    $("#fileTemp").children("tbody").children("tr").children("td").children(".delFlag").attr("name","mrAtchFiles["+fileCnt+"].deleted").val("true");
+		                    $("#fileTemp").children("tbody").children("tr").children("td").children(".mrAtchFileNo").attr("name","mrAtchFiles["+fileCnt+"].mrAtchFileNo").val($(this).children("td:eq(7)").children(".mrAtchFileNo").val());
+		                    $("#fileTemp").children("tbody").children("tr").children("td").children(".drawMngNo").attr("name","mrAtchFiles["+fileCnt+"].drawMngNo").val(0);
+		                    $("#fileTemp").children("tbody").children("tr").clone().insertAfter($("#fileList").children("tbody").children("tr:last"));
+		                    //alert($(this).children("td:eq(7)").children(".mrAtchFileNo").val()+".insFlag="+$(".insFlag").val());
+		                    //alert($("#fileTemp").children("tbody").children("tr").children("td").children(".delFlag").val());
+		                }
+		            });
+		            
+		            
+		            nodes = $("#fileList").children("tbody").children("tr:gt(0)");
+		            //nodes의 갯수를 alert
+					console.log(nodes.length);
+            		nodes.each(function(){
+            			fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+            		});
+            		nodes = $(document).find(".multipartFile");
+            		//nodes의 갯수를 alert
+					console.log(nodes.length);
+            		$(document).find(".multipartFile").each(function(index){
+            			fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+            		});
+            		
+	            var count = activeYNradioControll(false);		// yoo 240619 라디오 버튼 비활성화 
+	            console.log('--------------- Z02A:Z02I:Z02D -------------   ' + count);		//8:14:14
+	            $("#pRtnMsg").val(count);
+	            $("form").attr("action", "${saveURL}").submit();
+	            
+	        }
+	    }
+    });
+
+    $(".comp").click(function() {
+        if(!confirm("첨부자료 보완을 완료하시겠습니까?"))
+        	radioControll();
+        else{
+            $('#pageLoadingWrap').show();
+            $(".table_col").children("tbody").children("tr:gt(0)").each(function () {
+                if($(this).children("td:eq(1)").children(".delCheck").is(":checked")) {
+                    fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+                    $("#fileTemp").children("tbody").children("tr").children("td").children(".multipartFile").attr("name","mrAtchFiles["+fileCnt+"].fileNm").val("NA");
+                    $("#fileTemp").children("tbody").children("tr").children("td").children(".fileCd").attr("name","mrAtchFiles["+fileCnt+"].fileCd").val("NA");
+                    $("#fileTemp").children("tbody").children("tr").children("td").children(".fileStepCd").attr("name","mrAtchFiles["+fileCnt+"].fileStepCd").val("NA");
+                    $("#fileTemp").children("tbody").children("tr").children("td").children(".insFlag").attr("name","mrAtchFiles["+fileCnt+"].inserted").val("false");
+                    $("#fileTemp").children("tbody").children("tr").children("td").children(".delFlag").attr("name","mrAtchFiles["+fileCnt+"].deleted").val("true");
+                    $("#fileTemp").children("tbody").children("tr").children("td").children(".mrAtchFileNo").attr("name","mrAtchFiles["+fileCnt+"].mrAtchFileNo").val($(this).children("td:eq(7)").children(".mrAtchFileNo").val());
+                    $("#fileTemp").children("tbody").children("tr").children("td").children(".drawMngNo").attr("name","mrAtchFiles["+fileCnt+"].drawMngNo").val(0);
+                    $("#fileTemp").children("tbody").children("tr").clone().insertAfter($("#fileList").children("tbody").children("tr:last"));
+                }
+            });
+            $("form").attr("action", "compFileComp.do").submit();
+            
+            //202002 자료등록단계 -> 완료단계 넘어갈때 she 인터페이스 추가
+            
+        }
+    });
+
+    $(".send").click(function() {
+    	//yoo 241223 파일 첨부 콤보 박스 선택이 되어야 업로드 되게 처리 함. 선택이 안되면 업로드 막음
+    	var fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+    	console.log('fileCnt : ' + fileCnt);
+    	
+    	if( fileCnt > 0)
+    	{
+	    	var fileDivs = document.getElementsByClassName("fileDiv");
+			var fileDivsCount = 0;
+	    	for (var i = 0; i < fileDivs.length; i++) {
+	    		console.log('1111 ' + fileDivs[i].selectedIndex);
+	    		fileDivsCount += fileDivs[i].selectedIndex;
+	    		
+	    	}
+	    	console.log('fileDivsCount ' + fileDivsCount);
+	    	if(fileDivsCount < 1 )
+	    	{
+	    		alert('파일 구분을 선택하여 주세요!');	
+	    		return;
+	    	}
+	    	var stepDivs = document.getElementsByClassName("stepDiv");
+	    	var stepDivsCount = 0;
+	    	for (var i = 0; i < stepDivs.length; i++) {
+	    		console.log('2222 ' + stepDivs[i].selectedIndex);
+	    		stepDivsCount += stepDivs[i].selectedIndex;
+	    	}
+	    	console.log('stepDivsCount ' + stepDivsCount);
+	    	if(stepDivsCount < 1 )
+	    	{
+	    		alert('파일 Step 정보를 선택하여 주세요!');	
+	    		return;
+	    	}
+    	}
+    	reqDocRegist(true);
+    });
+    
+    $(".requestDoc").click(function() {
+    	//alert('requestDoc');
+    	var i_radio = document.getElementsByClassName("i_radio");
+    	console.log('i_radio.length : ' + i_radio.length)
+    	var bRun = true;
+    	
+    	for (var i = 0; i < i_radio.length; i++) 
+		{
+		
+
+	        var radio_ = $('input[name="rvRsts[' + i + '].clCd01"]:checked');
+	        console.log(i + 'i_radio : ' + radio_.val())
+	        if(radio_.val() === undefined)
+	        {
+	        	console.log('undefined : ' + i)
+	        	
+	        	if(i > 17)
+	        		bRun = true;
+	        	else
+	        		{
+			        	alert('해당 유무 체크가 필요한 사항입니다.\n해당 유부 체크 후, 저장 여부를 확인해 주시기 바랍니다.');
+			        	bRun = false;
+			        	break;
+	        		}
+	        }
+		}
+    	
+    	if(bRun)
+	    	if(confirm("메일 전송 하시겠습니까?"))
+	    		$("form").attr("action", "requestDoc.do").submit();
+	    	else
+	    		radioControll();
+    	
+    });
+    
+    $(".re-send").click(function() {
+    	
+    	//yoo 241223 파일 첨부 콤보 박스 선택이 되어야 업로드 되게 처리 함. 선택이 안되면 업로드 막음
+    	var fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+    	console.log('fileCnt : ' + fileCnt);
+    	
+    	if( fileCnt > 0)
+    	{
+	    	var fileDivs = document.getElementsByClassName("fileDiv");
+			var fileDivsCount = 0;
+	    	for (var i = 0; i < fileDivs.length; i++) {
+	    		console.log('1111 ' + fileDivs[i].selectedIndex);
+	    		fileDivsCount += fileDivs[i].selectedIndex;
+	    		
+	    	}
+	    	console.log('fileDivsCount ' + fileDivsCount);
+	    	if(fileDivsCount < 1 )
+	    	{
+	    		alert('파일 구분을 선택하여 주세요!');	
+	    		return;
+	    	}
+	    	var stepDivs = document.getElementsByClassName("stepDiv");
+	    	var stepDivsCount = 0;
+	    	for (var i = 0; i < stepDivs.length; i++) {
+	    		console.log('2222 ' + stepDivs[i].selectedIndex);
+	    		stepDivsCount += stepDivs[i].selectedIndex;
+	    	}
+	    	console.log('stepDivsCount ' + stepDivsCount);
+	    	if(stepDivsCount < 1 )
+	    	{
+	    		alert('파일 Step 정보를 선택하여 주세요!');	
+	    		return;
+	    	}
+    	}
+    	
+    
+    	reqDocRegist(false);
+    });
+
+ // 첨부파일관리 다운로드
+    $(document).on("click", ".fileMngDown", function() {
+    	//alert("/download.do?drawMngNo="+$(this).parent("td").parent("tr").children("td").children(".drawMngNoFile").val());
+    	console.log(window.location.host);
+    	console.log($(this).parent("td").parent("tr").children("td").children(".drawMngNoFile").val());
+    	var sUrl = "http://" + window.location.host + "/mr/download.do?drawMngNo="+$(this).parent("td").parent("tr").children("td").children(".drawMngNoFile").val();
+    	console.log(sUrl);
+        location.href = sUrl;
+    });
+
+
+    //첨부파일관리 추가
+    $(document).on("click", "#addFileMng",function(){
+        fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+        $("#fileTemp").children("tbody").children("tr").children("td").children(".multipartFile").attr("name","mrAtchFiles["+fileCnt+"].fileNm");
+        $("#fileTemp").children("tbody").children("tr").children("td").children(".fileCd").attr("name","mrAtchFiles["+fileCnt+"].fileCd");
+        $("#fileTemp").children("tbody").children("tr").children("td").children(".insFlag").attr("name","mrAtchFiles["+fileCnt+"].inserted").val("true");
+        $("#fileTemp").children("tbody").children("tr").children("td").children(".drawMngNo").attr("name","mrAtchFiles["+fileCnt+"].drawMngNo");
+        $("#fileTemp").children("tbody").children("tr").children("td").children(".fileStepCd").attr("name","mrAtchFiles["+fileCnt+"].fileStepCd");
+        $("#fileTemp").children("tbody").children("tr").children("td").children(".delFlag").attr("name","mrAtchFiles["+fileCnt+"].deleted").val("false");
+        $("#fileTemp").children("tbody").children("tr").children("td").children(".mrAtchFileNo").attr("name","mrAtchFiles["+fileCnt+"].mrAtchFileNo").val(0);
+        $("#fileTemp").children("tbody").children("tr").clone().insertAfter($("#fileList").children("tbody").children("tr:last"));
+    });
+
+    $(document).on("change",".realPath", function () {
+        var fileName = this.value;
+        var td = $(this).parent("td");
+        td.find(".multipartFile").val(fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length));
+    });
+
+    $(document).on("click",".inputFileMng", function () {
+        $(this).parent("td").find(".fileForm").click();
+    });
+
+    $(document).on("change",".fileForm", function () {
+        var fileList = new Array();
+        var fileName = this.value;
+        var td = $(this).parent("td");
+        var fileTemp = $("#fileTemp").children("tbody").children("tr");
+        var fileTr;
+        var fileType;
+        var fileStepType;
+        var fileTempTd = fileTemp.children("td");
+        fileList = fileName.split(", C:\\");
+
+        if(fileList.length>1){
+            fileType = td.children(".fileCd").val();
+            fileStepType = td.children(".fileStepCd").val();
+            td.parent("tr").remove();
+            for( var i = 0; i<fileList.length; i++){
+                fileCnt = $("#fileList").children("tbody").children("tr:last").index();
+                
+
+                fileTempTd.children(".multipartFile").attr("name","mrAtchFiles["+fileCnt+"].fileNm");
+                fileTempTd.children(".fileCd").attr("name","mrAtchFiles["+fileCnt+"].fileCd");
+                fileTempTd.children(".fileStepCd").attr("name","mrAtchFiles["+fileCnt+"].fileStepCd");
+                fileTempTd.children(".insFlag").attr("name","mrAtchFiles["+fileCnt+"].inserted");
+                fileTempTd.children(".delFlag").attr("name","mrAtchFiles["+fileCnt+"].deleted");
+                fileTempTd.children(".drawMngNo").attr("name","mrAtchFiles["+fileCnt+"].drawMngNo");
+                fileTemp.clone().insertAfter($("#fileList").children("tbody").children("tr:last"));
+
+                fileTr = $("#fileList").children("tbody").children("tr:last");
+                fileTr.children("td").children(".realPath").val(i==0 ? fileList[i] : "C:\\"+fileList[i]);
+                fileTr.children("td").children(".fileCd").val(fileType);
+                fileTr.children("td").children(".fileStepCd").val(fileStepType);
+                fileTr.children("td").children(".multipartFile").val(fileList[i].substring(fileList[i].lastIndexOf("\\") + 1, fileList[i].length));
+
+            }
+        } else {
+            td.find(".realPath").val(fileName);
+            td.find(".multipartFile").val(fileName.substring(fileName.lastIndexOf("\\") + 1, fileName.length));
+        }
+    });
+
+
+    $.validation = function(){
+        var isValid = false;
+        <% if(auth.getEmpNo().equals("admin")) { %>
+        isValid = true;
+        <% } else { %>
+        
+		
+		if(clcd == 'Z02D')
+		{
+			isValid = $.validator({
+			Z02QText : {method:"class",type:"text", msg:"문서등록 담당자를 입력하세요."},
+			ATCH01 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH02 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH03 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH04 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH05 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH06 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH07 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH08 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH09 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH10 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH11 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH12 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH13 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH14 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},		
+			ATCH15 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH16 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH17 : {method:"class",type:"check", msg:"해당 유무에 선택되지 않은 항목이 있습니다.\n모든 해당 유무의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+
+			ATCH_D12 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D13 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D14 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},		
+			ATCH_D15 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D16 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D17 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			});  
+			
+		}else if(clcd == 'Z02A')
+		{
+			isValid = $.validator({
+			Z02QText : {method:"class",type:"text", msg:"문서등록 담당자를 입력하세요."},
+			
+			ATCH_D01 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D02 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D03 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D04 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			
+			});  	
+		}else if(clcd == 'Z02I')
+		{
+			isValid = $.validator({
+			Z02QText : {method:"class",type:"text", msg:"문서등록 담당자를 입력하세요."},
+			
+			ATCH_D05 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},	
+			ATCH_D06 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D07 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D08 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D09 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D10 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			ATCH_D11 : {method:"class",type:"check", msg:"자료등록 여부에 선택되지 않은 항목이 있습니다.\n모든 자료등록 여부의 모든 항목을 선택하신 뒤 저장하여 주시기 바랍니다."},
+			
+			});  	
+		}
+		     
+		<% } %>
+        return isValid;
+    };
+
+    
+    $.Z02D_validation = function(){
+        var isValid = '1:-1';
+        <% if(auth.getEmpNo().equals("admin")) { %>
+        isValid = '1:-1';
+        <% } else { %>
+	if (clcd == 'Z02D') {
+
+								var prev = null;
+								for (var i = 0; i < d_radio.length; i++) {
+
+									var i_radio = $('input[name="rvRsts[' + i
+											+ '].clCd01"]:checked');
+									console.log(i_radio + ':' + i_radio.val())
+
+									var nn = i + 100;
+									var n_radio = $('input[name="rvRsts[' + nn
+											+ '].clCd01"]:checked');
+									if (n_radio.val() == '2'
+											&& i_radio.val() == '1') {
+										isValid = '0:' + i;
+										break;
+									}
+
+								}
+
+							}
+<%}%>
+	console.log(isValid);
+							return isValid;
+						};
+
+						// 단계구분 Select
+						$.selectLoad({
+							className : "stepDiv",
+							url : "codeList.do?mrCommGrpCd=MR_FILE",
+							defaultText : "선택",
+						});
+
+						if ($.getParameter('c') == 'c') {
+							//$(".send").hide();
+							alert('메일이 전송 되었습니다.');
+							//close();
+						}
+
+						if ($.getParameter('c') == 'e') {
+							//$(".send").hide();
+							alert('임시저장 후, 자료등록 버튼을 눌러 주십시오!');
+							//close();
+						}
+
+					});
+
+	$.getParameter = function(sname) {
+		var params = location.search.substr(location.search.indexOf("?") + 1);
+
+		var sval = "";
+
+		params = params.split("&");
+
+		for (var i = 0; i < params.length; i++) {
+
+			temp = params[i].split("=");
+
+			if ([ temp[0] ] == sname) {
+				sval = temp[1];
+			}
+
+		}
+
+		return sval;
+	}
+
+	function activeYNradioControll(yn) {
+		//yn : false 활성화
+		//yn : true 비활성화
+		///라디오 컨트롤을 모두  활성화 시킨다 yoo 240617
+		var z02d = 0;
+		var z02a = 0;
+		var z02i = 0;
+		var clcd = '';
+		appClass = "Z02D";
+		clcd = "Z02D";
+		$("." + appClass)
+				.children("tbody")
+				.children("tr:gt(0)")
+				.each(
+						function() {
+							console.log(this);
+							$(".save").show();
+							$(this).show();
+							$(this)
+									.find("input")
+									.each(
+											function() {
+												var className = $(this).attr(
+														'class');
+												console.log('className1 : '
+														+ className);
+												var classType = typeof className;
+												console.log('classType : '
+														+ classType);
+												if (classType == 'string') {
+													if (className
+															.indexOf('i_radio') > -1)
+														$(this).attr(
+																"disabled", yn);//활성화
+													if (className
+															.indexOf('d_radio') > -1)
+														$(this).attr(
+																"disabled", yn);//활성화
+													console.log(appClass + ':'
+															+ $(this).val());
+													if ($(this).is(':checked'))
+														z02d++;
+													console
+															.log($(this).is(
+																	':checked')
+																	+ ' z02d : '
+																	+ z02d);
+												}
+											});
+						})
+		appClass = "Z02A";
+		$("." + appClass)
+				.children("tbody")
+				.children("tr:gt(0)")
+				.each(
+						function() {
+							console.log(this);
+							$(".save").show();
+							$(this).show();
+							$(this)
+									.find("input")
+									.each(
+											function() {
+												var className = $(this).attr(
+														'class');
+												console.log('className1 : '
+														+ className);
+												var classType = typeof className;
+												console.log('classType : '
+														+ classType);
+												if (classType == 'string') {
+													if (className
+															.indexOf('d_radio') > -1)
+														$(this).attr(
+																"disabled", yn); //비활성화
+													if (className
+															.indexOf('i_radio') > -1)
+														$(this).attr(
+																"disabled", yn); //활성화
+													console.log(appClass + ':'
+															+ $(this).val());
+													if ($(this).is(':checked'))
+														z02a++;
+													console
+															.log($(this).is(
+																	':checked')
+																	+ ' z02a : '
+																	+ z02a);
+												}
+											});
+
+						})
+		appClass = "Z02I";
+		$("." + appClass)
+				.children("tbody")
+				.children("tr:gt(0)")
+				.each(
+						function() {
+							console.log(this);
+							$(".save").show();
+							$(this).show();
+							$(this)
+									.find("input")
+									.each(
+											function() {
+												var className = $(this).attr(
+														'class');
+												console.log('className1 : '
+														+ className);
+												var classType = typeof className;
+												console.log('classType : '
+														+ classType);
+												if (classType == 'string') {
+													if (className
+															.indexOf('d_radio') > -1)
+														$(this).attr(
+																"disabled", yn); //비활성화
+													if (className
+															.indexOf('i_radio') > -1)
+														$(this).attr(
+																"disabled", yn); //활성화
+													console.log(appClass + ':'
+															+ $(this).val());
+													if ($(this).is(':checked'))
+														z02i++;
+													console
+															.log($(this).is(
+																	':checked')
+																	+ ' z02i : '
+																	+ z02i);
+												}
+											});
+
+						})
+
+		console.log('z02d : ' + z02d);
+		console.log('z02a : ' + z02a);
+		console.log('z02i : ' + z02i);//8:14:14
+		return z02a + ':' + z02i + ':' + z02d;
+	}
+
+	function radioControll() {
+		"<c:forEach var='appLine' items='${register.appLine}'>";
+		switch ("${appLine.chrgrClCd}") {
+		//yoo 240529 Z02D, Z02A, Z02I 추가
+		//${appLine.chrgrClCd}:${appLine.chrgEmpName}:${appLine.chrgEmpNo}
+
+		case "Z02A": {
+			if ("${register.loginEmpNo}" == "${appLine.chrgEmpNo}") {
+				appClass = "Z02A";
+				clcd = "Z02A";
+				$("." + appClass).children("tbody").children("tr:gt(0)").each(
+						function() {
+							console.log(this);
+							$(".save").show();
+							$(this).show();
+							$(this).find("input").each(function() {
+								var className = $(this).attr('class');
+								console.log('className1 : ' + className);
+								var classType = typeof className;
+								console.log('classType : ' + classType);
+								if (classType == 'string') {
+									if (className.indexOf('d_radio') > -1)
+										$(this).attr("disabled", false);
+								}
+							});
+
+						})
+			}
+			;
+		}
+			break;
+		case "Z02D": {
+			if ("${register.loginEmpNo}" == "${appLine.chrgEmpNo}") {
+				appClass = "Z02D";
+				clcd = "Z02D";
+				//$("[name='requestDoc']").show();
+				$("." + appClass).children("tbody").children("tr:gt(0)").each(
+						function() {
+							console.log(this);
+							$(".save").show();
+							$(this).show();
+							$(this).find("input").each(function() {
+								var className = $(this).attr('class');
+								console.log('className1 : ' + className);
+								var classType = typeof className;
+								console.log('classType : ' + classType);
+								if (classType == 'string') {
+									if (className.indexOf('i_radio') > -1)
+										$(this).attr("disabled", false);//활성화
+									if (className.indexOf('d_radio') > -1)
+										$(this).attr("disabled", false);//활성화
+								}
+							});
+						})
+				appClass = "Z02A";
+				$("." + appClass).children("tbody").children("tr:gt(0)").each(
+						function() {
+							console.log(this);
+							$(".save").show();
+							$(this).show();
+							$(this).find("input").each(function() {
+								var className = $(this).attr('class');
+								console.log('className1 : ' + className);
+								var classType = typeof className;
+								console.log('classType : ' + classType);
+								if (classType == 'string') {
+									if (className.indexOf('d_radio') > -1)
+										$(this).attr("disabled", true); //비활성화
+									if (className.indexOf('i_radio') > -1)
+										$(this).attr("disabled", false); //활성화
+								}
+							});
+
+						})
+				appClass = "Z02I";
+				$("." + appClass).children("tbody").children("tr:gt(0)").each(
+						function() {
+							console.log(this);
+							$(".save").show();
+							$(this).show();
+							$(this).find("input").each(function() {
+								var className = $(this).attr('class');
+								console.log('className1 : ' + className);
+								var classType = typeof className;
+								console.log('classType : ' + classType);
+								if (classType == 'string') {
+									if (className.indexOf('d_radio') > -1)
+										$(this).attr("disabled", true); //비활성화
+									if (className.indexOf('i_radio') > -1)
+										$(this).attr("disabled", false); //활성화
+								}
+							});
+
+						})
+
+			}
+			;
+
+		}
+			break;
+		case "Z02I":
+
+			if ("${register.loginEmpNo}" == "${appLine.chrgEmpNo}") {
+				appClass = "Z02I";
+				clcd = "Z02I";
+				$("." + appClass).children("tbody").children("tr:gt(0)").each(
+						function() {
+
+							$(".save").show();
+							$(this).show();
+							$(this).find("input").each(function() {
+								var className = $(this).attr('class');
+								console.log('className1 : ' + className);
+								var classType = typeof className;
+								console.log('classType : ' + classType);
+								if (classType == 'string')
+									if (className.indexOf('d_radio') > -1)
+										$(this).attr("disabled", false);
+							});
+
+						})
+			}
+			;
+			break;
+		case "Z02Q": {
+			appClass = "Z02Q";
+			$
+					.appLineSet({
+						className : appClass,
+						dutyText : "${appLine.thdayPos}",
+						text : "${appLine.chrgEmpName}",
+						value : "${appLine.chrgEmpNo}",
+						teamText : "${appLine.thdayTeam}",
+						teamValue : "${appLine.chrgTeamNo}",
+						endDate : "<fmt:formatDate value='${appLine.fstProcTrmDt}' pattern='yyyy-MM-dd' />",
+						date : "<fmt:formatDate value='${appLine.lastChgDt}' pattern='yyyy-MM-dd' />"
+					});
+		}
+			break;
+
+		//$("."+jobClass).children("tbody").children("tr:eq(0)").children("td:eq(0)").children(".empChange").show();
+		//$("."+jobClass).find(".addJobFile").show();
+		//$("."+jobClass).find(".removeDownFile").show();
+		}
+
+		"</c:forEach>";
+
+	}
+
+	function reqDocRegist(nextStep) {
+		
+		if (!$.validation()) {
+			activeYNradioControll(true); // yoo 240619 라디오 버튼 비활성화
+			radioControll();
+		} else if (confirm("해당파일을 EDIMS로 등록요청하시겠습니까?")) {
+			activeYNradioControll(false);
+			$('#pageLoadingWrap').show();
+
+			var docSeqList = "";
+			var cnt = 0;
+
+			//2017-03-16 중복값 체크를 위하여 변수 추가.
+			var docListTemp = [];
+			var docList = [];
+
+			$(".table_col").children("tbody").children("tr:gt(0)").each(
+					function() {
+
+						//등록요청인 파일만 등록요청하드록 변경 2017-02-22 $(this).find(".fileProcCd").val()=="1"
+						//if($(this).children("td:eq(0)").children(".docCheck").is(":checked") && $(this).find(".fileProcCd").val()=="1") {
+
+						//wj 위에 로직처럼 하면 그냥 지나감
+						/*
+							허세욱 과장에게 문의:
+								- 등록요청 파일만 등록요청하게 처리한 이유?
+								- edims에 같은파일의 등록요청이 중복으로 가면 문제가 생기는지 확인
+								
+						 */
+
+						if ($(this).children("td:eq(0)").children(".docCheck")
+								.is(":checked")) {
+
+							//alert("No="+$(this).children("td:eq(7)").children(".drawMngNoFile").val());
+
+							//2017-03-16 주석처리 => 해당로직 주석으로 인해 저장이 안됨
+							docSeqList = docSeqList
+									+ $(this).children("td:eq(7)").children(
+											".drawMngNoFile").val() + ",";
+
+							//2017-03-16 보내려고 하는 docSeq를 배열에 추가
+							//wj 주석해제
+							//docListTemp.push($(this).children("td:eq(7)").children(".drawMngNoFile").val());
+
+							$(this).children("td:eq(7)").children(
+									".mrAtchFileNo").attr("name",
+									"mrAtchFiles[" + cnt + "].mrAtchFileNo");
+							cnt++;
+						}
+					});
+
+			/*
+			 * 2017-03-16 추가
+			 * 중복제거 및 file String 생성
+			 */
+			$.each(docListTemp, function(idx, val) {
+				if ($.inArray(val, docList) == -1) {
+					docList.push(val); //중복체크를 위하여 배열에 추가함.
+					docSeqList = docSeqList + val + ","; //String생성
+				}
+			});
+
+			//console.log(docList);		//운영적용시 삭제
+			//console.log(docSeqList);	//운영적용시 삭제
+
+			$(".table_col")
+					.children("tbody")
+					.children("tr:gt(0)")
+					.each(
+							function() {
+								if ($(this).children("td:eq(1)").children(
+										".delCheck").is(":checked")) {
+									fileCnt = $("#fileList").children("tbody")
+											.children("tr:last").index();
+									$("#fileTemp").children("tbody").children(
+											"tr").children("td").children(
+											".multipartFile").attr(
+											"name",
+											"mrAtchFiles[" + fileCnt
+													+ "].fileNm");
+									$("#fileTemp").children("tbody").children(
+											"tr").children("td").children(
+											".fileCd").attr(
+											"name",
+											"mrAtchFiles[" + fileCnt
+													+ "].fileCd").val("NA");
+									$("#fileTemp").children("tbody").children(
+											"tr").children("td").children(
+											".fileStepCd").attr(
+											"name",
+											"mrAtchFiles[" + fileCnt
+													+ "].fileStepCd").val("NA");
+									$("#fileTemp").children("tbody").children(
+											"tr").children("td").children(
+											".delFlag").attr(
+											"name",
+											"mrAtchFiles[" + fileCnt
+													+ "].deleted").val("true");
+									$("#fileTemp").children("tbody").children(
+											"tr").children("td").children(
+											".insFlag").attr(
+											"name",
+											"mrAtchFiles[" + fileCnt
+													+ "].inserted")
+											.val("false");
+									$("#fileTemp").children("tbody").children(
+											"tr").children("td").children(
+											".mrAtchFileNo").attr(
+											"name",
+											"mrAtchFiles[" + fileCnt
+													+ "].mrAtchFileNo").val(
+											$(this).children("td:eq(7)")
+													.children(".mrAtchFileNo")
+													.val());
+									$("#fileTemp").children("tbody").children(
+											"tr").clone().insertAfter(
+											$("#fileList").children("tbody")
+													.children("tr:last"));
+								}
+							});
+
+			docSeqList = docSeqList.substring(0, docSeqList.length - 1);
+
+			// 도면관리 파일등록요청
+			//Openfile.requestRegister("${register.loginEmpNo}", $(".Z02QValue").val(), "<c:out value="${register.mrNo}"/>", docSeqList, "MR번호:<c:out value="${register.mrNo}"/>, CAPEX번호:<c:out value="${register.capexNo}"/>", function(wf_id) {
+			/* Openfile.requestRegister("admin", $(".Z02QValue").val(), "<c:out value="${register.mrNo}"/>", docSeqList, "MR번호:<c:out value="${register.mrNo}"/>, CAPEX번호:<c:out value="${register.capexNo}"/>", function(wf_id) {            
+
+				alert("문서등록요청완료");
+			    
+			    if(nextStep) {
+			    	$("form").attr("action", "compFileRequest.do").submit();
+			    }
+			}); */
+
+			var data = new FormData();
+			if ("${register.loginEmpNo}" == "admin")
+				data.append("requser_id", "admin");
+			else
+				data.append("requser_id", "${register.loginEmpNo}");
+			data.append("receiverid", $(".Z02QValue").val());
+			data.append("mr_code", <c:out value="${register.mrNo}"/>);
+			data.append("doc_seqList", docSeqList);
+			data
+					.append(
+							"remark",
+							"MR번호:<c:out value="${register.mrNo}"/>, CAPEX번호:<c:out value="${register.capexNo}"/>");
+			data.append("mrNo2", "");
+
+			$
+					.ajax({
+						type : "POST",
+						url : "requestRegister.do",
+						data : data,
+						dataType : "JSON",
+						processData : false,
+						contentType : false,
+						async : false,
+						success : function(data) {
+							alert("문서등록요청완료");
+
+							if (nextStep) {
+								$("form").attr("action", "compFileRequest.do")
+										.submit();
+							}
+						},
+						error : function(request) {
+							alert(request);
+						}
+					});
+		}
+	}
+
+	$(window)
+			.ready(
+					function() {
+
+						$(".inputLimitDate").datepicker({
+							dateformat : "yyyy-mm-dd",
+							showOn : "button",
+							changeYear : true,
+							changeMonth : true,
+							buttonImage : "images/icon_calendar.png",
+							buttonImageOnly : true,
+							minDate : "today",
+							maxDate : "+3M"
+						});
+						$("img.ui-datepicker-trigger")
+								.attr(
+										"style",
+										"border=0;cursor:Pointer;vertical-align:middle;margin-left: 4px;margin-right: 4px;");
+						$(".ui-datepicker-month").attr("width", "30px");
+
+						"<c:forEach var='rvRst' items='${register.rvRsts}'>";
+						var itemCd = "${rvRst.itemCd}";
+						if (itemCd != "") {
+							$("." + itemCd).each(function() {
+								//console.log("rvRst.clCd01 - ${rvRst.clCd01} : val - " + $(this).val());
+
+								if ($(this).val() == "${rvRst.clCd01}") {
+									$(this).prop("checked", true);
+								}
+							});
+
+							itemCd = itemCd.replace('ATCH', 'ATCH_D');
+
+							$("." + itemCd).each(function() {
+								//console.log("rvRst.clCd01 - ${rvRst.clCd01} : val - " + $(this).val());
+
+								if ($(this).val() == "${rvRst.clCd02}") {
+									$(this).prop("checked", true);
+								}
+							});
+						}
+						"</c:forEach>";
+					});
+</script>

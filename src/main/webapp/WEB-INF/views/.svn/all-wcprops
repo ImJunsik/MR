@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/views
+END
+404.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/views/404.jsp
+END
+help.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/repos_edims/!svn/ver/205/trunk/src/mr/src/main/webapp/WEB-INF/views/help.jsp
+END
+login.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/views/login.jsp
+END
+error.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/views/error.jsp
+END
+toExcel.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/views/toExcel.jsp
+END

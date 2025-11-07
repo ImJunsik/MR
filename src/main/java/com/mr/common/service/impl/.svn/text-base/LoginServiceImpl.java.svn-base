@@ -1,0 +1,94 @@
+package com.mr.common.service.impl;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.base.service.BaseService;
+import com.mr.common.domain.EmpInfoVo;
+import com.mr.common.repository.EmpAndTeamDAO;
+import com.mr.common.service.LoginService;
+
+/**
+ * 로그인 서비스 구현
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * </pre>
+ */
+@Service
+public class LoginServiceImpl extends BaseService implements LoginService{
+
+    @Autowired
+    EmpAndTeamDAO loginDAO;
+
+
+    @Override
+    public EmpInfoVo loginCheck(EmpInfoVo empInfoVo) {
+        EmpInfoVo loginEmpInfoVo = null;
+
+        //freepass
+
+        //System.out.println("******3_1111" + "xxxxx");
+        
+        if(empInfoVo.getPasswd()!=null && empInfoVo.getPasswd().equals("MR!"+adminPassword())) {
+            loginEmpInfoVo = loginDAO.getEmp(empInfoVo.getEmpNo());
+        } else if(empInfoVo.getPasswd()!=null) {
+            empInfoVo.setPasswd(encrypt(empInfoVo.getPasswd()));
+            loginEmpInfoVo = loginDAO.loginCheck(empInfoVo);
+        }
+        
+        return loginEmpInfoVo;
+    }
+
+    @Override
+    public EmpInfoVo loginUserInfo(String empNo) {
+        return loginDAO.getEmp(empNo);
+    }
+
+
+    @Override
+    public String encrypt(String str) {
+
+        String MD5 = "";
+        try{
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            md.update(str.getBytes());
+            byte byteData[] = md.digest();
+            StringBuffer sb = new StringBuffer();
+            for(int i = 0 ; i < byteData.length ; i++){
+                sb.append(Integer.toString((byteData[i]&0xff) + 0x100, 16).substring(1));
+            }
+            MD5 = sb.toString();
+
+        }catch(NoSuchAlgorithmException e){
+            e.printStackTrace();
+            MD5 = null;
+        }
+        return MD5;
+    }
+
+
+    /**
+     * 관리자용 암호 생성
+     * @return
+     */
+    public String adminPassword(){
+        long currentTime = System.currentTimeMillis();
+        SimpleDateFormat transFormat = new SimpleDateFormat("yyMMdd-HH");
+        Date to = null;
+        to = new Date(currentTime);
+        return transFormat.format(to).toString();
+    }
+
+
+}

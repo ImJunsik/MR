@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/controller
+END
+EmpAndTeamController.java
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/repos_edims/!svn/ver/66/trunk/src/mr/src/main/java/com/mr/common/controller/EmpAndTeamController.java
+END
+MailConnectionController.java
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svn/repos_edims/!svn/ver/112/trunk/src/mr/src/main/java/com/mr/common/controller/MailConnectionController.java
+END
+MrAprvIfGwController.java
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/repos_edims/!svn/ver/159/trunk/src/mr/src/main/java/com/mr/common/controller/MrAprvIfGwController.java
+END
+LoginController.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/java/com/mr/common/controller/LoginController.java
+END
+CodeController.java
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svn/repos_edims/!svn/ver/159/trunk/src/mr/src/main/java/com/mr/common/controller/CodeController.java
+END

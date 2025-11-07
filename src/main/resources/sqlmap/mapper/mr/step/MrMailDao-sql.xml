@@ -1,0 +1,415 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.step">
+
+    <resultMap id="mrMailRsltMap" type="com.mr.step.domain.MrMailVO">
+        <result property="mrStepNo" column="MR_STEP_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="mrStepDtlNm" column="MR_STEP_DTL_NM" />
+        <result property="emailTtl" column="EMAIL_TTL" />
+        <result property="coordiTeamNo" column="COORDI_TEAM_NO" />
+        <result property="coordiEmpNo" column="COORDI_EMP_NO" />
+        <result property="fstProcTrm" column="FST_PROC_TRM" />
+        <result property="scndProcTrm" column="SCND_PROC_TRM" />
+        <result property="thrdProcTrm" column="THRD_PROC_TRM" />
+        <result property="rmk" column="RMK" />
+    </resultMap>
+
+    <resultMap id="mrMailForScreenRsltMap" type="com.mr.step.domain.MrMailForScreenVO">
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="mrStepNm" column="MR_STEP_NM" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="procStNm" column="PROC_ST_NM" />
+        <result property="chrgr" column="CHRGR" />
+    </resultMap>
+
+    <select id="getMrMail" parameterType="map" resultMap="mrMailRsltMap">
+        SELECT ESR_STEP_NO
+             , ESR_STEP_CD
+             , PROC_ST_CD
+             , ESR_STEP_DTL_NM
+             , EMAIL_TTL
+             , COORDI_TEAM_NO
+             , COORDI_EMP_NO
+             , FST_PROC_TRM
+             , SCND_PROC_TRM
+             , THRD_PROC_TRM
+             , RMK
+          FROM ESR_STEP
+         WHERE PROC_ST_CD = #{procStCd}
+           AND ESR_STEP_CD = #{esrStepCd}
+    </select>
+
+    <select id="getMrMailForScreenRsltMap" parameterType="map" resultMap="mrMailForScreenRsltMap">
+        SELECT ESR_STEP_CD
+             , REQ.ESR_NO
+             , REQ.ESR_REQ_TITLE
+             , CC.COMM_CD_NM AS ESR_STEP_NM
+             , PROC_ST_CD
+             , CCC.COMM_CD_NM AS PROC_ST_NM
+             , CASE WHEN ESR_STEP_CD = 'Z0010' AND PROC_ST_CD IN ('Z0110', 'Z0131', 'Z0122', 'Z0111','Z0141')    -- 요청서작성, 작성/확인완료/보완요청/보완작성,반려 요청자 정보
+                THEN ( SELECT H.CHRG_EMP_NO FROM ESR_REQ_CHRGR_CHG_HIST H
+                        WHERE H.EFF_END_DTM = '99991231235959'
+                          AND H.CHRGR_CL_CD = 'Z02B'  -- 요청자
+                          AND H.ESR_REQ_NO = REQ.ESR_REQ_NO
+                          AND ROWNUM = 1 )
+                WHEN ESR_STEP_CD = 'Z0010' AND PROC_ST_CD IN ('Z0121', 'Z0124','Z0141') -- 요청서작성, 확인요청/재검토확인요청,반려 요청서 확인자
+                THEN ( SELECT H.CHRG_EMP_NO
+                         FROM ESR_REQ_PROC_STEP ERPS,ESR_REQ_PROC_STEP_DET ERPSD, ESR_REQ_CHRGR_CHG_HIST H
+                        WHERE ERPS.ESR_REQ_NO = REQ.ESR_REQ_NO
+                          AND ERPS.EFF_END_DTM = '99991231235959'
+                          AND ERPS.ESR_REQ_PROC_STEP_NO = ERPSD.ESR_REQ_PROC_STEP_NO
+                          AND ERPSD.ESR_REQ_PROC_STEP_DET_NO = H.ESR_REQ_PROC_STEP_DET_NO
+                          AND H.EFF_END_DTM = '99991231235959'
+                          AND H.CHRGR_CL_CD = 'Z02C' -- 확인자
+                          AND H.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                WHEN ESR_STEP_CD = 'Z0010' AND PROC_ST_CD = 'Z0123' -- 요청서작성, 승인요청, 요청자 팀장
+                THEN ( SELECT H.CHRG_EMP_NO FROM ESR_REQ_CHRGR_CHG_HIST H, ESR_REQ_PROC_STEP_DET S
+                        WHERE H.EFF_END_DTM = '99991231235959'
+                          AND H.CHRGR_CL_CD = 'Z02D'  -- 승인자
+                          AND H.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                          AND S.PROC_ST_CD = REQ.PROC_ST_CD
+                          AND S.ESR_STEP_CD = REQ.ESR_STEP_CD
+                          AND S.ESR_REQ_NO = REQ.ESR_REQ_NO
+                          AND ROWNUM = 1 )
+                WHEN ESR_STEP_CD = 'Z0020'  -- 기술검토, 기술검토관련자
+                THEN ( SELECT H.CHRG_EMP_NO FROM ESR_REQ_CHRGR_CHG_HIST H
+                        WHERE H.CHRG_TEAM_NO = #{chrgTeamNo} -- 팀정보
+                          AND H.CHRG_EMP_NO = #{chrgEmpNo}   -- 사용자정보
+                          AND H.EFF_END_DTM = '99991231235959'
+                          AND H.CHRGR_CL_CD IN ('Z02E1', 'Z02E2', 'Z02E3', 'Z02E4')  -- 기술검토팀
+                          AND H.ESR_REQ_NO = REQ.ESR_REQ_NO)
+                WHEN ESR_STEP_CD = 'Z0030' AND PROC_ST_CD IN ('Z0110', 'Z0111')  -- 타당성검토, 작성/보완작성, 설계1팀 담당자
+                THEN ( SELECT H.CHRG_EMP_NO FROM ESR_REQ_CHRGR_CHG_HIST H, ESR_REQ_PROC_STEP_DET S
+                        WHERE H.EFF_END_DTM = '99991231235959'
+                          AND H.CHRGR_CL_CD = 'Z02I'  -- 설계1팀 담당자(확인자)
+                          AND H.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                          AND S.PROC_ST_CD = REQ.PROC_ST_CD
+                          AND S.ESR_STEP_CD = REQ.ESR_STEP_CD
+                          AND S.ESR_REQ_NO = REQ.ESR_REQ_NO
+                          AND ROWNUM = 1 )
+                WHEN ESR_STEP_CD = 'Z0030' AND PROC_ST_CD IN ('Z0123') -- 타당성검토, 승인요청, 설계1팀 팀장
+                THEN ( SELECT H.CHRG_EMP_NO FROM ESR_REQ_CHRGR_CHG_HIST H, ESR_REQ_PROC_STEP_DET S
+                        WHERE H.EFF_END_DTM = '99991231235959'
+                          AND H.CHRGR_CL_CD = 'Z02D'  -- 설계1팀 팀장 (승인자)
+                          AND H.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                          AND S.PROC_ST_CD = REQ.PROC_ST_CD
+                          AND S.ESR_STEP_CD = REQ.ESR_STEP_CD
+                          AND S.ESR_REQ_NO = REQ.ESR_REQ_NO
+                          AND ROWNUM = 1 )
+                WHEN ESR_STEP_CD = 'Z0030' AND PROC_ST_CD IN ('Z0112', 'Z0125') -- 타당성검토(부적합승인), 재검토작성/재검토보완요청, 요청팀 작성자
+                THEN REQ.FST_RGSTR
+                WHEN ESR_STEP_CD = 'Z0030' AND PROC_ST_CD IN ('Z0126') -- 타당성검토(부적합승인), 재검토승인요청, 요청자 팀장
+                THEN ( SELECT H.CHRG_EMP_NO FROM ESR_REQ_CHRGR_CHG_HIST H, ESR_REQ_PROC_STEP_DET S
+                        WHERE H.EFF_END_DTM = '99991231235959'
+                          AND H.CHRGR_CL_CD = 'Z02D'  -- 요청자 팀장
+                          AND H.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                          AND S.PROC_ST_CD = REQ.PROC_ST_CD
+                          AND S.ESR_STEP_CD = REQ.ESR_STEP_CD
+                          AND S.ESR_REQ_NO = REQ.ESR_REQ_NO
+                          AND ROWNUM = 1 )
+                WHEN ESR_STEP_CD = 'Z0040' AND PROC_ST_CD IN ('Z0110', 'Z0111', 'Z0124')  -- ESR추진승인, 작성/보완작성, 요청자, 추진재검토
+                THEN REQ.FST_RGSTR
+                WHEN ESR_STEP_CD = 'Z0040' AND PROC_ST_CD IN ('Z0123') -- ESR추진승인, 승인요청, 조정자/합의자/승인자
+                THEN ( SELECT CHRGR.CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE CHRGR.DEL_YN = 0
+                          AND CHRGR.EFF_END_DTM   = '99991231235959'
+                          AND CHRGR.CHRGR_CL_CD IN ('Z02G', 'Z02F', 'Z02D')
+                          AND CHRGR.ESR_REQ_PROC_STEP_DET_NO = ( SELECT MIN(S_CHRGR.ESR_REQ_PROC_STEP_DET_NO)
+                                                                   FROM ESR_REQ_CHRGR_CHG_HIST S_CHRGR
+                                                                      , ESR_REQ_PROC_STEP_DET DET
+                                                                      , ESR_REQ_PROC_STEP STEP
+                                                                  WHERE S_CHRGR.DEL_YN        = 0
+                                                                    AND S_CHRGR.CHRGR_CL_CD IN ('Z02G', 'Z02F', 'Z02D')
+                                                                    AND S_CHRGR.EFF_END_DTM   = '99991231235959'
+                                                                    AND S_CHRGR.ESR_REQ_PROC_STEP_DET_NO = DET.ESR_REQ_PROC_STEP_DET_NO
+                                                                    AND DET.DEL_YN        = 0
+                                                                    AND DET.PROC_ST_CD = STEP.PROC_ST_CD
+                                                                    AND DET.ESR_REQ_PROC_STEP_NO = STEP.ESR_REQ_PROC_STEP_NO
+                                                                    AND STEP.EFF_END_DTM   = '99991231235959'
+                                                                    AND STEP.ESR_STEP_CD   = 'Z0040'
+                                                                    AND STEP.ESR_REQ_NO    = #{esrReqNo} )
+                          AND ROWNUM = 1 )
+               WHEN ESR_STEP_CD = 'Z0060' AND PROC_ST_CD IN ('Z0110', 'Z0111')  -- 기본설계, 작성/보완작성
+               THEN ( SELECT CHRG_EMP_NO
+                        FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                       WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(ESR_REQ_PROC_STEP_DET_NO)
+                                                            FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                           WHERE 1 = 1
+                                                             AND SUB.DEL_YN = 0
+                                                             AND SUB.CHRGR_CL_CD = 'Z02J'
+                                                             AND SUB.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                         AND CHRGR.DEL_YN = 0
+                         AND CHRGR.EFF_END_DTM   = '99991231235959'
+                         AND CHRGR_CL_CD = 'Z02J')
+                WHEN ESR_STEP_CD = 'Z0060' AND PROC_ST_CD IN ('Z0123')  -- 승인요청
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(S.ESR_REQ_PROC_STEP_DET_NO)
+                                                             FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                                , ESR_REQ_PROC_STEP_DET S
+                                                            WHERE 1 = 1
+                                                              AND SUB.DEL_YN = 0
+                                                              AND SUB.CHRGR_CL_CD = 'Z02D'
+                                                              AND SUB.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                                                              AND S.DEL_YN = 0
+                                                              AND S.PROC_ST_CD = 'Z0123'
+                                                              AND S.ESR_STEP_CD = 'Z0060'
+                                                              AND S.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                          AND CHRGR.DEL_YN = 0
+                          AND CHRGR.EFF_END_DTM   = '99991231235959'
+                          AND CHRGR_CL_CD = 'Z02D')
+               WHEN ESR_STEP_CD = 'Z0070' AND PROC_ST_CD IN ('Z0110', 'Z0111')  -- ER승인, 작성/보완작성, ER담당자
+               THEN ( SELECT CHRG_EMP_NO
+                        FROM ( SELECT ESR_REQ_PROC_STEP_DET_NO, CHRG_TEAM_NO, CHRG_EMP_NO
+                                 FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                WHERE 1 = 1
+                                  AND SUB.DEL_YN = 0
+                                  AND SUB.CHRGR_CL_CD = 'Z02N'
+                                  AND SUB.ESR_REQ_NO = #{esrReqNo}
+                             ORDER BY SUB.EFF_END_DTM DESC ) SUB_SET
+                       WHERE ROWNUM = 1 )
+                WHEN ESR_STEP_CD = 'Z0070' AND PROC_ST_CD IN ('Z0123') -- ESR추진승인, 승인요청, 조정자/합의자/승인자
+                THEN ( SELECT CHRGR.CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE CHRGR.DEL_YN = 0
+                          AND CHRGR.EFF_END_DTM   = '99991231235959'
+                          AND CHRGR.CHRGR_CL_CD IN ('Z02G', 'Z02F', 'Z02D')
+                          AND CHRGR.ESR_REQ_PROC_STEP_DET_NO = ( SELECT MIN(S_CHRGR.ESR_REQ_PROC_STEP_DET_NO)
+                                                                   FROM ESR_REQ_CHRGR_CHG_HIST S_CHRGR
+                                                                      , ESR_REQ_PROC_STEP_DET DET
+                                                                      , ESR_REQ_PROC_STEP STEP
+                                                                  WHERE S_CHRGR.DEL_YN        = 0
+                                                                    AND S_CHRGR.CHRGR_CL_CD IN ('Z02G', 'Z02F', 'Z02D')
+                                                                    AND S_CHRGR.EFF_END_DTM   = '99991231235959'
+                                                                    AND S_CHRGR.ESR_REQ_PROC_STEP_DET_NO = DET.ESR_REQ_PROC_STEP_DET_NO
+                                                                    AND DET.DEL_YN        = 0
+                                                                    AND DET.PROC_ST_CD = STEP.PROC_ST_CD
+                                                                    AND DET.ESR_REQ_PROC_STEP_NO = STEP.ESR_REQ_PROC_STEP_NO
+                                                                    AND STEP.EFF_END_DTM   = '99991231235959'
+                                                                    AND STEP.ESR_STEP_CD   = 'Z0070'
+                                                                    AND STEP.ESR_REQ_NO    = #{esrReqNo} )
+                          AND ROWNUM = 1 )
+                WHEN ESR_STEP_CD = 'Z0070' AND PROC_ST_CD IN ('Z0123')  -- 승인요청
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST
+                        WHERE ROWNUM = 1
+                          AND DEL_YN = 0
+                          AND EFF_END_DTM = '99991231235959'
+                          AND ESR_REQ_PROC_STEP_DET_NO = ( SELECT ESR_REQ_PROC_STEP_DET_NO
+                                                             FROM ( SELECT ESR_REQ_PROC_STEP_DET_NO
+                                                                      FROM ESR_REQ_PROC_STEP_DET DET
+                                                                         , ESR_REQ_PROC_STEP STEP
+                                                                     WHERE DET.DEL_YN        = 0
+                                                                       AND DET.PROC_ST_CD    = 'Z0123'
+                                                                       AND DET.ESR_REQ_PROC_STEP_NO = STEP.ESR_REQ_PROC_STEP_NO
+                                                                       AND STEP.DEL_YN       = 0
+                                                                       AND STEP.EFF_END_DTM  = '99991231235959'
+                                                                       AND STEP.PROC_ST_CD   = 'Z0123'
+                                                                       AND STEP.ESR_STEP_CD  = 'Z0070'
+                                                                       AND STEP.ESR_REQ_NO   = #{esrReqNo}
+                                                                     ORDER BY 1 )
+                                                             WHERE ROWNUM = 1 ) )
+                WHEN ESR_STEP_CD = 'Z0080' AND PROC_ST_CD IN ('Z0110', 'Z0131', 'Z0134')  -- 위험성 검토 작성중
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(SUB.ESR_REQ_PROC_STEP_DET_NO)
+                                                             FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                            WHERE 1 = 1
+                                                              AND SUB.DEL_YN = 0
+                                                              AND SUB.EFF_END_DTM   = '99991231235959'
+                                                              AND SUB.CHRGR_CL_CD = 'Z02O'
+                                                              AND SUB.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                          AND CHRGR.DEL_YN = 0
+                          AND CHRGR.CHRGR_CL_CD = 'Z02O'
+                          AND CHRGR.EFF_END_DTM   = '99991231235959' )
+                WHEN ESR_STEP_CD = 'Z0080' AND PROC_ST_CD IN ('Z0121')  -- 위험성 검토 확인요청
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(SUB.ESR_REQ_PROC_STEP_DET_NO)
+                                                             FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                            WHERE 1 = 1
+                                                              AND SUB.DEL_YN = 0
+                                                              AND SUB.EFF_END_DTM   = '99991231235959'
+                                                              AND SUB.CHRGR_CL_CD = 'Z02P'
+                                                              AND SUB.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                          AND CHRGR.DEL_YN = 0
+                          AND CHRGR.CHRGR_CL_CD = 'Z02P'
+                          AND CHRGR.EFF_END_DTM   = '99991231235959' )
+                WHEN ESR_STEP_CD = 'Z0090' AND PROC_ST_CD IN ('Z0110', 'Z0131')  -- M/C 준공일 작성중
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(S.ESR_REQ_PROC_STEP_DET_NO)
+                                                             FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                                , ESR_REQ_PROC_STEP_DET S
+                                                            WHERE 1 = 1
+                                                              AND SUB.DEL_YN = 0
+                                                              AND SUB.EFF_END_DTM   = '99991231235959'
+                                                              AND SUB.CHRGR_CL_CD = 'Z02Q'
+                                                              AND SUB.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                                                              AND S.DEL_YN = 0
+                                                              AND S.PROC_ST_CD IN ('Z0110', 'Z0131')
+                                                              AND S.ESR_STEP_CD = 'Z0090'
+                                                              AND S.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                          AND CHRGR.DEL_YN = 0
+                          AND CHRGR.CHRGR_CL_CD = 'Z02Q'
+                          AND CHRGR.EFF_END_DTM   = '99991231235959' )
+                WHEN ESR_STEP_CD = 'Z00A3' AND PROC_ST_CD IN ('Z0110', 'Z0111')  -- PCR 작성중
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(S.ESR_REQ_PROC_STEP_DET_NO)
+                                                             FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                                , ESR_REQ_PROC_STEP_DET S
+                                                            WHERE 1 = 1
+                                                              AND SUB.DEL_YN = 0
+                                                              AND SUB.EFF_END_DTM   = '99991231235959'
+                                                              AND SUB.CHRGR_CL_CD = 'Z02M'
+                                                              AND SUB.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                                                              AND S.DEL_YN = 0
+                                                              AND S.PROC_ST_CD IN ('Z0110', 'Z0131')
+                                                              AND S.ESR_STEP_CD = 'Z0090'
+                                                              AND S.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                          AND CHRGR.DEL_YN = 0
+                          AND CHRGR.CHRGR_CL_CD = 'Z02M'
+                          AND CHRGR.EFF_END_DTM   = '99991231235959' )
+                WHEN ESR_STEP_CD = 'Z00A3' AND PROC_ST_CD = 'Z0123'  -- PCR 작성중
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(S.ESR_REQ_PROC_STEP_DET_NO)
+                                                             FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                                , ESR_REQ_PROC_STEP_DET S
+                                                            WHERE 1 = 1
+                                                              AND SUB.DEL_YN = 0
+                                                              AND SUB.EFF_END_DTM   = '99991231235959'
+                                                              AND SUB.CHRGR_CL_CD = 'Z02D'
+                                                              AND SUB.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                                                              AND S.DEL_YN = 0
+                                                              AND S.PROC_ST_CD IN ('Z0110', 'Z0131')
+                                                              AND S.ESR_STEP_CD = 'Z0090'
+                                                              AND S.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                          AND CHRGR.DEL_YN = 0
+                          AND CHRGR.CHRGR_CL_CD = 'Z02D'
+                          AND CHRGR.EFF_END_DTM   = '99991231235959' )
+                WHEN ESR_STEP_CD = 'Z00B0' AND PROC_ST_CD IN ('Z0110', 'Z0111')
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(S.ESR_REQ_PROC_STEP_DET_NO)
+                                                             FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                                , ESR_REQ_PROC_STEP_DET S
+                                                            WHERE 1 = 1
+                                                              AND SUB.DEL_YN = 0
+                                                              AND SUB.EFF_END_DTM   = '99991231235959'
+                                                              AND SUB.CHRGR_CL_CD = 'Z02U'
+                                                              AND SUB.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                                                              AND S.DEL_YN = 0
+                                                              AND S.PROC_ST_CD IN ('Z0110', 'Z0131')
+                                                              AND S.ESR_STEP_CD = 'Z00B0'
+                                                              AND S.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                          AND CHRGR.DEL_YN = 0
+                          AND CHRGR.CHRGR_CL_CD = 'Z02U'
+                          AND CHRGR.EFF_END_DTM   = '99991231235959' )
+                WHEN ESR_STEP_CD = 'Z00B0' AND PROC_ST_CD IN ('Z0123')
+                THEN ( SELECT CHRG_EMP_NO
+                         FROM ESR_REQ_CHRGR_CHG_HIST CHRGR
+                        WHERE ESR_REQ_PROC_STEP_DET_NO = ( SELECT MAX(S.ESR_REQ_PROC_STEP_DET_NO)
+                                                             FROM ESR_REQ_CHRGR_CHG_HIST SUB
+                                                                , ESR_REQ_PROC_STEP_DET S
+                                                            WHERE 1 = 1
+                                                              AND SUB.DEL_YN = 0
+                                                              AND SUB.EFF_END_DTM   = '99991231235959'
+                                                              AND SUB.CHRGR_CL_CD = 'Z02D'
+                                                              AND SUB.ESR_REQ_PROC_STEP_DET_NO = S.ESR_REQ_PROC_STEP_DET_NO
+                                                              AND S.DEL_YN = 0
+                                                              AND S.PROC_ST_CD IN ('Z0123')
+                                                              AND S.ESR_STEP_CD = 'Z00B0'
+                                                              AND S.ESR_REQ_NO = REQ.ESR_REQ_NO )
+                          AND CHRGR.DEL_YN = 0
+                          AND CHRGR.CHRGR_CL_CD = 'Z02D'
+                          AND CHRGR.EFF_END_DTM   = '99991231235959' )
+               ELSE PROC_ST_CD
+               END CHRGR
+          FROM ESR_REQ REQ,
+               COMM_CD CC,
+               COMM_CD CCC
+         WHERE REQ.ESR_STEP_CD = CC.COMM_CD_ID
+           AND REQ.PROC_ST_CD = CCC.COMM_CD_ID
+           AND REQ.ESR_STEP_CD NOT IN ('Z00A0')
+           AND REQ.ESR_REQ_NO = #{esrReqNo}
+         UNION ALL
+        SELECT STEP.ESR_STEP_CD
+             , REQ.ESR_NO
+             , REQ.ESR_REQ_TITLE
+             , CC.COMM_CD_NM AS ESR_STEP_NM
+             , STEP.PROC_ST_CD
+             , CCC.COMM_CD_NM AS PROC_ST_NM
+             , CASE WHEN STEP.ESR_STEP_CD = 'Z00A1' AND STEP.PROC_ST_CD IN ('Z0110', 'Z0111')
+                    THEN ( SELECT H.CHRG_EMP_NO
+                             FROM ESR_REQ_CHRGR_CHG_HIST H
+                                , ESR_REQ_PROC_STEP_DET  D
+                            WHERE H.EFF_END_DTM = '99991231235959'
+                              AND H.CHRGR_CL_CD = 'Z02R' -- 안전정보재개정 담당자
+                              AND H.ESR_REQ_PROC_STEP_DET_NO = D.ESR_REQ_PROC_STEP_DET_NO
+                              AND D.DEL_YN      = 0
+                              AND D.ESR_REQ_PROC_STEP_NO = STEP.ESR_REQ_PROC_STEP_NO
+                              AND ROWNUM = 1 )
+                    WHEN STEP.ESR_STEP_CD = 'Z00A3' AND STEP.PROC_ST_CD IN ('Z0110', 'Z0111')  -- PCR작성, 보완작성
+                    THEN ( SELECT H.CHRG_EMP_NO
+                             FROM ESR_REQ_CHRGR_CHG_HIST H
+                                , ESR_REQ_PROC_STEP_DET  D
+                            WHERE H.EFF_END_DTM = '99991231235959'
+                              AND H.CHRGR_CL_CD = 'Z02M' -- PCR담당자
+                              AND H.ESR_REQ_PROC_STEP_DET_NO = D.ESR_REQ_PROC_STEP_DET_NO
+                              AND D.DEL_YN      = 0
+                              AND D.ESR_REQ_PROC_STEP_NO = STEP.ESR_REQ_PROC_STEP_NO
+                              AND ROWNUM = 1 )
+                    WHEN STEP.ESR_STEP_CD = 'Z00A3' AND STEP.PROC_ST_CD IN ('Z0123', 'Z0132')  -- PCR 승인요청, 승인완료
+                    THEN ( SELECT H.CHRG_EMP_NO
+                             FROM ESR_REQ_CHRGR_CHG_HIST H
+                                , ESR_REQ_PROC_STEP_DET  D
+                            WHERE H.EFF_END_DTM = '99991231235959'
+                              AND H.CHRGR_CL_CD = 'Z02D' -- PER담당자
+                              AND H.ESR_REQ_PROC_STEP_DET_NO = D.ESR_REQ_PROC_STEP_DET_NO
+                              AND D.DEL_YN      = 0
+                              AND D.ESR_REQ_PROC_STEP_NO = STEP.ESR_REQ_PROC_STEP_NO
+                              AND ROWNUM = 1 )
+                    WHEN STEP.ESR_STEP_CD = 'Z00A4' AND STEP.PROC_ST_CD IN ('Z0110', 'Z0111')  -- PER작성, 보완작성
+                    THEN ( SELECT H.CHRG_EMP_NO
+                             FROM ESR_REQ_CHRGR_CHG_HIST H
+                                , ESR_REQ_PROC_STEP_DET  D
+                            WHERE H.EFF_END_DTM = '99991231235959'
+                              AND H.CHRGR_CL_CD = 'Z02L' -- PER담당자
+                              AND H.ESR_REQ_PROC_STEP_DET_NO = D.ESR_REQ_PROC_STEP_DET_NO
+                              AND D.DEL_YN      = 0
+                              AND D.ESR_REQ_PROC_STEP_NO = STEP.ESR_REQ_PROC_STEP_NO
+                              AND ROWNUM = 1 )
+                    WHEN STEP.ESR_STEP_CD = 'Z00A4' AND STEP.PROC_ST_CD IN ('Z0123', 'Z0132')  -- PER 승인요청, 승인완료
+                    THEN ( SELECT H.CHRG_EMP_NO
+                             FROM ESR_REQ_CHRGR_CHG_HIST H
+                                , ESR_REQ_PROC_STEP_DET  D
+                            WHERE H.EFF_END_DTM = '99991231235959'
+                              AND H.CHRGR_CL_CD = 'Z02D' -- PER담당자
+                              AND H.ESR_REQ_PROC_STEP_DET_NO = D.ESR_REQ_PROC_STEP_DET_NO
+                              AND D.DEL_YN      = 0
+                              AND D.ESR_REQ_PROC_STEP_NO = STEP.ESR_REQ_PROC_STEP_NO
+                              AND ROWNUM = 1 )
+               ELSE REQ.ESR_STEP_CD
+               END CHRGR
+          FROM COMM_CD CC
+             , COMM_CD CCC
+             , ESR_REQ_PROC_STEP STEP
+             , ESR_REQ REQ
+         WHERE CC.COMM_CD_ID = STEP.ESR_STEP_CD
+           AND CCC.COMM_CD_ID = STEP.PROC_ST_CD
+           AND STEP.DEL_YN      = 0
+           AND STEP.EFF_END_DTM = '99991231235959'
+           AND STEP.ESR_STEP_CD = #{esrStepCd}   -- 입력받아야 함 'Z00A1~A4'
+           AND STEP.ESR_REQ_NO = REQ.ESR_REQ_NO
+           AND REQ.ESR_STEP_CD = 'Z00A0'
+           AND REQ.ESR_REQ_NO = #{esrReqNo}
+    </select>
+
+</mapper>

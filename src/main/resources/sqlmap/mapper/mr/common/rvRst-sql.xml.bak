@@ -1,0 +1,1047 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.rvRst">
+    <resultMap id="mrRvRstMap" type="com.mr.common.domain.MrRvRstVO">
+        <id property="mrRvRstNo" column= "MR_RV_RST_NO" />
+        <result property="mrReqNo" column= "MR_REQ_NO" />
+        <result property="mrNo" column= "MR_NO" />
+        <result property="plant" column= "PLANT" />
+        <result property="mrReqProcStepDetNo" column= "MR_REQ_PROC_STEP_DET_NO" />
+        <result property="itemCd" column= "ITEM_CD" />
+        <result property="clCd01" column= "CL_CD_01" />
+        <result property="clCd02" column= "CL_CD_02" />
+        <result property="clCd03" column= "CL_CD_03" />
+        <result property="clCd04" column= "CL_CD_04" />
+        <result property="clCd05" column= "CL_CD_05" />
+        <result property="clCd06" column= "CL_CD_06" />
+        <result property="clCd07" column= "CL_CD_07" />
+        <result property="clCd08" column= "CL_CD_08" />
+        <result property="clCd09" column= "CL_CD_09" />
+        <result property="clCd10" column= "CL_CD_10" />
+        <result property="clCd11" column= "CL_CD_11" />
+        <result property="clCd12" column= "CL_CD_12" />
+        <result property="clCd13" column= "CL_CD_13" />
+        <result property="clCd14" column= "CL_CD_14" />
+        <result property="clCd15" column= "CL_CD_15" />
+        <result property="clCtt01" column= "CL_CTT_01" />
+        <result property="clCtt02" column= "CL_CTT_02" />
+        <result property="clCtt03" column= "CL_CTT_03" />
+        <result property="clCtt04" column= "CL_CTT_04" />
+        <result property="clCtt05" column= "CL_CTT_05" />
+        <result property="clCtt06" column= "CL_CTT_06" />
+        <result property="clCtt07" column= "CL_CTT_07" />
+        <result property="clCtt08" column= "CL_CTT_08" />
+        <result property="clCtt09" column= "CL_CTT_09" />
+        <result property="clCtt10" column= "CL_CTT_10" />
+        <result property="clCtt11" column= "CL_CTT_11" />
+        <result property="clCtt12" column= "CL_CTT_12" />
+        <result property="clCtt13" column= "CL_CTT_13" />
+        <result property="clCtt14" column= "CL_CTT_14" />
+        <result property="clCtt15" column= "CL_CTT_15" />
+        <result property="clCmt01" column= "CL_CMT_01" />
+        <result property="clCmt02" column= "CL_CMT_02" />
+        <result property="clCmt03" column= "CL_CMT_03" />
+        <result property="clCmt04" column= "CL_CMT_04" />
+        <result property="clCmt05" column= "CL_CMT_05" />
+        <result property="clCmt06" column= "CL_CMT_06" />
+        <result property="clCmt07" column= "CL_CMT_07" />
+        <result property="clCmt08" column= "CL_CMT_08" />
+        <result property="clCmt09" column= "CL_CMT_09" />
+        <result property="clCmt10" column= "CL_CMT_10" />
+        <result property="clCmt11" column= "CL_CMT_11" />
+        <result property="clCmt12" column= "CL_CMT_12" />
+        <result property="clCmt13" column= "CL_CMT_13" />
+        <result property="clCmt14" column= "CL_CMT_14" />
+        <result property="clCmt15" column= "CL_CMT_15" />
+        <result property="totRvSugg" column= "TOT_RV_SUGG" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <!-- 2025-06-18 ijs 화면개선에 따른 컬럼 추가 @-->
+        <result property="peName" column="PE_NAME" />
+        <result property="peId" column="PE_ID" />
+        <result property="peAddName" column="PE_ADD_NAME" />
+        <result property="rgstId" column="RGST_ID" />
+        <result property="rgstName" column="RGST_NAME" />
+        <result property="confId" column="CONF_ID" />
+        <result property="confName" column="CONF_NAME" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+		<result property="mrHazopYn" column="MR_HAZOP_YN" />
+    </resultMap>
+
+	<!--
+	/*
+	 수정 2017-05-11
+     REPLACE(REPLACE(RST.TOT_RV_SUGG,CHR(10),'\N'),CHR(13),'\R') AS TOT_RV_SUGG,
+     REPLACE( REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'''','') AS TOT_RV_SUGG, 따움표안보이게 처리됨
+     REPLACE( REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'&#34','') AS TOT_RV_SUGG, 따움표안보이게 처리됨
+     
+         수정 2018-03-13
+     REPLACE(REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'"','˝') AS TOT_RV_SUGG, 따움표보이게 (따움표를 특수문자 따움표로변경) 
+	*/
+	 -->
+
+    <select id="selectMrRvRst" resultMap="mrRvRstMap">
+    --selectMrRvRst 11 (타당성검토 확인 page. 기술 및 타당성 검토 (경제성, 법규상제약, 기술적제약, 개선효과 미흡)
+             SELECT RST.MR_RV_RST_NO,
+                    MR_REQ.MR_REQ_NO,
+                    MR_REQ.MR_NO,
+                    MR_REQ.PLANT,
+                    <choose>
+					  <when test="mrStepCd == 'Z0080'">
+					    #{itemCd} AS MR_STEP_CD,
+					  </when>
+					  <otherwise>
+					    'Z00R0' AS MR_STEP_CD,
+					  </otherwise>
+					</choose>
+                    
+                    RST.MR_REQ_PROC_STEP_DET_NO,
+                    RST.ITEM_CD,
+                    RST.CL_CD_01,
+                    RST.CL_CD_02,
+                    RST.CL_CD_03,
+                    RST.CL_CD_04,
+                    RST.CL_CD_05,
+                    RST.CL_CD_06,
+                    RST.CL_CD_07,
+                    RST.CL_CD_08,
+                    RST.CL_CD_09,
+                    RST.CL_CD_10,
+                    RST.CL_CD_11,
+                    RST.CL_CD_12,
+                    RST.CL_CD_13,
+                    RST.CL_CD_14,
+                    RST.CL_CD_15,
+                    RST.CL_CTT_01,
+                    RST.CL_CTT_02,
+                    RST.CL_CTT_03,
+                    RST.CL_CTT_04,
+                    RST.CL_CTT_05,
+                    RST.CL_CTT_06,
+                    RST.CL_CTT_07,
+                    RST.CL_CTT_08,
+                    RST.CL_CTT_09,
+                    RST.CL_CTT_10,
+                    RST.CL_CTT_11,
+                    RST.CL_CTT_12,
+                    RST.CL_CTT_13,
+                    RST.CL_CTT_14,
+                    RST.CL_CTT_15,
+                    RST.CL_CMT_01,
+                    RST.CL_CMT_02,
+                    RST.CL_CMT_03,
+                    RST.CL_CMT_04,
+                    RST.CL_CMT_05,
+                    RST.CL_CMT_06,
+                    RST.CL_CMT_07,
+                    RST.CL_CMT_08,
+                    RST.CL_CMT_09,
+                    RST.CL_CMT_10,
+                    RST.CL_CMT_11,
+                    RST.CL_CMT_12,
+                    RST.CL_CMT_13,
+                    RST.CL_CMT_14,
+                    RST.CL_CMT_15,
+                    MR_REQ.HAZOP_ACT_YN,
+                    MR_REQ.PORC_ACT_YN,
+                    <!-- TOT_RV_SUGG, yoo 241106 홑따음표 , 개행 문자 처리를 위해 아래 처럼 변경 --> 
+                    REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(RST.TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'"','˝'), CHR(34), '¶'), CHR(39),'¶') AS TOT_RV_SUGG, 
+                    RST.DEL_YN,
+                    RST.FST_RGST_DT,
+                    RST.FST_RGSTR,
+                    RST.LAST_CHG_DT,
+                    RST.LAST_CHGR,
+                    <!-- 2025-07-09 IJS 컬럼추가 -->
+                    replace(replace(GETDEPTNAMEANEMPNAME(RST.PE_ID),'HDO_', ''),'HDC_', '') as PE_NAME,
+				    RST.PE_ID,
+				    RST.PE_ADD_NAME,
+				    (SELECT
+					    EMP.EMP_ID
+					    --, EMP.EMP_NAME
+					FROM
+					    mr_req_chrgr_chg_hist   hist,
+					    mr_req_proc_step_det    det,
+					    edm_emp                 emp
+					WHERE
+					    det.mr_req_proc_step_det_no = hist.mr_req_proc_step_det_no
+					    AND det.del_yn = 0
+					    AND hist.chrg_emp_no = emp.emp_id
+					    AND hist.eff_end_dtm = '99991231235959'
+					    AND hist.del_yn = 0
+					    AND det.mr_req_proc_step_det_no = (
+					        SELECT
+					            MIN(det.mr_req_proc_step_det_no)
+					        FROM
+					            mr_req_proc_step_det    det,
+					            mr_req_chrgr_chg_hist   hist
+					        WHERE
+					            det.mr_req_proc_step_det_no = hist.mr_req_proc_step_det_no
+					            AND det.mr_step_cd = 'Z00R0'
+					            AND det.mr_req_no = #{mrReqNo}
+					            AND hist.chrgr_cl_cd = 'Z02D'
+					            AND hist.eff_end_dtm = '99991231235959'
+					            AND det.del_yn = 0
+					            AND hist.del_yn = 0
+					    )) as RGST_ID,
+               replace(replace(GETDEPTNAMEANEMPNAME((SELECT
+														    EMP2.EMP_ID
+														    --, EMP.EMP_NAME
+														FROM
+														    mr_req_chrgr_chg_hist   hist2,
+														    mr_req_proc_step_det    det2,
+														    edm_emp                 emp2
+														WHERE
+														    det2.mr_req_proc_step_det_no = hist2.mr_req_proc_step_det_no
+														    AND det2.del_yn = 0
+														    AND hist2.chrg_emp_no = emp2.emp_id
+														    AND hist2.eff_end_dtm = '99991231235959'
+														    AND hist2.del_yn = 0
+														    AND det2.mr_req_proc_step_det_no = (
+														        SELECT
+														            MIN(det3.mr_req_proc_step_det_no)
+														        FROM
+														            mr_req_proc_step_det    det3,
+														            mr_req_chrgr_chg_hist   hist3
+														        WHERE
+														            det3.mr_req_proc_step_det_no = hist3.mr_req_proc_step_det_no
+														            AND det3.mr_step_cd = 'Z00R0'
+														            AND det3.mr_req_no = #{mrReqNo}
+														            AND hist3.chrgr_cl_cd = 'Z02D'
+														            AND hist3.eff_end_dtm = '99991231235959'
+														            AND det3.del_yn = 0
+														            AND hist3.del_yn = 0
+														    ))),'HDO_', ''),'HDC_', '') AS RGST_NAME,
+               
+	                
+				    RST.CONF_ID,
+				    replace(replace(GETDEPTNAMEANEMPNAME(RST.CONF_ID),'HDO_', ''),'HDC_', '') AS CONF_NAME
+               FROM MR_REQ_MST MR_REQ,
+                    MR_RV_RST RST
+              WHERE MR_REQ.MR_REQ_NO = RST.MR_REQ_NO(+)
+                AND MR_REQ.MR_REQ_NO = #{mrReqNo}
+              <if test="itemCd!=null">
+                AND RST.ITEM_CD(+) LIKE #{itemCd} || '%'
+              </if>
+                AND MR_REQ.DEL_YN=0
+                AND RST.DEL_YN(+)=0
+    </select>
+
+
+    <resultMap id="mrRvRstRiskMap" type="com.mr.common.domain.MrRvRstVO">
+        <id property="mrRvRstNo" column= "MR_RV_RST_NO" />
+        <result property="mrReqNo" column= "MR_REQ_NO" />
+        <result property="mrNo" column= "MR_NO" />
+        <result property="plant" column= "PLANT" />
+        <result property="mrReqProcStepDetNo" column= "MR_REQ_PROC_STEP_DET_NO" />
+        <result property="itemCd" column= "ITEM_CD" />
+        <result property="clCd01" column= "CL_CD_01" />
+        <result property="clCd02" column= "CL_CD_02" />
+        <result property="clCd03" column= "CL_CD_03" />
+        <result property="clCd04" column= "CL_CD_04" />
+        <result property="clCd05" column= "CL_CD_05" />
+        <result property="clCd06" column= "CL_CD_06" />
+        <result property="clCd07" column= "CL_CD_07" />
+        <result property="clCd08" column= "CL_CD_08" />
+        <result property="clCd09" column= "CL_CD_09" />
+        <result property="clCd10" column= "CL_CD_10" />
+        <result property="clCd11" column= "CL_CD_11" />
+        <result property="clCd12" column= "CL_CD_12" />
+        <result property="clCd13" column= "CL_CD_13" />
+        <result property="clCd14" column= "CL_CD_14" />
+        <result property="clCd15" column= "CL_CD_15" />
+        <result property="clCtt01" column= "CL_CTT_01" />
+        <result property="clCtt02" column= "CL_CTT_02" />
+        <result property="clCtt03" column= "CL_CTT_03" />
+        <result property="clCtt04" column= "CL_CTT_04" />
+        <result property="clCtt05" column= "CL_CTT_05" />
+        <result property="clCtt06" column= "CL_CTT_06" />
+        <result property="clCtt07" column= "CL_CTT_07" />
+        <result property="clCtt08" column= "CL_CTT_08" />
+        <result property="clCtt09" column= "CL_CTT_09" />
+        <result property="clCtt10" column= "CL_CTT_10" />
+        <result property="clCtt11" column= "CL_CTT_11" />
+        <result property="clCtt12" column= "CL_CTT_12" />
+        <result property="clCtt13" column= "CL_CTT_13" />
+        <result property="clCtt14" column= "CL_CTT_14" />
+        <result property="clCtt15" column= "CL_CTT_15" />
+        <result property="clCmt01" column= "CL_CMT_01" />
+        <result property="clCmt02" column= "CL_CMT_02" />
+        <result property="clCmt03" column= "CL_CMT_03" />
+        <result property="clCmt04" column= "CL_CMT_04" />
+        <result property="clCmt05" column= "CL_CMT_05" />
+        <result property="clCmt06" column= "CL_CMT_06" />
+        <result property="clCmt07" column= "CL_CMT_07" />
+        <result property="clCmt08" column= "CL_CMT_08" />
+        <result property="clCmt09" column= "CL_CMT_09" />
+        <result property="clCmt10" column= "CL_CMT_10" />
+        <result property="clCmt11" column= "CL_CMT_11" />
+        <result property="clCmt12" column= "CL_CMT_12" />
+        <result property="clCmt13" column= "CL_CMT_13" />
+        <result property="clCmt14" column= "CL_CMT_14" />
+        <result property="clCmt15" column= "CL_CMT_15" />
+        <result property="hazopActYn" column= "HAZOP_ACT_YN" />
+        <result property="porcActYn" column= "PORC_ACT_YN" />
+        <result property="totRvSugg" column= "TOT_RV_SUGG" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <!-- 2025-06-18 ijs 화면개선에 따른 컬럼 추가 @-->
+        <result property="rgstId" column="RGST_ID" />
+        <result property="rgstName" column="RGST_NAME" />
+        <result property="confId" column="CONF_ID" />
+        <result property="confName" column="CONF_NAME" />
+        <result property="peName" column="PE_NAME" />
+        <result property="peId" column="PE_ID" />
+        <result property="peAddName" column="PE_ADD_NAME" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="mrHazopYn" column="MR_HAZOP_YN" />
+        
+        <collection property="appLine" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD} " select="mr.step.selectAppLine" />
+        <collection property="porcLineList" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=Z00P0} " select="mr.step.selectPorcLine" />
+    </resultMap>
+
+	<!--
+	/*
+	 수정 2017-05-11
+     REPLACE(REPLACE(RST.TOT_RV_SUGG,CHR(10),'\N'),CHR(13),'\R') AS TOT_RV_SUGG,
+     REPLACE( REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'&#34','') AS TOT_RV_SUGG,
+     REPLACE(REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'"','˝') AS TOT_RV_SUGG,
+	*/
+	 -->
+	<!-- selectMrRvRstRisk 22 -->
+    <select id="selectMrRvRstRisk" resultMap="mrRvRstRiskMap">             
+             --selectMrRvRstRisk 11
+             SELECT RST.MR_RV_RST_NO,
+                    MR_REQ.MR_REQ_NO,
+                    MR_REQ.MR_NO,
+                    MR_REQ.PLANT,
+                    'Z00R0' AS MR_STEP_CD,
+                    'Z00P0' AS Z00P0,
+                    RST.MR_REQ_PROC_STEP_DET_NO,
+                    RST.ITEM_CD,
+                    RST.CL_CD_01,
+                    RST.CL_CD_02,
+                    RST.CL_CD_03,
+                    RST.CL_CD_04,
+                    RST.CL_CD_05,
+                    RST.CL_CD_06,
+                    RST.CL_CD_07,
+                    RST.CL_CD_08,
+                    RST.CL_CD_09,
+                    RST.CL_CD_10,
+                    RST.CL_CD_11,
+                    RST.CL_CD_12,
+                    RST.CL_CD_13,
+                    RST.CL_CD_14,
+                    RST.CL_CD_15,
+                    RST.CL_CTT_01,
+                    RST.CL_CTT_02,
+                    RST.CL_CTT_03,
+                    RST.CL_CTT_04,
+                    RST.CL_CTT_05,
+                    RST.CL_CTT_06,
+                    RST.CL_CTT_07,
+                    RST.CL_CTT_08,
+                    RST.CL_CTT_09,
+                    RST.CL_CTT_10,
+                    RST.CL_CTT_11,
+                    RST.CL_CTT_12,
+                    RST.CL_CTT_13,
+                    RST.CL_CTT_14,
+                    RST.CL_CTT_15,
+                    RST.CL_CMT_01,
+                    RST.CL_CMT_02,
+                    RST.CL_CMT_03,
+                    RST.CL_CMT_04,
+                    RST.CL_CMT_05,
+                    RST.CL_CMT_06,
+                    RST.CL_CMT_07,
+                    RST.CL_CMT_08,
+                    RST.CL_CMT_09,
+                    RST.CL_CMT_10,
+                    RST.CL_CMT_11,
+                    RST.CL_CMT_12,
+                    RST.CL_CMT_13,
+                    RST.CL_CMT_14,
+                    RST.CL_CMT_15,
+                    MR_REQ.HAZOP_ACT_YN,
+                    MR_REQ.PORC_ACT_YN,
+                    REPLACE(REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'"','˝') AS TOT_RV_SUGG,
+                    RST.DEL_YN,
+                    RST.FST_RGST_DT,
+                    RST.FST_RGSTR,
+                    RST.LAST_CHG_DT,
+                    RST.LAST_CHGR,
+                    
+                    RST.RGST_ID,
+	                replace(replace(GETDEPTNAMEANEMPNAME(RST.RGST_ID),'HDO_', ''),'HDC_', '') AS RGST_NAME,
+	                RST.CONF_ID,
+	                replace(replace(GETDEPTNAMEANEMPNAME(RST.CONF_ID),'HDO_', ''),'HDC_', '') AS CONF_NAME,
+	                RST.PE_ID,
+				    replace(replace(GETDEPTNAMEANEMPNAME(RST.PE_ID),'HDO_', ''),'HDC_', '') as PE_NAME,
+				    RST.PE_ADD_NAME
+               FROM MR_REQ_MST MR_REQ,
+                    MR_RV_RST RST
+              WHERE MR_REQ.MR_REQ_NO = RST.MR_REQ_NO(+)
+                AND MR_REQ.MR_REQ_NO = #{mrReqNo}
+              <if test="itemCd!=null">
+                AND RST.ITEM_CD(+) LIKE #{itemCd} || '%'
+              </if>
+                AND MR_REQ.DEL_YN=0
+                AND RST.DEL_YN(+)=0
+    </select>
+    
+    <select id="selectTechMrRvRst" resultMap="mrRvRstRiskMap">
+             --selectTechMrRvRst 33
+             SELECT RST.MR_RV_RST_NO,
+                    MR_REQ.MR_REQ_NO,
+                    MR_REQ.MR_NO,
+                    MR_REQ.PLANT,
+                    'Z00R0' AS MR_STEP_CD,
+                    'Z00P0' AS Z00P0,
+                    RST.MR_REQ_PROC_STEP_DET_NO,
+                    RST.ITEM_CD,
+                    RST.CL_CD_01,
+                    RST.CL_CD_02,
+                    RST.CL_CD_03,
+                    RST.CL_CD_04,
+                    RST.CL_CD_05,
+                    RST.CL_CD_06,
+                    RST.CL_CD_07,
+                    RST.CL_CD_08,
+                    RST.CL_CD_09,
+                    RST.CL_CD_10,
+                    RST.CL_CD_11,
+                    RST.CL_CD_12,
+                    RST.CL_CD_13,
+                    RST.CL_CD_14,
+                    RST.CL_CD_15,
+                    RST.CL_CTT_01,
+                    RST.CL_CTT_02,
+                    RST.CL_CTT_03,
+                    RST.CL_CTT_04,
+                    RST.CL_CTT_05,
+                    RST.CL_CTT_06,
+                    RST.CL_CTT_07,
+                    RST.CL_CTT_08,
+                    RST.CL_CTT_09,
+                    RST.CL_CTT_10,
+                    RST.CL_CTT_11,
+                    RST.CL_CTT_12,
+                    RST.CL_CTT_13,
+                    RST.CL_CTT_14,
+                    RST.CL_CTT_15,
+                    RST.CL_CMT_01,
+                    RST.CL_CMT_02,
+                    RST.CL_CMT_03,
+                    RST.CL_CMT_04,
+                    RST.CL_CMT_05,
+                    RST.CL_CMT_06,
+                    RST.CL_CMT_07,
+                    RST.CL_CMT_08,
+                    RST.CL_CMT_09,
+                    RST.CL_CMT_10,
+                    RST.CL_CMT_11,
+                    RST.CL_CMT_12,
+                    RST.CL_CMT_13,
+                    RST.CL_CMT_14,
+                    RST.CL_CMT_15,
+                    MR_REQ.HAZOP_ACT_YN,
+                    MR_REQ.PORC_ACT_YN,
+                    REPLACE(REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'"','˝') AS TOT_RV_SUGG,
+                    RST.DEL_YN,
+                    RST.FST_RGST_DT,
+                    RST.FST_RGSTR,
+                    RST.LAST_CHG_DT,
+                    RST.LAST_CHGR,
+                    RST.MR_HAZOP_YN
+               FROM MR_REQ_MST MR_REQ,
+                    MR_RV_RST RST
+              WHERE MR_REQ.MR_REQ_NO = RST.MR_REQ_NO(+)
+                AND MR_REQ.MR_REQ_NO = #{mrReqNo}
+              <if test="itemCd!=null">
+                AND RST.ITEM_CD(+) LIKE #{itemCd} || '%'
+              </if>
+                AND MR_REQ.DEL_YN=0
+                AND RST.DEL_YN(+)=0
+    </select>
+
+    <select id="selectRvRstIsCheckMst" resultType="string">
+             --selectRvRstIsCheckMst 44
+             SELECT DECODE(HAZOP_ACT_YN, NULL, 'FALSE','TRUE') AS IS_CHECK
+               FROM MR_REQ_MST
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN=0
+    </select>
+
+   <select id="selectRvRstIsCheck" resultType="string">
+             --selectRvRstIsCheck 55
+             SELECT DECODE(DECODE(NVL(CL_CTT_01,0),1,1,0) + DECODE(NVL(CL_CTT_02,0),1,1,0) +
+                    DECODE(NVL(CL_CTT_03,0),1,1,0) + DECODE(NVL(CL_CTT_04,0),1,1,0) +
+                    DECODE(NVL(CL_CTT_05,0),1,1,0) + DECODE(NVL(CL_CTT_06,0),1,1,0) +
+                    DECODE(NVL(CL_CTT_07,0),1,1,0) + DECODE(NVL(CL_CTT_08,0),1,1,0) +
+                    DECODE(NVL(CL_CTT_09,0),1,1,0) + DECODE(NVL(CL_CTT_10,0),1,1,0) +
+                    DECODE(NVL(CL_CTT_11,0),1,1,0) + DECODE(NVL(CL_CTT_12,0),1,1,0) +
+                    DECODE(NVL(CL_CTT_13,0),1,1,0) + DECODE(NVL(CL_CTT_14,0),1,1,0) +
+                    DECODE(NVL(CL_CTT_15,0),1,1,0),0,'TRUE','FALSE') AS IS_CHECK
+               FROM MR_RV_RST
+              WHERE MR_REQ_NO = #{mrReqNo}
+              <if test="itemCd!=null">
+                AND ITEM_CD LIKE #{itemCd} || '%'
+              </if>
+                AND DEL_YN=0
+    </select>
+
+    <select id="selectRvRstCount" resultType="int">
+             --selectRvRstCount 66
+             SELECT COUNT(RST.MR_RV_RST_NO) AS PORC_COUNT
+               FROM MR_RV_RST RST,
+                    (SELECT * FROM MR_REQ_PROC_STEP_DET DET WHERE MR_REQ_NO = #{mrReqNo} AND DEL_YN=0 ) DET
+              WHERE RST.MR_REQ_NO = #{mrReqNo}
+               AND RST.MR_REQ_PROC_STEP_DET_NO = DET.MR_REQ_PROC_STEP_DET_NO(+)
+              <if test="itemCd!=null">
+                AND RST.ITEM_CD LIKE #{itemCd} || '%'
+              </if>
+                AND RST.DEL_YN=0  
+    </select>
+
+	<select id="selectRvRstCountDet" resultType="int">
+    	 --직무검토자와 직무검토 입력갯수비교(selectRvRstCountDet) 77
+         SELECT COUNT(DISTINCT(MR_REQ_PROC_STEP_DET_NO)) AS PORC_COUNT
+               FROM MR_RV_RST
+              WHERE MR_REQ_NO =  #{mrReqNo} /**P*/
+               <if test="itemCd!=null">
+                AND ITEM_CD LIKE #{itemCd} || '%'
+              </if>
+                AND DEL_YN=0
+                AND MR_REQ_PROC_STEP_DET_NO IN (SELECT DET.MR_REQ_PROC_STEP_DET_NO AS MR_REQ_PROC_STEP_DET_NO
+          FROM MR_REQ_PROC_STEP STEP,
+               MR_REQ_PROC_STEP_DET DET,
+               MR_REQ_CHRGR_CHG_HIST HIST
+         WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+           AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+           AND STEP.MR_REQ_NO =  #{mrReqNo} /**P*/
+           <if test="stepCd!=null">
+           AND DET.MR_STEP_CD =  #{stepCd} /**P*/
+           </if>
+           <if test="stepCd==null">
+           AND DET.MR_STEP_CD =  'Z0040' /**P*/
+           </if>
+           /* 2025-08-12 ijs 잘못 입력된 데이터 필터링, 직무검토1 단계이서만 적용되도록 수정*/
+           AND (
+                (DET.MR_STEP_CD = 'Z0025' AND HIST.CHRGR_CL_CD IN ('Z02H2','Z02H9','Z02H4','Z02H11','Z02H6','Z02H10'))
+                OR DET.MR_STEP_CD != 'Z0025'
+              )
+           AND HIST.CHRGR_CL_CD LIKE 'Z02H%'
+           AND HIST.EFF_END_DTM = '99991231235959'
+           AND HIST.DEL_YN=0
+           AND DET.DEL_YN=0
+           AND STEP.DEL_YN=0)
+    </select>
+    
+    <select id="selectRvRstCountDet2" resultType="int">
+    		--직무검토자와 직무검토 입력갯수비교(selectRvRstCountDet2) 88
+             SELECT COUNT(DISTINCT(MR_REQ_PROC_STEP_DET_NO)) AS PORC_COUNT
+               FROM MR_RV_RST
+              WHERE MR_REQ_NO = #{mrReqNo}
+              <if test="itemCd!=null">
+                AND ITEM_CD LIKE #{itemCd} || '%'
+              </if>
+                AND DEL_YN=0
+    </select>
+
+
+    <select id="selectMrRvRstDetNo" resultMap="mrRvRstMap">
+             --직무검토 *관점 99
+             SELECT MR_RV_RST_NO,
+                    MR_REQ_NO,
+                    MR_REQ_PROC_STEP_DET_NO,
+                    ITEM_CD,
+                    CL_CD_01,
+                    CL_CD_02,
+                    CL_CD_03,
+                    CL_CD_04,
+                    CL_CD_05,
+                    CL_CD_06,
+                    CL_CD_07,
+                    CL_CD_08,
+                    CL_CD_09,
+                    CL_CD_10,
+                    CL_CD_11,
+                    CL_CD_12,
+                    CL_CD_13,
+                    CL_CD_14,
+                    CL_CD_15,
+                    CL_CTT_01,
+                    CL_CTT_02,
+                    CL_CTT_03,
+                    CL_CTT_04,
+                    CL_CTT_05,
+                    CL_CTT_06,
+                    CL_CTT_07,
+                    CL_CTT_08,
+                    CL_CTT_09,
+                    CL_CTT_10,
+                    CL_CTT_11,
+                    CL_CTT_12,
+                    CL_CTT_13,
+                    CL_CTT_14,
+                    CL_CTT_15,
+                    CL_CMT_01,
+                    CL_CMT_02,
+                    CL_CMT_03,
+                    CL_CMT_04,
+                    CL_CMT_05,
+                    CL_CMT_06,
+                    CL_CMT_07,
+                    CL_CMT_08,
+                    CL_CMT_09,
+                    CL_CMT_10,
+                    CL_CMT_11,
+                    CL_CMT_12,
+                    CL_CMT_13,
+                    CL_CMT_14,
+                    CL_CMT_15,
+                    <!--원본: REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r') AS TOT_RV_SUGG, -->
+                    REPLACE(REPLACE(REPLACE(TOT_RV_SUGG,CHR(10),'\n'),CHR(13),'\r'),'"','˝') AS TOT_RV_SUGG,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+               FROM MR_RV_RST
+              WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+                AND DEL_YN=0
+    </select>
+
+    <update id="updateTechMrRvRstDelYn" parameterType="map">
+        -- 111
+        UPDATE MR_RV_RST
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND ITEM_CD IN ('TECH01','TECH02','TECH03','TECH04','TECH05')
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateMrRvRstDelYnItemCd" parameterType="map">
+        -- 222
+        UPDATE MR_RV_RST
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND ITEM_CD LIKE #{itemCd} || '%'
+           AND DEL_YN=0
+    </update>
+
+
+    <select id="selectRvRstIsAppCheck" resultType="string">
+        --위험성검토수행여부 체크(selectRvRstIsAppCheck) 333
+        SELECT CASE WHEN CL_CD_15 = 'APP_YN' AND CL_CTT_15 = 'Y' THEN 'FALSE' ELSE 'TRUE' END AS IS_CHECK
+               FROM MR_RV_RST
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND ITEM_CD = #{itemCd}
+           AND DEL_YN=0
+    </select>
+
+    <update id="updateMrRvRstApp" parameterType="map">
+        -- 444
+        UPDATE MR_RV_RST
+           SET CL_CD_15 = 'APP_YN',
+               CL_CTT_15 = 'Y',
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND ITEM_CD = #{itemCd}
+           AND DEL_YN=0
+    </update>
+    <select id="selectMrRvRstItemCount" resultType="int" parameterType="com.mr.common.domain.MrRvRstVO">
+    	-- 555
+    	SELECT COUNT(*) AS CNT
+						FROM MR_REQ_CHRGR_CHG_HIST HIST, MR_RV_RST RST
+					   WHERE HIST.MR_REQ_NO = RST.MR_REQ_NO
+						 AND HIST.MR_REQ_PROC_STEP_DET_NO = RST.MR_REQ_PROC_STEP_DET_NO
+						 AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+                         AND RST.MR_REQ_NO = #{mrReqNo}
+						 AND HIST.DEL_YN = '0'
+						 AND RST.DEL_YN = '0'
+    </select>
+    <update id="updateMrRvRstDelYnDet" parameterType="map">
+        -- 666
+        UPDATE MR_RV_RST
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateMrRvRst" parameterType="map" >
+        --자료등록 updateMrRvRst 777
+        UPDATE MR_RV_RST
+           SET CL_CD_01 = #{clCd01},
+               CL_CD_02 = #{clCd02},
+               CL_CD_03 = #{clCd03},
+               CL_CD_04 = #{clCd04},
+               CL_CD_05 = #{clCd05},
+               CL_CD_06 = #{clCd06},
+               CL_CD_07 = #{clCd07},
+               CL_CD_08 = #{clCd08},
+               CL_CD_09 = #{clCd09},
+               CL_CD_10 = #{clCd10},
+               CL_CD_11 = #{clCd11},
+               CL_CD_12 = #{clCd12},
+               CL_CD_13 = #{clCd13},
+               CL_CD_14 = #{clCd14},
+               CL_CD_15 = #{clCd15},
+               CL_CTT_01 = #{clCtt01},
+               CL_CTT_02 = #{clCtt02},
+               CL_CTT_03 = #{clCtt03},
+               CL_CTT_04 = #{clCtt04},
+               CL_CTT_05 = #{clCtt05},
+               CL_CTT_06 = #{clCtt06},
+               CL_CTT_07 = #{clCtt07},
+               CL_CTT_08 = #{clCtt08},
+               CL_CTT_09 = #{clCtt09},
+               CL_CTT_10 = #{clCtt10},
+               CL_CTT_11 = #{clCtt11},
+               CL_CTT_12 = #{clCtt12},
+               CL_CTT_13 = #{clCtt13},
+               CL_CTT_14 = #{clCtt14},
+               CL_CTT_15 = #{clCtt15},
+               CL_CMT_01 = #{clCmt01},
+               CL_CMT_02 = #{clCmt02},
+               CL_CMT_03 = #{clCmt03},
+               CL_CMT_04 = #{clCmt04},
+               CL_CMT_05 = #{clCmt05},
+               CL_CMT_06 = #{clCmt06},
+               CL_CMT_07 = #{clCmt07},
+               CL_CMT_08 = #{clCmt08},
+               CL_CMT_09 = #{clCmt09},
+               CL_CMT_10 = #{clCmt10},
+               CL_CMT_11 = #{clCmt11},
+               CL_CMT_12 = #{clCmt12},
+               CL_CMT_13 = #{clCmt13},
+               CL_CMT_14 = #{clCmt14},
+               CL_CMT_15 = #{clCmt15},
+               TOT_RV_SUGG = #{totRvSugg},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+ 
+               <if test="confId != null">
+		         , CONF_ID = #{confId}
+		       </if>    
+               <if test="peId != null">
+		         , PE_ID = #{peId}
+		       </if>   
+		       <if test="peAddName != null">
+		         , PE_ADD_NAME = #{peAddName}
+		       </if>  
+				    
+         WHERE MR_REQ_NO = #{mrReqNo}
+         <if test="itemCd != null">
+           AND ITEM_CD = #{itemCd}
+         </if>
+         <if test="mrReqProcStepDetNo!=null and mrReqProcStepDetNo!=0">
+           AND MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+         </if>
+           AND DEL_YN=0
+    </update>
+
+    <update id="updateTechMrRvRst" parameterType="com.mr.common.domain.MrRvRstVO">
+        --updateTechMrRvRst 888
+        UPDATE MR_RV_RST
+           SET CL_CD_01 = #{clCd01},
+               CL_CD_02 = #{clCd02},
+               CL_CD_03 = #{clCd03},
+               CL_CD_04 = #{clCd04},
+               CL_CD_05 = #{clCd05},
+               CL_CD_06 = #{clCd06},
+               CL_CD_07 = #{clCd07},
+               CL_CD_08 = #{clCd08},
+               CL_CD_09 = #{clCd09},
+               CL_CD_10 = #{clCd10},
+               CL_CD_11 = #{clCd11},
+               CL_CD_12 = #{clCd12},
+               CL_CD_13 = #{clCd13},
+               CL_CD_14 = #{clCd14},
+               CL_CD_15 = #{clCd15},
+               CL_CTT_01 = #{clCtt01},
+               CL_CTT_02 = #{clCtt02},
+               CL_CTT_03 = #{clCtt03},
+               CL_CTT_04 = #{clCtt04},
+               CL_CTT_05 = #{clCtt05},
+               CL_CTT_06 = #{clCtt06},
+               CL_CTT_07 = #{clCtt07},
+               CL_CTT_08 = #{clCtt08},
+               CL_CTT_09 = #{clCtt09},
+               CL_CTT_10 = #{clCtt10},
+               CL_CTT_11 = #{clCtt11},
+               CL_CTT_12 = #{clCtt12},
+               CL_CTT_13 = #{clCtt13},
+               CL_CTT_14 = #{clCtt14},
+               CL_CTT_15 = #{clCtt15},
+               CL_CMT_01 = #{clCmt01},
+               CL_CMT_02 = #{clCmt02},
+               CL_CMT_03 = #{clCmt03},
+               CL_CMT_04 = #{clCmt04},
+               CL_CMT_05 = #{clCmt05},
+               CL_CMT_06 = #{clCmt06},
+               CL_CMT_07 = #{clCmt07},
+               CL_CMT_08 = #{clCmt08},
+               CL_CMT_09 = #{clCmt09},
+               CL_CMT_10 = #{clCmt10},
+               CL_CMT_11 = #{clCmt11},
+               CL_CMT_12 = #{clCmt12},
+               CL_CMT_13 = #{clCmt13},
+               CL_CMT_14 = #{clCmt14},
+               CL_CMT_15 = #{clCmt15},
+               TOT_RV_SUGG = #{totRvSugg},
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+ 
+               <if test="confId != null">
+		         , CONF_ID = #{confId}
+		       </if>    
+               <if test="peId != null">
+		         , PE_ID = #{peId}
+		       </if>   
+		       <if test="peAddName != null">
+		         , PE_ADD_NAME = #{peAddName}
+		       </if>  
+         WHERE MR_REQ_NO = #{mrReqNo}
+           AND MR_REQ_PROC_STEP_DET_NO = #{mrReqProcStepDetNo}
+           AND DEL_YN=0
+    </update>
+    
+    <insert id="insertMrRvRst" parameterType="com.mr.common.domain.MrRvRstVO">
+        <selectKey keyProperty="mrRvRstNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_RV_RST_NO),0)+1
+              FROM MR_RV_RST
+        </selectKey>
+        --기술검토항목  임시저장1 999
+        INSERT INTO MR_RV_RST(
+                    MR_RV_RST_NO,
+                    MR_REQ_NO,
+                    MR_REQ_PROC_STEP_DET_NO,
+                    ITEM_CD,
+                    CL_CD_01,
+                    CL_CD_02,
+                    CL_CD_03,
+                    CL_CD_04,
+                    CL_CD_05,
+                    CL_CD_06,
+                    CL_CD_07,
+                    CL_CD_08,
+                    CL_CD_09,
+                    CL_CD_10,
+                    CL_CD_11,
+                    CL_CD_12,
+                    CL_CD_13,
+                    CL_CD_14,
+                    CL_CD_15,
+                    CL_CTT_01,
+                    CL_CTT_02,
+                    CL_CTT_03,
+                    CL_CTT_04,
+                    CL_CTT_05,
+                    CL_CTT_06,
+                    CL_CTT_07,
+                    CL_CTT_08,
+                    CL_CTT_09,
+                    CL_CTT_10,
+                    CL_CTT_11,
+                    CL_CTT_12,
+                    CL_CTT_13,
+                    CL_CTT_14,
+                    CL_CTT_15,
+                    CL_CMT_01,
+                    CL_CMT_02,
+                    CL_CMT_03,
+                    CL_CMT_04,
+                    CL_CMT_05,
+                    CL_CMT_06,
+                    CL_CMT_07,
+                    CL_CMT_08,
+                    CL_CMT_09,
+                    CL_CMT_10,
+                    CL_CMT_11,
+                    CL_CMT_12,
+                    CL_CMT_13,
+                    CL_CMT_14,
+                    CL_CMT_15,
+                    TOT_RV_SUGG,
+                    DEL_YN,
+                    FST_RGST_DT,
+                    FST_RGSTR,
+                    LAST_CHG_DT,
+                    LAST_CHGR
+ 
+               <if test="rgstId != null">
+		         , RGST_ID
+		       </if>    
+               <if test="confId != null">
+		         , CONF_ID
+		       </if>   
+		       <if test="peId != null">
+		         , PE_ID
+		       </if>   
+		       <if test="peAddName != null">
+		         , PE_ADD_NAME
+		       </if>  
+             ) VALUES (#{mrRvRstNo},
+                       #{mrReqNo},
+                       #{mrReqProcStepDetNo},
+                       #{itemCd},
+                       #{clCd01},
+                       #{clCd02},
+                       #{clCd03},
+                       #{clCd04},
+                       #{clCd05},
+                       #{clCd06},
+                       #{clCd07},
+                       #{clCd08},
+                       #{clCd09},
+                       #{clCd10},
+                       #{clCd11},
+                       #{clCd12},
+                       #{clCd13},
+                       #{clCd14},
+                       #{clCd15},
+                       #{clCtt01},
+                       #{clCtt02},
+                       #{clCtt03},
+                       #{clCtt04},
+                       #{clCtt05},
+                       #{clCtt06},
+                       #{clCtt07},
+                       #{clCtt08},
+                       #{clCtt09},
+                       #{clCtt10},
+                       #{clCtt11},
+                       #{clCtt12},
+                       #{clCtt13},
+                       #{clCtt14},
+                       #{clCtt15},
+                       #{clCmt01},
+                       #{clCmt02},
+                       #{clCmt03},
+                       #{clCmt04},
+                       #{clCmt05},
+                       #{clCmt06},
+                       #{clCmt07},
+                       #{clCmt08},
+                       #{clCmt09},
+                       #{clCmt10},
+                       #{clCmt11},
+                       #{clCmt12},
+                       #{clCmt13},
+                       #{clCmt14},
+                       #{clCmt15},
+                       #{totRvSugg},
+                       0,
+                       SYSDATE,
+                       #{loginEmpNo},
+                       SYSDATE,
+                       #{loginEmpNo}
+                       
+		               <if test="rgstId != null">
+				         , #{rgstId}
+				       </if>    
+		               <if test="confId != null">
+				         , #{confId}
+				       </if>   
+				       <if test="peId != null">
+				         , #{peId}
+				       </if>   
+				       <if test="peAddName != null">
+				         , #{peAddName}
+				       </if>
+				     )
+    </insert>
+    
+    <!-- yoo240830  MrRvRst 테이블 Z0025에서 Z0040으로 Copy-->
+    <insert id="copyMrRvRst" parameterType="com.mr.common.domain.MrRvRstVO">
+--copyMrRvRst yoo240904 Z0025에서  Z0040으로 복사 --기술검토항목  임시저장1
+INSERT INTO MR_RV_RST (MR_RV_RST_NO, MR_REQ_NO, MR_REQ_PROC_STEP_DET_NO, ITEM_CD, CL_CD_01, CL_CD_02, CL_CD_03, CL_CD_04, CL_CD_05, CL_CD_06, CL_CD_07, CL_CD_08, CL_CD_09, CL_CD_10, CL_CD_11, CL_CD_12, CL_CD_13, CL_CD_14, CL_CD_15
+,CL_CTT_01 ,CL_CTT_02 ,CL_CTT_03 ,CL_CTT_04 ,CL_CTT_05 ,CL_CTT_06 ,CL_CTT_07 ,CL_CTT_08 ,CL_CTT_09 ,CL_CTT_10, CL_CTT_11, CL_CTT_12, CL_CTT_13, CL_CTT_14, CL_CTT_15  
+,CL_CMT_01 ,CL_CMT_02 ,CL_CMT_03 ,CL_CMT_04 ,CL_CMT_05 ,CL_CMT_06 ,CL_CMT_07 ,CL_CMT_08 ,CL_CMT_09 ,CL_CMT_10 ,CL_CMT_11 ,CL_CMT_12 ,CL_CMT_13 ,CL_CMT_14 ,CL_CMT_15  
+,TOT_RV_SUGG ,DEL_YN ,FST_RGST_DT ,FST_RGSTR, LAST_CHG_DT, LAST_CHGR)
+WITH base AS(
+SELECT (SELECT NVL(MAX(MR_RV_RST_NO),0) FROM MR_RV_RST) + 1 AS MAX,MIN(MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO FROM MR_RV_RST WHERE MR_REQ_PROC_STEP_DET_NO IN (SELECT DET.MR_REQ_PROC_STEP_DET_NO 
+FROM MR_REQ_PROC_STEP STEP, MR_REQ_PROC_STEP_DET DET, MR_REQ_CHRGR_CHG_HIST HIST, EDM_EMP EMP, 
+EDM_ORG TEAM, EDM_DUTY DUTY WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO 
+AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO AND HIST.CHRG_EMP_NO = EMP.EMP_ID 
+AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+) AND EMP.DUTY_ID = DUTY.DUTY_ID AND STEP.MR_REQ_NO = #{mrReqNo} AND DET.MR_STEP_CD = 'Z0025' 
+AND HIST.CHRGR_CL_CD LIKE 'Z02H%' AND HIST.EFF_END_DTM = '99991231235959' AND HIST.DEL_YN=0 
+AND DET.DEL_YN=0 AND STEP.DEL_YN=0) AND DEL_YN=0 AND CL_CD_01 IS NOT NULL GROUP BY MR_REQ_NO)
+SELECT DISTINCT (select MAX + (RST.MR_REQ_PROC_STEP_DET_NO - MR_REQ_PROC_STEP_DET_NO) from base) AS MR_RV_RST_NO, #{mrReqNo} AS MR_REQ_NO, CODE_VIEW.NEW_MR_REQ_PROC_STEP_DET_NO AS MR_REQ_PROC_STEP_DET_NO, RST.ITEM_CD, RST.CL_CD_01, RST.CL_CD_02, RST.CL_CD_03, RST.CL_CD_04, RST.CL_CD_05, 
+RST.CL_CD_06, RST.CL_CD_07, RST.CL_CD_08, RST.CL_CD_09, RST.CL_CD_10, RST.CL_CD_11, RST.CL_CD_12, RST.CL_CD_13, RST.CL_CD_14, RST.CL_CD_15
+,RST.CL_CTT_01 ,RST.CL_CTT_02 ,RST.CL_CTT_03 ,RST.CL_CTT_04 ,RST.CL_CTT_05 ,RST.CL_CTT_06 ,RST.CL_CTT_07 ,RST.CL_CTT_08 ,RST.CL_CTT_09 ,RST.CL_CTT_10, RST.CL_CTT_11, RST.CL_CTT_12, RST.CL_CTT_13, RST.CL_CTT_14, RST.CL_CTT_15  
+,RST.CL_CMT_01 ,RST.CL_CMT_02 ,RST.CL_CMT_03 ,RST.CL_CMT_04 ,RST.CL_CMT_05 ,RST.CL_CMT_06 ,RST.CL_CMT_07 ,RST.CL_CMT_08 ,RST.CL_CMT_09 ,RST.CL_CMT_10 ,
+RST.CL_CMT_11 ,RST.CL_CMT_12 ,RST.CL_CMT_13 ,RST.CL_CMT_14 ,RST.CL_CMT_15  
+,RST.TOT_RV_SUGG ,RST.DEL_YN, SYSDATE AS FST_RGST_DT, #{loginEmpNo} AS FST_RGSTR, RST.LAST_CHG_DT ,RST.LAST_CHGR FROM MR_RV_RST RST, (
+SELECT SUBSTR(MR_REQ_PROC_STEP_DET_NO,0,INSTR(MR_REQ_PROC_STEP_DET_NO,',') - 1) AS MR_REQ_PROC_STEP_DET_NO, SUBSTR(MR_REQ_PROC_STEP_DET_NO,INSTR(MR_REQ_PROC_STEP_DET_NO,',') + 1,LENGTH(MR_REQ_PROC_STEP_DET_NO)) AS NEW_MR_REQ_PROC_STEP_DET_NO, CHRGR_CL_CD FROM (
+ SELECT LISTAGG(DET.MR_REQ_PROC_STEP_DET_NO, ',') WITHIN GROUP(ORDER BY DET.MR_REQ_PROC_STEP_DET_NO) AS MR_REQ_PROC_STEP_DET_NO, HIST.CHRGR_CL_CD FROM MR_REQ_PROC_STEP STEP, MR_REQ_PROC_STEP_DET DET, MR_REQ_CHRGR_CHG_HIST HIST, EDM_EMP EMP, EDM_ORG TEAM, EDM_DUTY DUTY WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO 
+AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO AND HIST.CHRG_EMP_NO = EMP.EMP_ID AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+) AND EMP.DUTY_ID = DUTY.DUTY_ID AND STEP.MR_REQ_NO = #{mrReqNo} AND DET.MR_STEP_CD IN ('Z0025' , 'Z0040')
+AND HIST.CHRGR_CL_CD LIKE 'Z02H%' AND HIST.EFF_END_DTM = '99991231235959' AND HIST.DEL_YN=0 AND DET.DEL_YN=0 AND STEP.DEL_YN=0 GROUP BY HIST.CHRGR_CL_CD ORDER BY LPAD(REPLACE(HIST.CHRGR_CL_CD,'Z02H',''),2,'0'))
+) CODE_VIEW 
+WHERE RST.MR_REQ_PROC_STEP_DET_NO = CODE_VIEW.MR_REQ_PROC_STEP_DET_NO AND RST.MR_REQ_PROC_STEP_DET_NO IN (SELECT DET.MR_REQ_PROC_STEP_DET_NO 
+FROM MR_REQ_PROC_STEP STEP, MR_REQ_PROC_STEP_DET DET, MR_REQ_CHRGR_CHG_HIST HIST, EDM_EMP EMP, 
+EDM_ORG TEAM, EDM_DUTY DUTY WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO 
+AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO AND HIST.CHRG_EMP_NO = EMP.EMP_ID 
+AND HIST.CHRG_TEAM_NO = TEAM.ORG_ID(+) AND EMP.DUTY_ID = DUTY.DUTY_ID AND STEP.MR_REQ_NO = #{mrReqNo} AND DET.MR_STEP_CD = 'Z0025' 
+AND HIST.CHRGR_CL_CD LIKE 'Z02H%' AND HIST.EFF_END_DTM = '99991231235959' AND HIST.DEL_YN=0 
+AND DET.DEL_YN=0 AND STEP.DEL_YN=0) AND RST.DEL_YN=0 AND RST.CL_CD_01 IS NOT NULL ORDER BY MR_REQ_PROC_STEP_DET_NO
+    </insert>
+    
+    <update id="updateDetHistDel" parameterType="map">
+    {call 
+    declare
+    begin
+    -- rvRst-Sql.updateDetHistDel
+		UPDATE MR_REQ_PROC_STEP_DET
+		   SET DEL_YN = 1
+		       ,LAST_CHG_DT = SYSDATE
+		       ,LAST_CHGR = #{loginEmpNo}
+         WHERE MR_REQ_PROC_STEP_DET_NO in (SELECT a.MR_REQ_PROC_STEP_DET_NO       
+                                             FROM MR_REQ_PROC_STEP_DET a, MR_REQ_CHRGR_CHG_HIST b
+                                            WHERE a.MR_REQ_PROC_STEP_DET_NO = b.MR_REQ_PROC_STEP_DET_NO
+                                              AND a.DEL_YN = 0
+                                              AND b.CHRGR_CL_CD IN ('Z02I1')
+                                              AND a.MR_REQ_PROC_STEP_NO IN (SELECT MR_REQ_PROC_STEP_NO 
+                                                                              FROM MR_REQ_PROC_STEP
+                                                                             WHERE MR_REQ_NO =  #{mrReqNo}
+                                                                               AND MR_STEP_CD =  'Z0030'     		                                  
+                                                                               AND DEL_YN = '0')
+                                                                       );
+    
+		UPDATE MR_REQ_CHRGR_CHG_HIST
+		   SET EFF_END_DTM = TO_CHAR(SYSDATE,'YYYYMMDDHH24MISS')
+		       ,LAST_CHG_DT = SYSDATE
+		       ,LAST_CHGR = #{loginEmpNo}
+		       ,DEL_YN = 1
+		 WHERE 1=1		   
+		   AND DEL_YN = '0'
+		   AND CHRGR_CL_CD IN ('Z02I1')
+		   AND MR_REQ_PROC_STEP_DET_NO IN (SELECT MR_REQ_PROC_STEP_DET_NO FROM MR_REQ_PROC_STEP_DET
+		                                    WHERE 1=1
+		                                      AND MR_REQ_PROC_STEP_NO IN (SELECT MR_REQ_PROC_STEP_NO 
+		                                                                    FROM MR_REQ_PROC_STEP
+		                                                                   WHERE MR_REQ_NO = #{mrReqNo}
+		                                                                     AND MR_STEP_CD = #{stepCd}		                                                                     
+		                                                                     AND DEL_YN = '0')
+		                                    );
+
+
+	end
+    }           
+    </update>
+</mapper>

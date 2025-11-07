@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="common.file">
+    <resultMap id="mrAtchFileResultMap" type="com.common.file.domain.MrAtchFile">
+        <id property="mrAtchFileNo" column="MR_ATCH_FILE_NO" />
+        <result property="mrReqProcStepDetNo" column="MR_REQ_PROC_STEP_DET_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="fileCd" column="FILE_CD" />
+        <result property="fileCdNm" column="FILE_CD_NM" />
+        <result property="fileNm" column="FILE_NM" />
+        <result property="fileStepCd" column="FILE_STEP_CD" />
+        <result property="fileStepNm" column="FILE_STEP_NM" />
+        <result property="drawMngNo" column="DRAW_MNG_NO" />
+        <result property="fileProcCd" column="FILE_PROC_CD" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="getMrAtchFile"  parameterType="int" resultMap="mrAtchFileResultMap">
+        SELECT MR_ATCH_FILE_NO
+              ,MR_REQ_PROC_STEP_DET_NO
+              ,MR_REQ_NO
+              ,FILE_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='ATCH' AND MR_COMM_CD=ATCH.FILE_CD) FILE_CD_NM
+              ,FILE_NM
+              ,FILE_STEP_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='MR_FILE' AND MR_COMM_CD=ATCH.FILE_STEP_CD) FILE_STEP_NM
+              ,DRAW_MNG_NO
+              ,FILE_PROC_CD
+              ,DEL_YN
+              ,FST_RGST_DT
+              ,FST_RGSTR
+              ,LAST_CHG_DT
+              ,LAST_CHGR
+          FROM MR_ATCH_FILE ATCH
+         WHERE ATCH.DEL_YN = 0
+           AND ATCH.MR_ATCH_FILE_NO = #{mrAtchFileNo}
+    </select>
+
+    <select id="getMrAtchFileList"  parameterType="map" resultMap="mrAtchFileResultMap">
+    --첨부파일 조회(getMrAtchFileList)
+        SELECT MR_ATCH_FILE_NO
+              ,#{mrStepCd}
+              ,MR_REQ_PROC_STEP_DET_NO
+              ,MR_REQ_NO
+              ,FILE_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='ATCH' AND MR_COMM_CD=ATCH.FILE_CD) FILE_CD_NM
+              ,FILE_NM
+              ,FILE_STEP_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='MR_FILE' AND MR_COMM_CD=ATCH.FILE_STEP_CD) FILE_STEP_NM
+              ,DRAW_MNG_NO
+              ,FILE_PROC_CD
+              ,DEL_YN
+              ,FST_RGST_DT
+              ,FST_RGSTR
+              ,LAST_CHG_DT
+              ,LAST_CHGR
+          FROM MR_ATCH_FILE ATCH
+         WHERE ATCH.DEL_YN = 0
+           AND ATCH.MR_REQ_NO = #{mrReqNo}
+           <if test="mrStepCd != null">
+           AND ATCH.MR_REQ_PROC_STEP_DET_NO IN (SELECT MR_REQ_PROC_STEP_DET_NO FROM MR_REQ_PROC_STEP_DET WHERE MR_REQ_NO=#{mrReqNo} AND MR_STEP_CD=#{mrStepCd})
+           </if>           
+      ORDER BY MR_ATCH_FILE_NO
+    </select>
+
+    <select id="getMrAtchFileChrgrList"  parameterType="map" resultMap="mrAtchFileResultMap">
+        SELECT MR_ATCH_FILE_NO
+              ,MR_REQ_PROC_STEP_DET_NO
+              ,MR_REQ_NO
+              ,FILE_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='ATCH' AND MR_COMM_CD=ATCH.FILE_CD) FILE_CD_NM
+              ,FILE_NM
+              ,FILE_STEP_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='MR_FILE' AND MR_COMM_CD=ATCH.FILE_STEP_CD) FILE_STEP_NM
+              ,DRAW_MNG_NO
+              ,FILE_PROC_CD
+              ,DEL_YN
+              ,FST_RGST_DT
+              ,FST_RGSTR
+              ,LAST_CHG_DT
+              ,LAST_CHGR
+          FROM MR_ATCH_FILE ATCH
+         WHERE ATCH.DEL_YN = 0
+           AND ATCH.MR_REQ_NO = #{mrReqNo}
+           AND ATCH.MR_REQ_PROC_STEP_DET_NO IN (SELECT A.MR_REQ_PROC_STEP_DET_NO FROM MR_REQ_PROC_STEP_DET A, MR_REQ_CHRGR_CHG_HIST B WHERE A.MR_REQ_PROC_STEP_DET_NO = B.MR_REQ_PROC_STEP_DET_NO AND A.MR_REQ_NO = #{mrReqNo} AND A.MR_STEP_CD = #{mrStepCd} AND B.CHRGR_CL_CD = #{chrgrClCd} )
+      ORDER BY MR_ATCH_FILE_NO
+    </select>
+
+
+    <select id="getMrAtchFileCode" parameterType="string" resultMap="mrAtchFileResultMap">
+        SELECT MR_ATCH_FILE_NO
+              ,MR_REQ_PROC_STEP_DET_NO
+              ,MR_REQ_NO
+              ,FILE_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='ATCH' AND MR_COMM_CD=ATCH.FILE_CD) FILE_CD_NM
+              ,FILE_NM
+              ,FILE_STEP_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='MR_FILE' AND MR_COMM_CD=ATCH.FILE_STEP_CD) FILE_STEP_NM
+              ,DRAW_MNG_NO
+              ,FILE_PROC_CD
+              ,DEL_YN
+              ,FST_RGST_DT
+              ,FST_RGSTR
+              ,LAST_CHG_DT
+              ,LAST_CHGR
+          FROM MR_ATCH_FILE
+         WHERE MR_ATCH_FILE_NO = #{code}
+           AND DEL_YN = 0
+    </select>
+
+    <select id="getMrAtchFileListCode" parameterType="java.util.List" resultMap="mrAtchFileResultMap">
+        SELECT MR_ATCH_FILE_NO
+              ,MR_REQ_PROC_STEP_DET_NO
+              ,MR_REQ_NO
+              ,FILE_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='ATCH' AND MR_COMM_CD=ATCH.FILE_CD) FILE_CD_NM
+              ,FILE_NM
+              ,FILE_STEP_CD
+              ,(SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='MR_FILE' AND MR_COMM_CD=ATCH.FILE_STEP_CD) FILE_STEP_NM
+              ,DRAW_MNG_NO
+              ,FILE_PROC_CD
+              ,DEL_YN
+              ,FST_RGST_DT
+              ,FST_RGSTR
+              ,LAST_CHG_DT
+              ,LAST_CHGR
+          FROM MR_ATCH_FILE
+         WHERE MR_ATCH_FILE_NO IN
+         <foreach collection="list" index="index" item="code" separator="," open="(" close=")">
+             #{code}
+         </foreach>
+           AND DEL_YN = 0
+      ORDER BY MR_ATCH_FILE_NO
+    </select>
+
+    <insert id="insertMrAtchFile" parameterType="com.common.file.domain.MrAtchFile">
+        <selectKey keyProperty="mrAtchFileNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_ATCH_FILE_NO),0)+1
+              FROM MR_ATCH_FILE
+        </selectKey>
+           INSERT INTO MR_ATCH_FILE(
+                       MR_ATCH_FILE_NO,
+                       MR_REQ_PROC_STEP_DET_NO,
+                       MR_REQ_NO,
+                       FILE_CD,
+                       FILE_NM,
+                       FILE_STEP_CD,
+                       DRAW_MNG_NO,
+                       FILE_PROC_CD,
+                       DEL_YN,
+                       FST_RGST_DT,
+                       FST_RGSTR,
+                       LAST_CHG_DT,
+                       LAST_CHGR
+           ) VALUES (
+                       #{mrAtchFileNo},
+                       (SELECT MIN(MR_REQ_PROC_STEP_DET_NO) FROM MR_REQ_PROC_STEP_DET WHERE MR_REQ_NO = #{mrReqNo} AND MR_STEP_CD = #{mrStepCd} AND DEL_YN='0'),
+                       #{mrReqNo},
+                       #{fileCd},
+                       #{fileNm},
+                       #{fileStepCd},
+                       #{drawMngNo},
+                       '0',
+                       0,
+                       SYSDATE,
+                       #{loginEmpNo},
+                       SYSDATE,
+                       #{loginEmpNo}
+                    )
+    </insert>
+
+    <insert id="insertMrAtchChrgrFile" parameterType="com.common.file.domain.MrAtchFile">
+        <selectKey keyProperty="mrAtchFileNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_ATCH_FILE_NO),0)+1
+              FROM MR_ATCH_FILE
+        </selectKey>
+        	--insertMrAtchChrgrFile(첨부파일 정보를 저장한다)
+           INSERT INTO MR_ATCH_FILE(
+                       MR_ATCH_FILE_NO,
+                       MR_REQ_PROC_STEP_DET_NO,
+                       MR_REQ_NO,
+                       FILE_CD,
+                       FILE_NM,
+                       FILE_STEP_CD,
+                       DRAW_MNG_NO,
+                       FILE_PROC_CD,
+                       DEL_YN,
+                       FST_RGST_DT,
+                       FST_RGSTR,
+                       LAST_CHG_DT,
+                       LAST_CHGR
+           ) VALUES (
+                       #{mrAtchFileNo},
+                       (SELECT MIN(A.MR_REQ_PROC_STEP_DET_NO)
+                          FROM MR_REQ_PROC_STEP_DET A, MR_REQ_CHRGR_CHG_HIST B
+                         WHERE A.MR_REQ_PROC_STEP_DET_NO = B.MR_REQ_PROC_STEP_DET_NO AND A.MR_REQ_NO = #{mrReqNo} AND A.MR_STEP_CD = #{mrStepCd} AND B.CHRGR_CL_CD = #{chrgrClCd} AND A.DEL_YN='0' AND B.DEL_YN='0'),
+                       #{mrReqNo},
+                       #{fileCd},
+                       #{fileNm},
+                       #{fileStepCd},
+                       #{drawMngNo},
+                       '0',
+                       0,
+                       SYSDATE,
+                       #{loginEmpNo},
+                       SYSDATE,
+                       #{loginEmpNo}
+                    )
+    </insert>
+
+    <delete id="deleteMrAtchFile" parameterType="list">
+    --deleteMrAtchFile (자료삭제)
+        UPDATE MR_ATCH_FILE
+           SET DEL_YN = 1,
+               LAST_CHG_DT = SYSDATE
+         WHERE MR_ATCH_FILE_NO IN
+         <foreach collection="list" index="index" item="code" separator="," open="(" close=")">
+             #{code}
+         </foreach>
+    </delete>
+</mapper>

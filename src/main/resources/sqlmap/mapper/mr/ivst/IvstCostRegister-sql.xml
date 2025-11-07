@@ -1,0 +1,524 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.ivst">
+    <resultMap id="ivstCostMap" type="com.mr.ivst.domain.IvstCostRegisterVO">
+        <id property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrTmpNo" column="MR_TMP_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="plant" column="PLANT" />
+        <result property="plantNm" column="PLANT_NM" />
+        <result property="reqClCd" column="REQ_CL_CD" />
+        <result property="reqClDtlCd" column="REQ_CL_DTL_CD" />
+        <result property="workPsblClCd" column="WORK_PSBL_CL_CD" />
+        <result property="workPsblClNm" column="WORK_PSBL_CL_NM" />
+        <result property="workPsblDt" column="WORK_PSBL_DT" />
+        <result property="workPsblClRsn" column="WORK_PSBL_CL_RSN" />
+        <result property="rigionCd" column="RIGION_CD" />
+        <result property="issueCtt" column="ISSUE_CTT" />
+        <result property="inflnceLoss" column="INFLNCE_LOSS" />
+        <result property="incnvCtt" column="INCNV_CTT" />
+        <result property="useCnt" column="USE_CNT" />
+        <result property="useCntPrd" column="USE_CNT_PRD" />
+        <result property="imprvPrpslCtt" column="IMPRV_PRPSL_CTT" />
+        <result property="qualEptEftCtt" column="QUAL_EPT_EFT_CTT" />
+        <result property="quanEptEftCtt" column="QUAN_EPT_EFT_CTT" />
+        <result property="quanEptEftCd" column="QUAN_EPT_EFT_CD" />
+        <result property="cnclEmpNo" column="CNCL_EMP_ID" />
+        <result property="cnclDt" column="CNCL_DT" />
+        <result property="cnclRsnCtt" column="CNCL_RSN_CTT" />
+        <result property="safetyChkDt" column="SAFETY_CHK_DT" />
+        <result property="safetyChkLoc" column="SAFETY_CHK_LOC" />
+        <result property="invstCostNo" column="INVST_COST_NO" />
+        <result property="capexNo" column="CAPEX_NO" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <result property="invstCd" column="INVST_CD" />
+        <result property="invstPurpCd" column="INVST_PURP_CD" />
+        <result property="zoutqty" column="ZOUTQTY" />
+        <result property="zoutamt" column="ZOUTAMT" />
+        <result property="invstCdNm" column="INVST_CD_NM" />
+        <result property="invstPurpCdNm" column="INVST_PURP_CD_NM" />
+        <result property="invstCostTotal" column="COST_TOT" />
+        <collection property="equips" ofType="com.mr.ivst.domain.IvstReqEquipVO" column="MR_REQ_NO" select="selectMrReqEquip" />
+        <collection property="procs" ofType="com.mr.ivst.domain.IvstReqProcVO" column="MR_REQ_NO" select="selectMrReqProc" />
+        <collection property="appLine" ofType="com.mr.step.domain.ChrgrChgHist" column="{mrReqNo=MR_REQ_NO, mrStepCd=MR_STEP_CD} " select="mr.step.selectAppLine" />
+    </resultMap>
+    <select id="selectIvstCost" resultMap="ivstCostMap">
+    --투자지출품의
+         SELECT A.MR_REQ_NO,
+                A.MR_REQ_TITLE,
+                A.MR_NO,
+                A.MR_TMP_NO,
+                'Z0050' AS MR_STEP_CD,
+                A.PROC_ST_CD,
+                A.PLANT,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='PLANT' AND MR_COMM_CD=A.PLANT) PLANT_NM,
+                A.REQ_CL_CD,
+                A.REQ_CL_DTL_CD,
+                A.WORK_PSBL_CL_CD,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='WORK' AND MR_COMM_CD=A.WORK_PSBL_CL_CD) WORK_PSBL_CL_NM,
+                A.WORK_PSBL_DT,
+                A.WORK_PSBL_CL_RSN,
+                A.RIGION_CD,
+                A.ISSUE_CTT,
+                A.INFLNCE_LOSS,
+                A.INCNV_CTT,
+                A.USE_CNT,
+                A.USE_CNT_PRD,
+                A.IMPRV_PRPSL_CTT,
+                A.QUAL_EPT_EFT_CTT,
+                A.QUAN_EPT_EFT_CTT,
+                A.QUAN_EPT_EFT_CD,
+                A.CNCL_EMP_ID,
+                A.CNCL_DT,
+                A.CNCL_RSN_CTT,
+                A.SAFETY_CHK_DT,
+                A.SAFETY_CHK_LOC,
+                A.INVST_COST_NO,
+                A.CAPEX_NO,
+                A.DEL_YN,
+                A.FST_RGST_DT,
+                A.FST_RGSTR,
+                A.LAST_CHG_DT,
+                A.LAST_CHGR,
+                B.INVST_CD,
+                B.INVST_PURP_CD,
+                B.ZOUTQTY,
+                B.ZOUTAMT,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='IVST' AND MR_COMM_CD=B.INVST_CD) INVST_CD_NM,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='IVST_PUR' AND MR_COMM_CD=B.INVST_PURP_CD) INVST_PURP_CD_NM,
+                (SELECT SUM(COST_TOT) FROM MR_INVST_COST WHERE  MR_REQ_NO = #{mrReqNo} AND DEL_YN = '0') COST_TOT
+           FROM MR_REQ_MST A, MR_TECH_RV B
+          WHERE A.MR_REQ_NO = B.MR_REQ_NO(+)
+            AND A.MR_REQ_NO = #{mrReqNo}
+            AND B.DEL_YN=0
+            AND A.DEL_YN=0
+            and b.STEP_TYPE is null  /*mr수행 위험성 검토 때문에 추가*/
+    </select>
+
+    <resultMap id="ivstCostRptMap" type="com.mr.ivst.domain.IvstCostRptVO">
+        <id property="mrInvstCostRptNo" column="MR_INVST_COST_RPT_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="bizPurpSurr" column="BIZ_PURP_SURR" />
+        <result property="imprvPlan" column="IMPRV_PLAN" />
+        <result property="eptEft" column="EPT_EFT" />
+        <result property="mngAnalEmpNo" column="MNG_ANAL_EMP_NO" />
+        <result property="respTeamCd" column="RESP_TEAM_CD" />
+        <result property="costTeamCd" column="COST_TEAM_CD" />
+        <result property="propClass" column="PROP_CLASS" />
+        <result property="propClassNm" column="PROP_CLASS_NM" />
+        <result property="invstStaDt" column="INVST_STA_DT" />
+        <result property="invstEndDt" column="INVST_END_DT" />
+        <result property="invstManNo" column="INVST_MAN_NO" />
+        <result property="sapSender" column="SAP_SENDER" />
+        <result property="sapSendDt" column="SAP_SEND_DT" />
+        <result property="sapInvstCostRptNo" column="SAP_INVST_COST_RPT_NO" />
+        <result property="sapInvstCostRptDt" column="SAP_INVST_COST_RPT_DT" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <result property="invstYear" column="INVST_YEAR" />
+        <result property="mngAnalEmpNm" column="MNG_ANAL_EMP_NM" />
+        <result property="respTeamNm" column="RESP_TEAM_NM" />
+        <result property="costTeamNm" column="COST_TEAM_NM" />
+        <result property="sapSenderNm" column="SAP_SENDER_NM" />
+        <result property="invstCostTotal" column="COST_TOT" />
+    </resultMap>
+    <select id="selectIvstCostRpt" resultMap="ivstCostRptMap">
+         SELECT MR_INVST_COST_RPT_NO,
+                MR_REQ_NO,
+                BIZ_PURP_SURR,
+                IMPRV_PLAN,
+                EPT_EFT,
+                MNG_ANAL_EMP_NO,
+                RESP_TEAM_CD,
+                COST_TEAM_CD,
+                PROP_CLASS,
+                (SELECT MR_COMM_NM FROM MR_COMM_COD WHERE MR_COMM_GRP_CD='PROP' AND MR_COMM_CD=MR_INVST_COST_RPT.PROP_CLASS) PROP_CLASS_NM,
+                INVST_STA_DT,
+                INVST_END_DT,
+                SAP_SENDER,
+                SAP_SEND_DT,
+                SAP_INVST_COST_RPT_NO,
+                SAP_INVST_COST_RPT_DT,
+                DEL_YN,
+                FST_RGST_DT,
+                FST_RGSTR,
+                LAST_CHG_DT,
+                LAST_CHGR,
+                <!-- 품의년도와 카펙스년도 동일하게  (SELECT MIN(INVST_YEAR) FROM MR_INVST_COST WHERE MR_REQ_NO = #{mrReqNo} AND DEL_YN='0') INVST_YEAR,-->
+                (CASE WHEN SAP_SEND_DT IS NULL THEN  TO_CHAR(SYSDATE,'YYYY') ELSE SUBSTR(SAP_SEND_DT,1, 4) END) AS INVST_YEAR,
+                (SELECT EMP_NAME FROM EDM_EMP WHERE EMP_ID=MR_INVST_COST_RPT.MNG_ANAL_EMP_NO) MNG_ANAL_EMP_NM,
+                (SELECT MAX(LCTXT) FROM SAP_COST_CENTER WHERE KOSTL=MR_INVST_COST_RPT.RESP_TEAM_CD AND DATBI > SYSDATE-1) RESP_TEAM_NM,
+                (SELECT MAX(LCTXT) FROM SAP_COST_CENTER WHERE KOSTL=MR_INVST_COST_RPT.COST_TEAM_CD AND DATBI > SYSDATE-1) COST_TEAM_NM,
+                (SELECT EMP_NAME FROM EDM_EMP WHERE EMP_ID=MR_INVST_COST_RPT.SAP_SENDER) SAP_SENDER_NM,
+                INVST_MAN_NO,
+                (SELECT SUM(COST_TOT) FROM MR_INVST_COST WHERE  MR_REQ_NO = #{mrReqNo} AND DEL_YN = '0') COST_TOT
+           FROM MR_INVST_COST_RPT
+          WHERE MR_REQ_NO = #{mrReqNo}
+            AND DEL_YN=0
+    </select>
+	
+    <insert id="insertIvstCostRpt" parameterType="com.mr.ivst.domain.IvstCostRptVO">
+        <selectKey keyProperty="mrInvstCostRptNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_INVST_COST_RPT_NO),0)+1
+              FROM MR_INVST_COST_RPT
+        </selectKey>
+           INSERT INTO MR_INVST_COST_RPT(
+                       MR_INVST_COST_RPT_NO,
+                       MR_REQ_NO,
+                       BIZ_PURP_SURR,
+                       IMPRV_PLAN,
+                       EPT_EFT,
+                       MNG_ANAL_EMP_NO,
+                       RESP_TEAM_CD,
+                       COST_TEAM_CD,
+                       PROP_CLASS,
+                       INVST_STA_DT,
+                       INVST_END_DT,
+                       DEL_YN,
+                       FST_RGST_DT,
+                       FST_RGSTR,
+                       LAST_CHG_DT,
+                       LAST_CHGR,
+                       INVST_MAN_NO
+           ) VALUES (
+                       #{mrInvstCostRptNo},
+                       #{mrReqNo},
+                       #{bizPurpSurr},
+                       #{imprvPlan},
+                       #{eptEft},
+                       #{mngAnalEmpNo},
+                       #{respTeamCd},
+                       #{costTeamCd},
+                       #{propClass},
+                       #{invstStaDt},
+                       #{invstEndDt},
+                       0,
+                       SYSDATE,
+                       #{loginEmpNo},
+                       SYSDATE,
+                       #{loginEmpNo},
+                       #{invstManNo}
+                    )
+    </insert>	
+	
+	
+	<!-- wj 투자지출품의 투자구분, 투자목적 추가 -->
+	 
+	<update id="updateIvstCostRpt_2" parameterType="com.mr.ivst.domain.IvstCostRegisterVO">
+			UPDATE MR_TECH_RV
+			   SET INVST_CD = #{invstCd}
+			   <if test="zoutqty != null">
+			   ,ZOUTQTY =  REPLACE(#{zoutqty},',','')
+			   </if>
+			   <if test="zoutamt != null">
+			   ,ZOUTAMT =   REPLACE(#{zoutamt},',','')
+			   </if>
+			   ,INVST_PURP_CD = #{invstPurpCd}
+			WHERE MR_REQ_NO = #{mrReqNo}
+			  AND DEL_YN=0
+	</update>
+	
+	 
+    <update id="updateIvstCostRpt" parameterType="map">
+             UPDATE MR_INVST_COST_RPT
+                SET BIZ_PURP_SURR = #{bizPurpSurr},
+                    IMPRV_PLAN = #{imprvPlan},
+                    EPT_EFT = #{eptEft},
+                    MNG_ANAL_EMP_NO = #{mngAnalEmpNo},
+                    RESP_TEAM_CD = #{respTeamCd},
+                    COST_TEAM_CD = #{costTeamCd},
+                    PROP_CLASS   = #{propClass},
+                    INVST_STA_DT = #{invstStaDt},
+                    INVST_END_DT = #{invstEndDt},
+                    LAST_CHG_DT  = SYSDATE,
+                    LAST_CHGR    = #{loginEmpNo},
+                    INVST_MAN_NO = #{invstManNo}                    
+                    <!-- wj추가 투자구분, 투자목적 도메인이 달라서 추가가 안됨
+                    INVST_CD = #{invstCd},
+			   		INVST_PURP_CD = #{invstPurpCd}
+			   		 -->
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+                
+                
+                
+    </update>
+
+    <insert id="insertIvstCostAppr" parameterType="com.mr.ivst.domain.IvstCostRptVO">
+        <selectKey keyProperty="mrInvstCostRptNo" resultType="int" order="BEFORE">
+            SELECT NVL(MAX(MR_INVST_COST_RPT_NO),0)+1
+              FROM MR_INVST_COST_RPT
+        </selectKey>
+           INSERT INTO MR_INVST_COST_RPT(
+                       MR_INVST_COST_RPT_NO,
+                       MR_REQ_NO,
+                       BIZ_PURP_SURR,
+                       IMPRV_PLAN,
+                       EPT_EFT,
+                       MNG_ANAL_EMP_NO,
+                       RESP_TEAM_CD,
+                       COST_TEAM_CD,
+                       PROP_CLASS,
+                       INVST_STA_DT,
+                       INVST_END_DT,
+                       SAP_SENDER,
+                       SAP_SEND_DT,
+                       DEL_YN,
+                       FST_RGST_DT,
+                       FST_RGSTR,
+                       LAST_CHG_DT,
+                       LAST_CHGR,
+                       INVST_MAN_NO
+           ) VALUES (
+                       #{mrInvstCostRptNo},
+                       #{mrReqNo},
+                       #{bizPurpSurr},
+                       #{imprvPlan},
+                       #{eptEft},
+                       #{mngAnalEmpNo},
+                       #{respTeamCd},
+                       #{costTeamCd},
+                       #{propClass},
+                       #{invstStaDt},
+                       #{invstEndDt},
+                       #{loginEmpNo},
+                       to_char(SYSDATE,'YYYY-MM-DD'),
+                       0,
+                       SYSDATE,
+                       #{loginEmpNo},
+                       SYSDATE,
+                       #{loginEmpNo},
+                       #{invstManNo}
+                    )
+    </insert>
+
+    <update id="updateIvstCostAppr" parameterType="map">
+             UPDATE MR_INVST_COST_RPT
+                SET BIZ_PURP_SURR = #{bizPurpSurr},
+                    IMPRV_PLAN = #{imprvPlan},
+                    EPT_EFT = #{eptEft},
+                    MNG_ANAL_EMP_NO = #{mngAnalEmpNo},
+                    RESP_TEAM_CD = #{respTeamCd},
+                    COST_TEAM_CD = #{costTeamCd},
+                    PROP_CLASS   = #{propClass},
+                    INVST_STA_DT = #{invstStaDt},
+                    INVST_END_DT = #{invstEndDt},
+                    SAP_SENDER   = #{loginEmpNo},
+                    SAP_SEND_DT  = to_char(SYSDATE,'YYYY-MM-DD'),
+                    LAST_CHG_DT  = SYSDATE,
+                    LAST_CHGR    = #{loginEmpNo},
+                    INVST_MAN_NO = #{invstManNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+    <update id="sendIvstCostRpt" parameterType="map">
+             UPDATE MR_INVST_COST_RPT
+                SET SAP_SENDER = #{loginEmpNo},
+                    SAP_SEND_DT = to_char(SYSDATE,'YYYY-MM-DD'),
+                    SAP_INVST_COST_RPT_NO = #{sapInvstCostRptNo},
+                    SAP_INVST_COST_RPT_DT = to_char(SYSDATE,'YYYY-MM-DD'),
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+    <update id="sendIvstCostRpt2" parameterType="map">
+             UPDATE MR_REQ_MST
+                SET INVST_COST_NO = #{sapInvstCostRptNo},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+    <update id="updateIvstCostRptEnd" parameterType="map">
+             UPDATE MR_REQ_MST
+                SET CNCL_EMP_ID = #{cnclEmpId},
+                    CNCL_RSN_CTT = #{cnclRsnCtt},
+                    CNCL_DT = #{cnclDt},
+                    LAST_CHG_DT = SYSDATE,
+                    LAST_CHGR = #{loginEmpNo}
+              WHERE MR_REQ_NO = #{mrReqNo}
+                AND DEL_YN='0'
+    </update>
+
+    <resultMap id="mrEquipMap" type="com.mr.ivst.domain.IvstReqEquipVO">
+        <id property="mrReqEquipNo" column="MR_REQ_EQUIP_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrProcNo" column="MR_PROC_NO" />
+        <result property="mrEquipCd" column="MR_EQUIP_CD" />
+        <result property="mrEquipName" column="MR_EQUIP_NAME" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMrReqEquip" resultMap="mrEquipMap">
+        SELECT MR_REQ_EQUIP_NO,
+               MR_REQ_NO,
+               MR_PROC_NO,
+               MR_EQUIP_CD,
+               MST.EQUIP_TEXT1 MR_EQUIP_NAME,
+               DEL_YN,
+               FST_RGST_DT,
+               FST_RGSTR,
+               LAST_CHG_DT,
+               LAST_CHGR
+          FROM MR_REQ_EQUIP EQUIP,
+               (SELECT EQUNR EQUIP_NO, EQKTX EQUIP_TEXT1 FROM SAP_EQUIP) MST
+         WHERE EQUIP.MR_EQUIP_CD = MST.EQUIP_NO
+           AND MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <resultMap id="mrProcMap" type="com.mr.ivst.domain.IvstReqProcVO">
+        <id property="mrReqProcNo" column="MR_REQ_PROC_NO" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrProcNo" column="MR_PROC_NO" />
+        <result property="mrProcName" column="MR_PROC_NAME" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMrReqProc" resultMap="mrProcMap">
+        SELECT MR_REQ_PROC_NO,
+               MR_REQ_NO,
+               MR_PROC_NO,
+               MST.UNIT_NM AS MR_PROC_NAME,
+               DEL_YN,
+               FST_RGST_DT,
+               FST_RGSTR,
+               LAST_CHG_DT,
+               LAST_CHGR
+          FROM MR_REQ_PROC PROC,
+               (SELECT STAND UNIT_NO, KTEXT UNIT_NM FROM SAP_LOCA WHERE WERKS=(SELECT PLANT FROM MR_REQ_MST WHERE MR_REQ_NO=#{mrReqNo} )) MST
+         WHERE PROC.MR_PROC_NO = MST.UNIT_NO
+           AND MR_REQ_NO = #{mrReqNo}
+           AND DEL_YN=0
+    </select>
+
+    <resultMap id="ivstCostSendMap" type="com.mr.ivst.domain.IvstCostSendVO">
+        <result property="mngAccount" column="MNG_ACCOUNT" />
+        <result property="invstYear" column="INVST_YEAR" />
+        <result property="respTeamCd" column="RESP_TEAM_CD" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="costTeamCd" column="COST_TEAM_CD" />
+        <result property="invstCd" column="INVST_CD" />
+        <result property="invstPurpCd" column="INVST_PURP_CD" />
+        <result property="mrProcNo" column="MR_PROC_NO" />
+        <result property="plant" column="PLANT" />
+        <result property="regionCd" column="REGION_CD" />
+        <result property="propClass" column="PROP_CLASS" />
+        <result property="invstStaDt" column="INVST_STA_DT" />
+        <result property="invstEndDt" column="INVST_END_DT" />
+        <result property="invstManNo" column="INVST_MAN_NO" />
+        <result property="sapSender" column="SAP_SENDER" />
+        <result property="waers" column="WAERS" />
+        <result property="sapSendDt" column="SAP_SEND_DT" />
+        <result property="mngAnalEmpNo" column="MNG_ANAL_EMP_NO" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="bizPurpSurr" column="BIZ_PURP_SURR" />
+        <result property="imprvPlan" column="IMPRV_PLAN" />
+        <result property="eptEft" column="EPT_EFT" />
+    </resultMap>
+
+    <select id="selectIvstCostSend" resultMap="ivstCostSendMap">
+    	--selectIvstCostSend 01
+         SELECT DECODE(A.PLANT,'1000','1000','8000','B000','8500','C000','8700','D000') MNG_ACCOUNT,
+                (SELECT MIN(INVST_YEAR) FROM MR_INVST_COST WHERE MR_REQ_NO =#{mrReqNo} AND DEL_YN='0') INVST_YEAR,
+                B.RESP_TEAM_CD,
+                A.MR_REQ_TITLE,
+                B.COST_TEAM_CD,
+                C.INVST_CD,
+                C.INVST_PURP_CD,
+                (SELECT MR_PROC_NO FROM MR_REQ_PROC WHERE MR_REQ_NO=#{mrReqNo} AND ROWNUM=1) MR_PROC_NO,
+                A.PLANT,
+                'D' REGION_CD,
+                B.PROP_CLASS,
+                REPLACE(B.INVST_STA_DT,'-','') INVST_STA_DT,
+                REPLACE(B.INVST_END_DT,'-','') INVST_END_DT,
+                B.LAST_CHGR SAP_SENDER,
+                'KRW' WAERS,
+                TO_CHAR(SYSDATE,'YYYYMMDD') SAP_SEND_DT,
+                B.MNG_ANAL_EMP_NO,
+                'MR_NO'||A.MR_NO MR_NO,
+                B.BIZ_PURP_SURR,
+                B.IMPRV_PLAN,
+                B.EPT_EFT,
+                B.INVST_MAN_NO
+           FROM MR_REQ_MST A, MR_INVST_COST_RPT B, MR_TECH_RV C
+          WHERE A.MR_REQ_NO   = B.MR_REQ_NO
+              AND A.MR_REQ_NO = C.MR_REQ_NO
+              AND A.MR_REQ_NO = #{mrReqNo}
+              AND A.DEL_YN='0' 
+              AND B.DEL_YN='0' 
+              AND C.DEL_YN='0'
+              AND C.STEP_TYPE is null    /*2025.11.03 IJS MR수행용 제외처리 */
+              and c.mr_step_cd != "Z0060"
+    </select>
+
+    <resultMap id="ivstCostItemSendMap" type="com.mr.ivst.domain.IvstCostItemSendVO">
+        <result property="mngAccount" column="MNG_ACCOUNT" />
+        <result property="invstYear" column="INVST_YEAR" />
+        <result property="costItemCd" column="COST_ITEM_CD" />
+        <result property="costItemCtt" column="COST_ITEM_CTT" />
+        <result property="costTot" column="COST_TOT" />
+        <result property="cost01" column="COST_01" />
+        <result property="cost02" column="COST_02" />
+        <result property="cost03" column="COST_03" />
+        <result property="cost04" column="COST_04" />
+        <result property="cost05" column="COST_05" />
+        <result property="cost06" column="COST_06" />
+        <result property="cost07" column="COST_07" />
+        <result property="cost08" column="COST_08" />
+        <result property="cost09" column="COST_09" />
+        <result property="cost10" column="COST_10" />
+        <result property="cost11" column="COST_11" />
+        <result property="cost12" column="COST_12" />
+    </resultMap>
+
+    <select id="selectIvstCostItemSend" resultMap="ivstCostItemSendMap">
+      SELECT (SELECT DECODE(PLANT,'1000','1000','8000','B000','8500','C000','8700','D000') FROM MR_REQ_MST WHERE MR_REQ_NO=#{mrReqNo} AND DEL_YN='0') MNG_ACCOUNT,
+             INVST_YEAR,
+             COST_ITEM_CD,
+             COST_ITEM_CTT,
+             COST_TOT * 1000 AS COST_TOT,
+             COST_01 * 1000 AS COST_01,
+             COST_02 * 1000 AS COST_02,
+             COST_03 * 1000 AS COST_03,
+             COST_04 * 1000 AS COST_04,
+             COST_05 * 1000 AS COST_05,
+             COST_06 * 1000 AS COST_06,
+             COST_07 * 1000 AS COST_07,
+             COST_08 * 1000 AS COST_08,
+             COST_09 * 1000 AS COST_09,
+             COST_10 * 1000 AS COST_10,
+             COST_11 * 1000 AS COST_11,
+             COST_12 * 1000 AS COST_12
+        FROM MR_INVST_COST
+       WHERE MR_REQ_NO = #{mrReqNo}
+         AND DEL_YN = '0'
+    </select>
+
+    <update id="skipIvstCostRpt" parameterType="map" statementType="CALLABLE">
+        {call MR_INVEST_NEXT_STEP(#{mrReqNo},'', #{loginEmpNo},#{pRtnCode},#{pRtnMsg}) }
+    </update>
+
+</mapper>

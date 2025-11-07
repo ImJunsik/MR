@@ -1,0 +1,929 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8" %>
+<%@ include file="/WEB-INF/includes/taglibs.jsp" %>
+<!-- title -->
+<div id="content_header">
+<!-- 임시저장화면 -->
+    <h4 class="content_header title">타당성검토 확인</h4>
+</div>
+<!-- button -->
+<div class="button_top">
+    <c:forEach var='appLine' items='${techReview.appLine}' varStatus="loop">
+    <c:if test="${appLine.chrgrClCd =='Z02D'}">
+    <c:if test="${appLine.ifStatCd != '1' && appLine.chrgEmpNo == appLine.loginEmpNo}"> 
+    <script>
+    //alert("${modeClass}");
+    //alert("${appLine.chrgrClCd}");
+    //alert("${appLine.ifStatCd}");
+    //alert("${appLine.chrgEmpNo}");
+    //alert("${appLine.loginEmpNo}");
+    </script>    
+    <input type="image" src="images/btn_reRequestApproval.png" style="display:none" class="cursor reAppReq CCA CCB"/><!-- 재상신 -->
+    </c:if>
+    </c:if>
+    </c:forEach>
+    <input type="image" src="images/btn_temp.png" style="display:none" class="vam cursor save CDA"/><!-- 임시저장버튼 -->
+    <input type="image" src="images/btn_requestApproval.png" style="display:none" class="vam cursor appReq CDA"/><!-- 승인요청 -->
+    <!-- hajewook 수정, 승인, 반려 버튼 비활성화 -->
+    <!-- <input type="image" src="images/btn_approve.png" style="display:none" class="vam cursor app CCA CEA"/>   -->   
+    <!-- <input type="image" src="images/btn_return.png" style="display:none" class="vam cursor return CCA CEA"/> --> 
+    <!-- <input type="image" src="images/btn_cancelMR.png" style="display:none" class="vam cursor cancel CEA"> -->
+    <input type="image" src="images/btn_approve.png" style="display:none" class="vam cursor app "/>
+    <input type="image" src="images/btn_return.png" style="display:none" class="vam cursor return "/>
+    <input type="image" src="images/btn_cancelMR.png" style="display:none" class="vam cursor cancel ">
+    <!-- <br><input type="image" src="images/btn_return.png" class="vam cursor return "/> -->
+    <!-- <br><input type="image" src="images/btn_approve.png"  class="vam cursor app"/> -->
+</div>
+
+<div id="content_wrap">
+<form id="registerForm" method="post">
+<input type="hidden" id="mrReqNo" name="mrReqNo" value="<c:out value="${techReview.mrReqNo}"/>"/>
+<input type="hidden" name="mrTechRvNo" value="<c:out value="${techReview.mrTechRvNo}"/>"/>
+
+<!-- 초기투자비 프로젝트 eng 멀티 지정으로 인하여 projEng 담당자 셋팅 관련 추가 2015-08-26 -->
+<table id="projEmpTemp" style="display: none;">
+  <tbody>
+  <tr style="display:none;">
+    <td>
+      <div>
+	    <input type="hidden" class="projValue"/>
+	    <input type="hidden" class="projChrgrClCd"/>
+	    <input type="hidden" class="projDutyText" />
+	    <input type="hidden" class="projTeamText" />
+	    <input type="hidden" class="projTeamValue" />
+	    <input type="hidden" class="projEndDate"/>
+	  </div>
+    </td>
+  </tr>
+  </tbody>
+</table>
+<!-- <table id="writerEmpTemp" style="display: none;">
+  <tr style="display:none;">
+    <td>
+    <input type="hidden" class="writerValue" />
+    <input type="hidden" value="Z02D"/>
+    <input type="hidden" class="writerDutyText" />
+    <input type="hidden" class="writerTeamText" />
+    <input type="hidden" class="writerTeamValue" />
+    <input type="hidden" value="9999-12-31"/>
+    </td>
+  </tr>
+</table>  -->
+<!--     <input type="hidden" class="engValue" name="appLine[0].chrgEmpNo" />
+    <input type="hidden" name="appLine[0].chrgrClCd" value="Z02I"/>
+    <input type="hidden" class="engDutyText" name="appLine[0].thdayPos" />
+    <input type="hidden" class="engTeamText" name="appLine[0].thdayTeam" />
+    <input type="hidden" class="engTeamValue" name="appLine[0].chrgTeamNo" />
+    <input type="hidden" class="engEndDate" name="appLine[0].procTrmDt" value=""/>
+
+    <input type="hidden" class="writerValue" name="appLine[1].chrgEmpNo" />
+    <input type="hidden" name="appLine[1].chrgrClCd" value="Z02D"/>
+    <input type="hidden" class="writerDutyText" name="appLine[1].thdayPos" />
+    <input type="hidden" class="writerTeamText" name="appLine[1].thdayTeam" />
+    <input type="hidden" class="writerTeamValue" name="appLine[1].chrgTeamNo" />
+    <input type="hidden" name="appLine[1].procTrmDt" value="9999-12-31"/> -->
+    <table class="table_row appEmpLine" border="1" cellspacing="0" >
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="15%">
+        <col width="15%">
+        <col width="20%">
+        <col width="15%">
+        <col width="35%">
+        </colgroup>
+        <tbody>
+        <tr>
+        <td colspan="5" class="topbg"></td>
+        </tr>
+        <tr>
+            <th class="dep1" rowspan="2" scope="row">타당성검토 확인<br />담당자</th><!-- 임시저장화면 -->
+            <th class="dep2" scope="row">1차(팀장)승인자</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="agreeText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input agreeText" readOnly/></c:if>
+                <input type="hidden" class="agreeValue" name="appLine[2].chrgEmpNo" />
+                <input type="hidden" class="agreeCode" name="appLine[2].chrgrClCd" value="Z02F"/>
+                <input type="hidden" class="agreeDutyText" name="appLine[2].thdayPos" />
+                <input type="hidden" class="agreeTeamText" name="appLine[2].thdayTeam" />
+                <input type="hidden" class="agreeTeamValue" name="appLine[2].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor empSearch CDA" data-role="agree" style="display:none"/>
+                </div>
+            </td>
+            <th class="dep2" scope="row">승인일</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="agreeDate"></span></c:if>
+                <c:if test="${modeClass!='CDA'}"><span class="agreeEndDate"></span></c:if>
+                <c:if test="${modeClass=='CDA'}">
+                    승인기한 : <input type="text" name="appLine[2].procTrmDt" class="i_input inputDate limitDate agreeEndDate" value="" readOnly/>(결재중)
+                </c:if>
+                <c:if test="${modeClass!='CDA'}">
+                    <input type="hidden" name="appLine[2].procTrmDt" class="agreeEndDate" value=""/>
+                </c:if>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th class="dep2" scope="row">2차(부문장)승인자</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="appText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input appText" readOnly/></c:if>
+                <input type="hidden" class="appValue" name="appLine[3].chrgEmpNo" />
+                <input type="hidden" class="agreeCode" name="appLine[3].chrgrClCd" value="Z02C"/>
+                <input type="hidden" class="appDutyText" name="appLine[3].thdayPos" />
+                <input type="hidden" class="appTeamText" name="appLine[3].thdayTeam" />
+                <input type="hidden" class="appTeamValue" name="appLine[3].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor empSearch CDA ABA" data-role="app" style="display:none"/>
+                </div>
+            </td>
+            <th class="dep2" scope="row">승인일</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="appDate"></span></c:if>
+                <c:if test="${modeClass!='CDA'}"><span class="appEndDate"></span></c:if>
+                <c:if test="${modeClass=='CDA'}">
+                    승인기한 : <input type="text" name="appLine[3].procTrmDt" class="i_input inputDate limitDate appEndDate" value="" readOnly />(결재중)
+                </c:if>
+                <c:if test="${modeClass!='CDA'}">
+                     <input type="hidden" name="appLine[3].procTrmDt" class="appEndDate" value=""/>
+                </c:if>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- space non 10 -->
+    <hr class="divider_none_10" />
+
+    <table class="table_row techJobList" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="15%">
+        <col width="85%">
+        </colgroup>
+        <tbody>
+        <tr>
+            <th scope="row">기술</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="techText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input techText" readOnly/></c:if>
+                <input type="hidden" class="techValue" name="jobs[0].chrgEmpNo" />
+                <input type="hidden" name="jobs[0].chrgrClCd" value="Z02H1"/>
+                <input type="hidden" class="techDutyText" name="jobs[0].thdayPos" />
+                <input type="hidden" class="techTeamText" name="jobs[0].thdayTeam" />
+                <input type="hidden" class="techTeamValue" name="jobs[0].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor jobEmpSearch CDA" data-role="tech" style="display:none"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">검사</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="checkText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input checkText" readOnly/></c:if>
+                <input type="hidden" class="checkValue" name="jobs[1].chrgEmpNo" />
+                <input type="hidden" name="jobs[1].chrgrClCd" value="Z02H2"/>
+                <input type="hidden" class="checkDutyText" name="jobs[1].thdayPos" />
+                <input type="hidden" class="checkTeamText" name="jobs[1].thdayTeam" />
+                <input type="hidden" class="checkTeamValue" name="jobs[1].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor jobEmpSearch CDA" data-role="check" style="display:none"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">운전</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="driveText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input driveText" readOnly/></c:if>
+                <input type="hidden" class="driveValue" name="jobs[2].chrgEmpNo" />
+                <input type="hidden" name="jobs[2].chrgrClCd" value="Z02H3"/>
+                <input type="hidden" class="driveDutyText" name="jobs[2].thdayPos" />
+                <input type="hidden" class="driveTeamText" name="jobs[2].thdayTeam" />
+                <input type="hidden" class="driveTeamValue" name="jobs[2].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor jobEmpSearch CDA" data-role="drive" style="display:none"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">환경</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="equipText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input equipText" readOnly/></c:if>
+                <input type="hidden" class="equipValue" name="jobs[3].chrgEmpNo" />
+                <input type="hidden" name="jobs[3].chrgrClCd" value="Z02H4"/>
+                <input type="hidden" class="equipDutyText" name="jobs[3].thdayPos" />
+                <input type="hidden" class="equipTeamText" name="jobs[3].thdayTeam" />
+                <input type="hidden" class="equipTeamValue" name="jobs[3].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor jobEmpSearch CDA" data-role="equip" style="display:none"/>
+                </div>
+            </td>
+        </tr>
+        <tr  class="chkDate2">
+            <th scope="row">안전</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="safetyText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input safetyText" readOnly/></c:if>
+                <input type="hidden" class="safetyValue" name="jobs[4].chrgEmpNo" />
+                <input type="hidden" name="jobs[4].chrgrClCd" value="Z02H5"/>
+                <input type="hidden" class="safetyDutyText" name="jobs[4].thdayPos" />
+                <input type="hidden" class="safetyTeamText" name="jobs[4].thdayTeam" />
+                <input type="hidden" class="safetyTeamValue" name="jobs[4].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor jobEmpSearch CDA" data-role="safety" style="display:none"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">회계</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="accountText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input accountText" readOnly/></c:if>
+                <input type="hidden" class="accountValue" name="jobs[5].chrgEmpNo" />
+                <input type="hidden" name="jobs[5].chrgrClCd" value="Z02H6"/>
+                <input type="hidden" class="accountDutyText" name="jobs[5].thdayPos" />
+                <input type="hidden" class="accountTeamText" name="jobs[5].thdayTeam" />
+                <input type="hidden" class="accountTeamValue" name="jobs[5].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor jobEmpSearch CDA" data-role="account" style="display:none"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th scope="row">에너지</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="energyText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input energyText" readOnly/></c:if>
+                <input type="hidden" class="energyValue" name="jobs[6].chrgEmpNo" />
+                <input type="hidden" name="jobs[6].chrgrClCd" value="Z02H7"/>
+                <input type="hidden" class="energyDutyText" name="jobs[6].thdayPos" />
+                <input type="hidden" class="energyTeamText" name="jobs[6].thdayTeam" />
+                <input type="hidden" class="energyTeamValue" name="jobs[6].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor jobEmpSearch CDA" data-role="energy" style="display:none"/>
+                </div>
+            </td>
+        </tr>
+    <%--     <tr>
+            <th scope="row">기타</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="etcText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input etcText" readOnly/></c:if>
+                <input type="hidden" class="etcValue" name="jobs[6].chrgEmpNo" />
+                <input type="hidden" name="jobs[6].chrgrClCd" value="Z02H7"/>
+                <input type="hidden" class="etcDutyText" name="jobs[6].thdayPos" />
+                <input type="hidden" class="etcTeamText" name="jobs[6].thdayTeam" />
+                <input type="hidden" class="etcTeamValue" name="jobs[6].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor empSearch CDA" data-role="etc" style="display:none"/>
+                </div>
+            </td>
+        </tr> --%>
+        <tr style="display:none">
+            <th scope="row">설계</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="designText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input designText" readOnly/></c:if>
+                <input type="hidden" class="designValue" name="jobs[7].chrgEmpNo" />
+                <input type="hidden" name="jobs[7].chrgrClCd" value="Z02H8"/>
+                <input type="hidden" class="designDutyText" name="jobs[7].thdayPos" />
+                <input type="hidden" class="designTeamText" name="jobs[7].thdayTeam" />
+                <input type="hidden" class="designTeamValue" name="jobs[7].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor empSearch CDA" data-role="design" style="display:none"/>
+                </div>
+            </td>
+        </tr>  
+  		<tr class="chkDate1">
+            <th scope="row">산업안전보건법</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="industrialText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input industrialText" readOnly/></c:if>
+                <input type="hidden" class="industrialValue" name="jobs[8].chrgEmpNo" />
+                <input type="hidden" name="jobs[8].chrgrClCd" value="Z02H9"/>
+                <input type="hidden" class="industrialDutyText" name="jobs[8].thdayPos" />
+                <input type="hidden" class="industrialTeamText" name="jobs[8].thdayTeam" />
+                <input type="hidden" class="industrialTeamValue" name="jobs[8].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor empSearch CDA" data-role="industrial" style="display:none"/>
+                </div>
+            </td>
+        </tr>         
+  		<tr class="chkDate1">
+            <th scope="row">고압가스관계법</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="highPressureText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input highPressureText" readOnly/></c:if>
+                <input type="hidden" class="highPressureValue" name="jobs[9].chrgEmpNo" />
+                <input type="hidden" name="jobs[9].chrgrClCd" value="Z02H10"/>
+                <input type="hidden" class="highPressureDutyText" name="jobs[9].thdayPos" />
+                <input type="hidden" class="highPressureTeamText" name="jobs[9].thdayTeam" />
+                <input type="hidden" class="highPressureTeamValue" name="jobs[9].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor empSearch CDA" data-role="highPressure" style="display:none"/>
+                </div>
+            </td>
+        </tr>         
+  		       
+  		<tr class="chkDate1">
+            <th scope="row">소방관계법</th>
+            <td>
+                <div class="form_group">
+                <c:if test="${modeClass!='CDA'}"><span class="fireText"></span></c:if>
+                <c:if test="${modeClass=='CDA'}"><input type="text" class="i_input fireText" readOnly/></c:if>
+                <input type="hidden" class="fireValue" name="jobs[10].chrgEmpNo" />
+                <input type="hidden" name="jobs[10].chrgrClCd" value="Z02H11"/>
+                <input type="hidden" class="fireDutyText" name="jobs[10].thdayPos" />
+                <input type="hidden" class="fireTeamText" name="jobs[10].thdayTeam" />
+                <input type="hidden" class="fireTeamValue" name="jobs[10].chrgTeamNo" />
+                <img src="images/icon_search.png" class="vam cursor empSearch CDA" data-role="fire" style="display:none"/>
+                </div>
+            </td>
+        </tr>         
+        </tbody>
+    </table>
+
+	<script>
+		/******최종수정일을 기준으로 직무담당자 view 제어*****/
+     	//var sLastChgdt ="${techReview.fstRgstDt}";	//Mon Jul 22 16:37:31 KST 2019
+     		     			     	
+     	//포멧변경 yyyyMMdd
+     	var sFirstChgdt = "<fmt:formatDate value='${techReview.fstRgstDt}' pattern='yyyyMMdd' />";
+     	var sLastChgdt = "<fmt:formatDate value='${techReview.lastChgDt}' pattern='yyyyMMdd' />";
+     	var sMod = "${modeClass}";
+     	
+     	//alert("sFirstChgdt"+sFirstChgdt);
+     	//alert("sLastChgdt"+sLastChgdt);
+     	
+     	//기술검토  지정된 날짜와 비교  작성한 내용, '날짜가 없을경우' 
+     	//산업안전보건법, 고압가스관계법, 소방관계법을 안보이게 한다
+     	if("20190904" < sFirstChgdt ) {
+     		$(".chkDate1").css("display","");
+     		$(".chkDate2").css("display","none");
+   		}else{     			
+   			$(".chkDate1").css("display","none");
+   			$(".chkDate2").css("display","");
+   		}
+	</script>	
+
+    <!-- space non 10 -->
+    <hr class="divider_none_10" />
+
+    <table class="table_row" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="10%">
+        <col width="10%">
+        <col width="35%">
+        <col width="10%">
+        <col width="35%">
+        </colgroup>
+        <tbody>
+        <tr>
+            <th colspan="2" scope="row">MR번호</th>
+            <td colspan="3"><c:out value="${techReview.mrNo}"/></td>
+        </tr>
+        <tr>
+            <th colspan="2" scope="row">사업명</th>
+            <td colspan="3"><c:out value="${techReview.mrReqTitle}"/></td>
+        </tr>
+        <tr>
+            <th colspan="2" scope="row">요청구분</th>
+            <td><c:out value="${techReview.reqClCdNm}"/> / <c:out value="${techReview.reqClDtlCdNm}"/></td>
+            <th scope="row">개선대상</th>
+            <td><c:out value="${techReview.plantNm}"/></td>
+        </tr>
+        <tr>
+            <th colspan="2" scope="row">공정</th>
+            <td>
+               <table id="selectUnit" class="table_default">
+                  <c:forEach var="proc" items="${techReview.procs}" varStatus="loop">
+                      <tr>
+                        <td><c:out value="${proc.mrProcNo}"/></td>
+                        <td><c:out value="${proc.mrProcName}"/></td>
+                      <tr>
+                  </c:forEach>
+               </table>
+            </td>
+            <th scope="row">설비</th>
+            <td>
+                <table id="selectEquip" class="table_default">
+                    <c:forEach var="equip" items="${techReview.equips}" varStatus="loop">
+                      <tr>
+                        <td><c:out value="${equip.mrEquipCd}"/></td>
+                        <td><c:out value="${equip.mrEquipName}"/></td>
+                      <tr>
+                    </c:forEach>
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <th colspan="2" scope="row">작업시점</th>
+            <td colspan="3"><c:out value="${techReview.workPsblClCdNm}"/> / <fmt:formatDate value="${techReview.workPsblDt}" pattern="yyyy-MM-dd" /></td>
+        </tr>
+        <tr>
+            <th rowspan="5" scope="row">기술 및 타당성검토</th>
+            <th class="dep2" scope="row">경제성</th>
+            <td colspan="3">
+                <div class="form_group TECH01_group">
+                <input type="hidden" name="rvRsts[0].itemCd" value="TECH01" />
+                <input type="radio" name="rvRsts[0].clCd01" class="i_radio CDA TECH01" value="1" disabled="disabled"/>증가
+                <input type="radio" name="rvRsts[0].clCd01" class="i_radio CDA TECH01" value="2" disabled="disabled"/>감소
+                <input type="radio" name="rvRsts[0].clCd01" class="i_radio CDA TECH01" value="3" disabled="disabled"/>해당없음
+                <span class="ml30">의견 : <c:if test="${modeClass!='CDA'}"><span class="TECH01_SUGG_text"></span></c:if><input type="text" name="rvRsts[0].totRvSugg" class="i_input_200 CDA TECH01_SUGG" value="" style="display:none"/></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th class="dep2" scope="row">법규상제약</th>
+            <td colspan="3">
+                <div class="form_group TECH02_group">
+                <input type="hidden" name="rvRsts[1].itemCd" value="TECH02" />
+                <input type="radio" name="rvRsts[1].clCd01" class="i_radio CDA TECH02" value="1" disabled="disabled"/>있음
+                <input type="radio" name="rvRsts[1].clCd01" class="i_radio CDA TECH02" value="2" disabled="disabled"/>없음
+                <input type="radio" name="rvRsts[1].clCd01" class="i_radio CDA TECH02" value="3" disabled="disabled"/>해당없음
+                <span class="ml30">의견 : <c:if test="${modeClass!='CDA'}"><span class="TECH02_SUGG_text"></span></c:if><input type="text" name="rvRsts[1].totRvSugg" class="i_input_200 CDA TECH02_SUGG" value="" style="display:none"/></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th class="dep2" scope="row">기술적제약</th>
+            <td colspan="3">
+                <div class="form_group TECH03_group">
+                <input type="hidden" name="rvRsts[2].itemCd" value="TECH03" />
+                <input type="radio" name="rvRsts[2].clCd01" class="i_radio CDA TECH03" value="1" disabled="disabled"/>있음
+                <input type="radio" name="rvRsts[2].clCd01" class="i_radio CDA TECH03" value="2" disabled="disabled"/>없음
+                <span class="ml30">의견 : <c:if test="${modeClass!='CDA'}"><span class="TECH03_SUGG_text"></span></c:if><input type="text" name="rvRsts[2].totRvSugg" class="i_input_200 CDA TECH03_SUGG" value="" style="display:none"/></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th class="dep2" scope="row">개선효과 미흡</th>
+            <td colspan="3">
+                <div class="form_group TECH04_group">
+                <input type="hidden" name="rvRsts[3].itemCd" value="TECH04" />
+                <input type="radio" name="rvRsts[3].clCd01" class="i_radio CDA TECH04" value="1" disabled="disabled"/>적합
+                <input type="radio" name="rvRsts[3].clCd01" class="i_radio CDA TECH04" value="2" disabled="disabled"/>미흡
+                <input type="radio" name="rvRsts[3].clCd01" class="i_radio CDA TECH04" value="3" disabled="disabled"/>없음
+                <span class="ml30">의견 : <c:if test="${modeClass!='CDA'}"><span class="TECH04_SUGG_text"></span></c:if><input type="text" name="rvRsts[3].totRvSugg" class="i_input_200 CDA TECH04_SUGG" value="" style="display:none"/></span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th class="dep2" scope="row">기타</th>
+            <td colspan="3">
+                <div class="form_group">
+                <input type="hidden" name="rvRsts[4].itemCd" value="TECH05" />
+                <c:if test="${modeClass!='CDA'}"><span class="TECH05_SUGG_text"></span></c:if><input type="text" name="rvRsts[4].totRvSugg" class="i_input_full CDA TECH05_SUGG" value="" style="display:none"/>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <th rowspan="2" scope="row">경제성 검토</th>
+            <th class="dep2" scope="row">정량적 효과</th>
+            <td>
+                <div class="form_group">
+                    <c:if test="${modeClass=='CDA'}">
+                        <input type="text" class="number i_input" name="quanEff" value="<fmt:formatNumber value="${techReview.quanEff}" groupingUsed="true"/>"/>
+                    </c:if>
+                    <c:if test="${modeClass!='CDA'}">
+                        <fmt:formatNumber value="${techReview.quanEff}" groupingUsed="true"/>
+                    </c:if>
+                    <select class="qnUnit CDA" name="quanEffCd"  disabled="disabled"></select>
+                </div>
+            </td>
+            <td colspan="2"><fmt:formatNumber value="${techReview.quanEptEftCtt}" groupingUsed="true"/><c:out value="${techReview.quanEptEftCdNm}"/></td>
+        </tr>
+        <tr>
+            <th class="dep2" scope="row">정성적 효과</th>
+            <td>
+                <div class="form_group">
+                    <c:if test="${modeClass=='CDA'}">
+                        <textarea name="qualEff" class="i_text_full" rows="" cols="" style="width:100%"><c:out value="${techReview.qualEff}"/></textarea>
+                    </c:if>
+                    <c:if test="${modeClass!='CDA'}">
+                        <pre><c:out value="${techReview.qualEff}"/></pre>
+                    </c:if>
+                </div>
+            </td>
+            <td colspan="2"><c:out value="${techReview.qualEptEftCtt}"/></td>
+        </tr>
+        <tr>
+            <th colspan="2" scope="row">투자구분</th>
+            <td>
+                <select class="invstCd CDA" name="invstCd"  disabled="disabled"></select>
+            </td>
+            <th>투자목적</th>
+            <td>
+                <span class="invstPurpCdText">투자구분을 선택하세요.</span> <select class="invstPurpCd CDA" name="invstPurpCd"  disabled="disabled" style="display:none"></select>
+            </td>
+        </tr>
+        <tr>
+            <th colspan="2" scope="row">종합검토의견</th>
+            <td colspan="3">
+                <div class="form_group">
+                    <c:if test="${modeClass=='CDA'}">
+                        <textarea name="totRvSugg1" class="i_text_full" rows="" cols="" style="width:100%"><c:out value="${techReview.totRvSugg1}"/></textarea>
+                    </c:if>
+                    <c:if test="${modeClass!='CDA'}">
+                        <pre><c:out value="${techReview.totRvSugg1}"/></pre>
+                    </c:if>
+                </div>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- space non 10 -->
+    <hr class="divider_none_10" />
+
+    <table class="table_row" id="file" border="1" cellspacing="0">
+        <caption class="blind"></caption>
+        <colgroup>
+        <col width="15%">
+        <col width="85%">
+        </colgroup>
+        <tbody>
+        <tr>
+        <th scope="row" class="vam fileAdd">첨부파일
+        </th>
+        <td class="section_text pl5 pt5 pb5" colspan="3">
+          <div class="form_group">
+            <table id="fileList" class="table_default_margin" border="1" cellspacing="0">
+              <tr style="display:none"><td></td></tr>
+              <c:forEach var="mrAtchFiles" items="${techReview.mrAtchFiles}" varStatus="loop">
+              <tr>
+                 <td>
+                  <input type="text" class="i_input" value="${mrAtchFiles.fileCdNm}" readonly>
+                  <input type="text" class="i_input_300" value="${mrAtchFiles.fileNm}" readonly>
+                  <img src="images/btn_inFile.png" class="cursor fileDown"/>
+                  <input type="hidden" value="${mrAtchFiles.fileCd}"/>
+                  <input type="hidden" class="delFlag" name="mrAtchFiles[${loop.index}].deleted" value="false"/>
+                  <input type="hidden" class="insFlag" name="mrAtchFiles[${loop.index}].inserted" value="false"/>
+                  <input type="hidden" name="mrAtchFiles[${loop.index}].mrAtchFileNo" value="${mrAtchFiles.mrAtchFileNo}"/>
+                  <input type="hidden" class="drawMngNo" name="mrAtchFiles[${loop.index}].drawMngNo" value="${mrAtchFiles.drawMngNo}"/>
+                </td>
+              </tr>
+            </c:forEach>
+            </table>
+          </div>
+        </td>
+        </tr>
+        </tbody>
+    </table>
+</form>
+</div>
+
+<script>
+<!-- 초기투자비 프로젝트 eng 멀티 지정으로 인하여 projEng 담당자 셋팅 관련 추가 2015-08-26 (담당자 sort)-->
+$.sortEmpLine = function(){
+	var empDiv;
+	var count = 0;
+	$(".appEmpLine").children("tbody").children("tr:gt(0)").each(function () {
+
+		empDiv = $(this).children("td").children("div");
+		empDiv.find(".projValue").attr("name","appLine["+count+"].chrgEmpNo");
+		empDiv.find(".projChrgrClCd").attr("name","appLine["+count+"].chrgrClCd");
+		empDiv.find(".projDutyText").attr("name","appLine["+count+"].thdayPos");
+		empDiv.find(".projTeamText").attr("name","appLine["+count+"].thdayTeam");
+		empDiv.find(".projTeamValue").attr("name","appLine["+count+"].chrgTeamNo");
+		empDiv.find(".projEndDate").attr("name","appLine["+count+"].procTrmDt");
+		
+		empDiv.find(".agreeValue").attr("name","appLine["+count+"].chrgEmpNo");
+		empDiv.find(".agreeCode").attr("name","appLine["+count+"].chrgrClCd");
+		empDiv.find(".agreeDutyText").attr("name","appLine["+count+"].thdayPos");
+		empDiv.find(".agreeTeamText").attr("name","appLine["+count+"].thdayTeam");
+		empDiv.find(".agreeTeamValue").attr("name","appLine["+count+"].chrgTeamNo");
+		empDiv.find(".agreeEndDate").attr("name","appLine["+count+"].procTrmDt");
+
+		empDiv.find(".appValue").attr("name","appLine["+count+"].chrgEmpNo");
+		empDiv.find(".agreeCode").attr("name","appLine["+count+"].chrgrClCd");
+		empDiv.find(".appDutyText").attr("name","appLine["+count+"].thdayPos");
+		empDiv.find(".appTeamText").attr("name","appLine["+count+"].thdayTeam");
+		empDiv.find(".appTeamValue").attr("name","appLine["+count+"].chrgTeamNo");
+		empDiv.find(".appEndDate").attr("name","appLine["+count+"].procTrmDt");
+		count++;
+	});
+};
+
+$(window).ready(function() {
+	
+	//alert("${modeClass}");
+	//alert("${appLine.chrgrClCd}");
+	//alert("${appLine.ifStatCd}");
+	//alert("${appLine.chrgEmpNo}");
+	
+	
+	var appClass= "";
+    var invstCd = "${techReview.invstCd}";
+	"<c:forEach var='rvRst' items='${techReview.rvRsts}'>";
+	   if("${rvRst.itemCd}" !="") {
+            $(".${rvRst.itemCd}").each(function () {
+            	if($(this).val()=="${rvRst.clCd01}") {
+            	    $(this).prop("checked",true);
+            	}
+            });
+            $(".${rvRst.itemCd}_SUGG").val("<c:out value='${rvRst.totRvSugg}'/>");
+            if("${modeClass}"!="CDA") {
+            	$(".${rvRst.itemCd}_SUGG_text").html("<c:out value='${rvRst.totRvSugg}'/>");
+            }
+	   }
+	"</c:forEach>";
+
+	// 초기투자비 프로젝트 eng 멀티 지정으로 인하여 projEng 담당자 셋팅 변경  2015-08-26
+	var count = 0;
+	var projEmpTempDiv ="";
+    "<c:forEach var='appLine' items='${techReview.appLine}'>";
+    switch ("${appLine.chrgrClCd}") {
+    case "Z02I":
+        appClass = "proj";
+        break;
+    case "Z02D":
+        appClass = "proj";
+        break;
+    case "Z02F":
+        appClass = "agree";
+        break;
+    case "Z02C":
+        appClass = "app";
+        break;
+    case "Z02G":
+        appClass = "action";
+        break;
+    }
+    if(appClass == "proj"){
+    		projEmpTempDiv = $("#projEmpTemp").children("tbody").children("tr").children("td").children("div");
+    		projEmpTempDiv.find(".projValue").val("${appLine.chrgEmpNo}");
+    		projEmpTempDiv.find(".projChrgrClCd").val("${appLine.chrgrClCd}");
+    		projEmpTempDiv.find(".projDutyText").val("${appLine.thdayPos}");
+    		projEmpTempDiv.find(".projTeamText").val("${appLine.thdayTeam}");
+    		projEmpTempDiv.find(".projTeamValue").val("${appLine.chrgTeamNo}");
+    		if("${appLine.chrgrClCd}" == "Z02D"){
+        		projEmpTempDiv.find(".projEndDate").val("9999-12-31");
+    		}else{
+        		projEmpTempDiv.find(".projEndDate").val("");
+    		}
+    	var empTemp = $("#projEmpTemp").children("tbody").children("tr");
+    	empTemp.clone().insertAfter($(".appEmpLine").children("tbody").children("tr:eq("+count+")"));
+        count++;
+    }else{
+        $.appLineSet({className:appClass, dutyText:"${appLine.thdayPos}",
+            text:"${appLine.chrgEmpName}", value:"${appLine.chrgEmpNo}",
+            teamText:"${appLine.thdayTeam}" , teamValue:"${appLine.chrgTeamNo}",
+            endDate:"<fmt:formatDate value='${appLine.fstProcTrmDt}' pattern='yyyy-MM-dd' />",
+            date:"<fmt:formatDate value='${appLine.lastChgDt}' pattern='yyyy-MM-dd' />"});
+
+    }
+    "</c:forEach>";
+
+    $.sortEmpLine();
+
+    var jobClass= "";
+    "<c:forEach var='job' items='${techReview.jobs}'>";
+    switch ("${job.chrgrClCd}") {
+    case "Z02H1":
+        jobClass = "tech";
+        break;
+    case "Z02H2":
+        jobClass = "check";
+        break;
+    case "Z02H3":
+        jobClass = "drive";
+        break;
+    case "Z02H4":
+        jobClass = "equip";
+        break;
+    case "Z02H5":
+        jobClass = "safety";
+        break;
+    case "Z02H6":
+        jobClass = "account";
+        break;
+    case "Z02H7":
+    	jobClass = "energy";
+        break;
+    case "Z02H8":
+    	jobClass = "design";	//설계추가
+        break;        
+    case "Z02H9":
+    	jobClass = "industrial";
+        break;
+    case "Z02H10":
+    	jobClass = "highPressure";
+        break;
+    case "Z02H11":
+    	jobClass = "fire";
+        break;   
+    }
+
+    $.appLineSet({className:jobClass, dutyText:"${job.thdayPos}",
+        text:"${job.chrgEmpName}", value:"${job.chrgEmpNo}",
+        teamText:"${job.thdayTeam}" , teamValue:"${job.chrgTeamNo}",
+        endDate:"<fmt:formatDate value='${job.fstProcTrmDt}' pattern='yyyy-MM-dd' />",
+        date:"<fmt:formatDate value='${job.lastChgDt}' pattern='yyyy-MM-dd' />"});
+    "</c:forEach>";
+
+    $.selectLoad({
+        className : "invstCd",
+        url : "codeList.do?mrCommGrpCd=IVST",
+        defaultText : "선택",
+        selectValue : "${techReview.invstCd}"+""
+    });
+
+    if(invstCd!=""){
+        $.selectLoad({
+            className : "invstPurpCd",
+            url : "codeList.do?mrCommGrpCd=IVST_PUR&mrCommCd="+invstCd.substr(0, 1),
+            defaultText : "선택",
+            selectValue : "${techReview.invstPurpCd}"+""
+        });
+        $(".invstPurpCdText").hide();
+        $(".invstPurpCd").show();
+    }
+
+    $.selectLoad({
+        className : "qnUnit",
+        url : "codeList.do?mrCommGrpCd=QN_UNIT",
+        defaultText : "선택",
+        selectValue : "${techReview.quanEffCd}"
+    });
+
+    $.selectLoad({
+        className : "empClCd",
+        url : "codeList.do?mrCommGrpCd=MR_PROC&mrCommCd=Z02H",
+        defaultText : "선택",
+        selectValue : "${register.reqClCd}"+""
+    });
+
+	$(".empSearch").click(function() {
+	     $.popup({url:"popup/empSearch.do", width:"500", height:"500", targetName:$(this).attr("data-role")});
+    });
+
+	$(".jobEmpSearch").click(function() {
+	     $.popup({url:"popup/empSearch.do", width:"500", height:"500", targetName:$(this).attr("data-role"), overlap:"techJobList"});
+	});
+
+	//임시저장 버튼
+    $(".save").click(function () {
+        if(confirm("저장 하시겠습니까?")) {
+        	$.removeComma();
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "mrCompleteSave.do").submit();
+        }
+    });
+
+    $(".appReq").click(function () {
+    	if($.validation())
+    	if(confirm("승인요청 하시겠습니까?")) {
+    		$.removeComma();
+    		$('#pageLoadingWrap').show();
+            $("form").attr("action", "mrCompleteAppReq.do").submit();
+    	}
+    });
+
+    $(".app").click(function () {
+        if(confirm("승인 하시겠습니까?")) {
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "${appURL}").submit();
+        }
+    });
+
+    $(".return").click(function () {
+        if(confirm("반려 하시겠습니까?")) {
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "mrCompleteReturn.do").submit();
+        }
+    });
+
+    $(".cancel").click(function () {
+        if(confirm("사업취소 하시겠습니까?")) {
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "mrRqRegisterCancel.do").submit();
+        }
+    });
+
+    $.validation = function(){
+        var isValid = false;
+
+        isValid = $.validator({
+                    agreeText : {method:"class",type:"text", msg:"1차 승인자를 입력하세요."},
+                    agreeEndDate : {method:"class",type:"text", msg:"1차 승인기한을 입력하세요."},
+                    appText :  {method:"class",type:"text", msg:"2차 승인자를 입력하세요."},
+                    appEndDate : {method:"class",type:"text", msg:"2차 승인기한을 입력하세요."}
+                });
+
+        if(isValid && "${modeClass}"=="CDA") {
+        	var jobCehckCnt = 0;
+        	if($(".techText").val()!="")
+        		jobCehckCnt++;
+        	if($(".checkText").val()!="")
+        		jobCehckCnt++;
+        	if($(".driveText").val()!="")
+        		jobCehckCnt++;
+        	if($(".equipText").val()!="")
+        		jobCehckCnt++;
+        	if($(".safetyText").val()!="")
+        		jobCehckCnt++;
+        	if($(".accountText").val()!="")
+        		jobCehckCnt++;
+        	if($(".energyText").val()!="")
+        		jobCehckCnt++;
+
+        	if(jobCehckCnt==0) {
+        		isValid = false;
+        		alert("직무검토 담당자를 입력하세요.");
+        	} else if(jobCehckCnt>0) {
+        		isValid = true;
+        	}
+        }
+        
+        if(isValid && "${modeClass}"=="CDA") {
+            isValid = $.validator({
+                TECH01 : {method:"class",type:"check",focus :"TECH01_group",msg:"경제성을 선택하세요."},
+                TECH02 : {method:"class",type:"check",focus :"TECH02_group",msg:"법규상제약을 선택하세요."},
+                TECH03 : {method:"class",type:"check",focus :"TECH03_group",msg:"기술적제약을 선택하세요."},
+                TECH04 : {method:"class",type:"check",focus :"TECH04_group",msg:"개선효과 미흡을 선택하세요."},
+                invstCd : {method:"class",type:"select",msg:"투자구분을 선택하세요."},
+                invstPurpCd : {method:"class",type:"select",msg:"투자목적을 선택하세요."}
+            });
+        }
+
+        return isValid;
+    };
+
+    
+    /***************************************
+     * hajewook 추가
+     * 기안 로직 
+     * 승인요청
+     * 테스트 url "http://devgian.oilbank.co.kr/connlogin.aspx?"
+     ***************************************/
+     // wj: mrAction == mrCompleteAppReq 이었으나 변경되어있음     
+     if("${mrAction}" == "승인요청"){	 
+         var url = "http://gian.oilbank.co.kr/connlogin.aspx?"
+             + "&uid="      + "${techReview.fstRgstr}"
+             + "&connkey="  + "${techReview.mrReqNo}"
+             + "&connType=" + "WEB"
+             + "&connName=" + "MR"
+             + "&connCode=" + "Z0030_Z0122"
+             + "&endTime="  + "DRAFT"
+             + "&auto="     + "N";
+         window.open(url, "mrCompleteAppReq");
+     }
+});
+
+
+/***************************************
+ * HSW 추가
+ * 기안 로직 
+ ***************************************/
+/*hajewook 재상신*/
+$(document).on("click", ".reAppReq", function() {
+	var url = "http://gian.oilbank.co.kr/connlogin.aspx?"   	   
+       + "&uid="      + "${techReview.loginEmpNo}"
+       + "&connkey="  + "${techReview.mrReqNo}"
+       + "&connType=" + "WEB"
+       + "&connName=" + "MR"
+       + "&connCode=" + "Z0030_Z0122"
+       + "&endTime="  + "DRAFT"
+       + "&auto="     + "N";
+   window.open(url, "mrCompleteAppReq");
+});
+
+$(document).on("change",".invstCd", function () {
+    var commCd = $(this).val();
+
+    if($(this).val()!=""){
+        $(".invstPurpCdText").hide();
+        $(".invstPurpCd").show();
+        $.selectLoad({
+            className : "invstPurpCd",
+            url : "codeList.do?mrCommGrpCd=IVST_PUR&mrCommCd="+commCd.substr(0, 1),
+            defaultText : "선택"
+        });
+    } else {
+        $(".invstPurpCd").val("");
+        $(".invstPurpCdText").show();
+        $(".invstPurpCd").hide();
+    }
+});
+
+$(document).on("click",".delEmp",function () {
+    var removeClass="";
+    if(confirm("기술검토자를 삭제 하시겠습니까?")) {
+
+        removeClass = $(this).parent("td").parent("tr").parent("tbody").parent("table").attr("class");
+        $(this).parent("td").parent("tr").remove();
+        $.sort({className : removeClass+"Value", fristName : removeClass+"s", lastName : "chrgEmpNo"});
+        $.sort({className : removeClass+"Code", fristName : removeClass+"s", lastName : "chrgrClCd"});
+        $.sort({className : removeClass+"DutyText", fristName : removeClass+"s", lastName : "thdayPos"});
+        $.sort({className : removeClass+"TeamText", fristName : removeClass+"s", lastName : "thdayTeam"});
+        $.sort({className : removeClass+"TeamValue", fristName : removeClass+"s", lastName : "chrgTeamNo"});
+    }
+});
+</script>

@@ -1,0 +1,29 @@
+package com.mr.scheduling;
+
+import org.quartz.JobExecutionContext;
+import org.quartz.JobExecutionException;
+import org.springframework.scheduling.quartz.QuartzJobBean;
+
+import com.mr.step.service.MrMailService;
+
+//context-scheduling.xml >> 승인기한을 넘긴 MR 메일 발송
+public class LimitDateMailSender  extends QuartzJobBean {
+
+	
+    private MrMailService mrMailService;
+
+
+    public void setMrMailService(MrMailService mrMailService) {
+        this.mrMailService = mrMailService;
+    }
+
+
+    @Override
+    protected void executeInternal(JobExecutionContext arg0) throws JobExecutionException {
+
+    	//승인기한을 넘긴 MR 메일 발송
+        mrMailService.limitDateMrSendMail();
+
+    }
+
+}

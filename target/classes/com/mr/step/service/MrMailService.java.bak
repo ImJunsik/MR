@@ -1,0 +1,140 @@
+package com.mr.step.service;
+
+import java.util.List;
+
+import com.mr.comp.domain.CompFileVO;
+import com.mr.step.domain.ChrgrChgHist;
+import com.mr.step.domain.MailToInfoVo;
+
+
+public interface MrMailService {
+
+
+    /**
+     *
+     * @param mrReqNo
+     * @return
+     */
+    boolean mailSend(int mrReqNo);
+
+    /**
+     * 특정단계의 특정사용자에게 보낼때 사용
+     * @param mrReqNo
+     * @param mrStepCd
+     * @param procStepCd
+     * @param chrgrMrStepCd 단계
+     * @param chrgrClCd
+     * @return
+     */
+    boolean selectMailSend(int mrReqNo, String mrStepCd, String procStepCd, String chrgrMrStepCd, String chrgrClCd);
+
+    /**
+     * 특정단계, 특정사람을 지정해서 보낼경우 받는 사람을 셋팅해서 넘김
+     * @param mrReqNo
+     * @param mrStepCd
+     * @param procStepCd
+     * @param tos           받는사람주소 List
+     * @param toNms         받는사람이름 List
+     * @return
+     */
+    boolean selectMailSend(int mrReqNo, String mrStepCd, String procStepCd, List<MailToInfoVo> toInfos);
+
+    /**
+     *
+     * @param mrReqNo
+     * @return
+     */
+    boolean mailSendMulti(int mrReqNo);
+
+    /**
+     * 독립프로세스 수행시 전송로직 ( PORC, 위험성검토 등)
+     * @param mrReqNo
+     * @param mrStepCd
+     * @param procStepCd
+     * @return
+     */
+    boolean mailSend(int mrReqNo, String mrStepCd, String procStepCd);
+
+    /**
+     * 독립프로세스 수행시 전송로직
+     * @param mrReqNo
+     * @param mrStepCd
+     * @param procStepCd
+     * @return
+     */
+    boolean mailSendMulti(int mrReqNo, String mrStepCd, String procStepCd, String chrgrClCd);
+
+    /**
+     * 202001 추가
+     * 각각의 Proc 담당자들에게 메일 발송
+     * @param mrReqNo
+     * @param mrStepCd
+     * @param procStepCd
+     * @return
+     */
+    boolean mailSendMultiProc(int mrReqNo, String mrStepCd, String procStepCd, String chrgrClCd);
+    
+    
+    /**
+     *
+     * @param mrStepCd
+     * @param chrgrClCd
+     * 참고
+     *<pre>
+     *Z0010 : Z02A : 요청자
+     *Z0010 : Z02B : 1차승인
+     *Z0010 : Z02C : 2차승인
+     *Z0020 : Z02D : 기술검토 기술검토자
+     *Z0020 : Z02F : 기술검토 기술검토팀장
+     *Z0020 : Z02G : 기술검토 수행팀장
+     *Z0030 : Z02I : 투자비산정 PROJECT ENG
+     *Z0030 : Z02C : MR검토확인 1차승인자
+     *Z0030 : Z02F : MR검토확인 2차승인자
+     *Z0050 : Z02D : 투자품의 기술검토자
+     *Z0040 : Z02H : 직무검토 담당자
+     *Z00P0 : Z02L : PORC 담당자
+     *Z0070 : Z02P : MR수행 담당자
+     *</pre>
+     */
+    void addCc(String mrStepCd, String chrgrClCd);
+
+    /**
+     * 해당 MrReqNo의 결재라인에 존재하는 사용자에게 메일보내기
+     * @param mrReqNo
+     * @param mrStepCd
+     * @param chrgrClCd
+     * @return
+     */
+    boolean allMrEmpMailSend(int mrReqNo, String mrStepCd, String procStCd);
+
+
+    /**
+     * 기한일이 지난 mr건에 대하여 메일을 전송함.
+     *
+     */
+    void limitDateMrSendMail();
+    
+    /**
+     * 미완료 MR 메일을 전송함.
+     *
+     */
+    void incompleteMrSendMail(String mailAddress, List<CompFileVO> listMail);
+    
+    /**
+     * CAPEX 미완료 메일 보내기 위한 조건 도출
+     * @param compRptVO
+     */
+    void incompleteMrMail();
+
+    boolean mailDocuSend(int mrReqNo);
+
+
+    /**
+     * 담당자 변경시 메일 전송
+     * @param mrReqNo
+     * @param emps
+     * @return
+     */
+    boolean managerChangeMailSend(int mrReqNo, List<String> emps);
+
+}

@@ -1,0 +1,224 @@
+package com.mr.jobs.service;
+
+import org.springframework.stereotype.Service;
+
+import com.mr.common.domain.MrRvRstVO;
+import com.mr.jobs.domain.JobsCheckMasterVO;
+import com.mr.jobs.domain.JobsPorcVO;
+import com.mr.jobs.domain.JobsReviewVO;
+import com.mr.tech.domain.TechInvestVO;
+
+/**
+ * 직무검토 서비스
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.14 박성룡 최초 작성
+ * </pre>
+ */
+
+@Service
+public interface JobsReviewService {
+
+    /**
+     * 직무검토 기본화면 조회
+     * @param mrReqNo : MR_REQ_NO
+     * @return
+     */
+    JobsReviewVO selectJobsReview(int mrReqNo);
+
+
+    /**
+     * 직무검토 완료
+     * @param jobsReviewVO
+     */
+    void insertMrJobsReviewComplete(int mrReqNo);
+
+    /**
+     * 직무검토 저장
+     * @param jobsReviewVO
+     */
+    void insertMrJobsReview(JobsReviewVO jobsReviewVO);
+
+    /**
+     * Skip했을경우 저장
+     * @param jobsReviewVO
+     */
+    void insertSkipMrJobsReview(JobsReviewVO jobsReviewVO);
+
+    /**
+     * 직무검토 보류
+     * @param jobsReviewVO
+     */
+    void insertMrJobsReviewSkip(JobsReviewVO jobsReviewVO);
+
+    /**
+     * PORC위원들 조회
+     * @param mrReqNo : MR_REQ_NO
+     * @return
+     */
+    JobsPorcVO selectMrJobsPorc(int mrReqNo);
+
+    /**
+     * PORC위원들 저장
+     * @param jobsPorcVO
+     */
+    void insertMrJobsPorcSave(JobsPorcVO jobsPorcVO);
+
+    /**
+     * PORC위원들 지정완료
+     * @param jobsPorcVO
+     */
+    void insertMrJobsPorcComplete(JobsPorcVO jobsPorcVO);
+
+    /**
+     * PORC 작성
+     * @param mrRvRstVO
+     */
+    void insertMrJobPorcWriteSave(MrRvRstVO mrRvRstVO);
+
+    /**
+     * check 조회
+     * @param mrReqNo
+     * @return
+     */
+    JobsCheckMasterVO selectMrCheck(int mrReqNo);
+
+    /**
+     * check 저장
+     * @param mRrqRegisterVO
+     * @return
+     */
+    void insertMrCheck(JobsCheckMasterVO jobsCheckMasterVO);
+
+    /**
+     * check 수정
+     * @param mRrqRegisterVO
+     * @return
+     */
+    void updateMrCheck(JobsCheckMasterVO jobsCheckMasterVO);
+
+    /**
+     * 위험성 검토 조회
+     * @param mrReqNo
+     * @return
+     */
+    MrRvRstVO selectMrRiskCheck(int mrReqNo);
+
+    /**
+     * 위험성 검토 저장
+     * @param mRrqRegisterVO
+     * @return
+     */
+    void insertRiskCheck(MrRvRstVO mrRvRstVO);
+
+    /**
+     * 위험성 검토 업데이트
+     * @param mrRvRstVO
+     */
+    void updateRiskCheck(MrRvRstVO mrRvRstVO);
+
+
+    /**
+     * 위험성 검토 승인요청
+     * @param mrRvRstVO
+     */
+    void insertRiskCheckAppReq(MrRvRstVO mrRvRstVO);
+
+
+    /**
+     * 위험성 검토 승인
+     * @param mrReqNo
+     */
+    void insertRiskCheckApp(Integer mrReqNo);
+
+
+    /**
+     * 위험성 검토 반려
+     * @param mrRvRstVO
+     */
+    void insertRiskCheckReturn(MrRvRstVO mrRvRstVO);
+
+
+    /**
+     * hazop 조회
+     * @param mrReqNo
+     * @return
+     */
+    MrRvRstVO selectMrHazop(int mrReqNo);
+
+    /**
+     * hazop 저장
+     * @param mrRvRstVO
+     */
+    void insertMrHazop(MrRvRstVO mrRvRstVO);
+
+    /**
+     * hazop 수정
+     * @param mrRvRstVO
+     */
+    void updateMrHazop(MrRvRstVO mrRvRstVO);
+
+
+    /**
+     * 투자비재산정 조회
+     * @param mrReqNo
+     */
+    TechInvestVO selectMrTechInvestModify(Integer mrReqNo);
+
+    /**
+     * 투자비재산정 요청
+     * @param mrReqNo
+     */
+    void insertInvestCostModifyReq(Integer mrReqNo);
+
+
+    /**
+     * 투자비재산정 저장
+     * @param techInvestVO
+     */
+    void insertMrTechInvest(TechInvestVO techInvestVO);
+
+
+    /**
+     * 투자비재산정 승인요청
+     * @param techInvestVO
+     */
+    void insertInvestCostAppReq(TechInvestVO techInvestVO);
+
+
+    /**
+     * 투자비재산정 승인
+     * @param mrReqNo
+     */
+    void insertInvestCostApp(Integer mrReqNo);
+
+
+    /**
+     * 투자비재산정 반려
+     * @param techInvestVO
+     */
+    void insertInvestCostReturn(TechInvestVO techInvestVO);
+
+
+    /**
+     * 직무검토 Skip직무검토자 존재 판단.
+     * @param mrReqNo       MR요청번호
+     * @param isMailSend    메일전송여부 true 셋팅시 Skip 사용자에게 메일을 전송합니다.
+     * @return              true : Skip직무검토자 존재 , false : 존재하지 않음
+     */
+    boolean skipJobReviews(Integer mrReqNo, boolean isMailSend);
+
+    /**
+     * Skip 사용자 여부 판단
+     * @param mrReqNo
+     * @return
+     */
+    boolean getSkipJobReviewer(Integer mrReqNo);
+
+
+}

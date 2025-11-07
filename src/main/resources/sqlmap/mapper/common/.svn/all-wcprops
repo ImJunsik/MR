@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/resources/sqlmap/mapper/common
+END
+JobMonitoringRepository.xml
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/resources/sqlmap/mapper/common/JobMonitoringRepository.xml
+END
+AttachFileRepository.xml
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/resources/sqlmap/mapper/common/AttachFileRepository.xml
+END
+MrAtchFileRepository.xml
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svn/repos_edims/!svn/ver/131/trunk/src/mr/src/main/resources/sqlmap/mapper/common/MrAtchFileRepository.xml
+END

@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/views/scheduling
+END
+jobExecutedList.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/views/scheduling/jobExecutedList.jsp
+END
+jobAttributes.jsp
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/webapp/WEB-INF/views/scheduling/jobAttributes.jsp
+END

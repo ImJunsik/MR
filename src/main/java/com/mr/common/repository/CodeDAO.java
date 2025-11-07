@@ -1,0 +1,111 @@
+package com.mr.common.repository;
+
+import java.util.List;
+
+import org.springframework.stereotype.Repository;
+
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.mr.common.domain.CommCdVO;
+import com.mr.common.domain.UnitVo;
+/**
+ * 코드 처리 DAO
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * 2014.07.01 박성룡 플랜트조회 추가
+ * 2014.08.04 박성룡 전체 그룹코드 조회 추가
+ * 2017.11.28 wj: 초기투자비 산정 직책과장 조회 추가
+ * </pre>
+ */
+@Repository
+public class CodeDAO  extends BaseSqlMapRepository {
+
+    /**
+     * 전체 그룹코드 조회
+     * @return
+     */
+    public List<CommCdVO> selectAllGrpCd(){
+        return selectList("common.code.selectAllGrpCd");
+    }
+
+    /**
+     * 코드조회
+     * @param commCdVO
+     * @return 코드리스트
+     */
+    public List<CommCdVO> selectCommCd(CommCdVO commCdVO){
+        return selectList("common.code.selectCommCd" , commCdVO);
+    }
+
+    /**
+     * 플랜트 조회
+     * @param unitVo
+     * @return
+     */
+    public UnitVo selectPlant(UnitVo unitVo){
+        return selectOne("common.code.selectPlant", unitVo);
+    	
+    }
+
+
+    public List<UnitVo> selectPlantAndUnit(UnitVo unitVo){
+        
+    	return selectList("common.code.selectPlantAndUnit", unitVo);
+    }
+    
+    /**
+     * 공정리스트
+     * @param
+     * @return 코드리스트
+     */
+    public List<CommCdVO> selectAllUnit(){
+        return selectList("common.code.selectAllUnit");
+    }
+
+    /**
+     * 설비리스트
+     * @param
+     * @return 코드리스트
+     */
+    public List<CommCdVO> selectEquip(String unitNo){
+        return selectList("common.code.selectEquip" , unitNo);
+    }
+
+    /**
+     * 공정조회
+     * @param
+     * @return 코드리스트
+     */
+    public List<UnitVo> unitSearch(UnitVo unitVo) {
+        return selectList("common.code.unitSearch" , unitVo);
+    }
+
+    /**
+     * 설비조회
+     * @param
+     * @return 코드리스트
+     */
+    public List<UnitVo> equipSearch(UnitVo unitVo) {
+        return selectList("common.code.equipSearch" , unitVo);
+    }
+    
+    /**
+     * wj:직책과장조회
+     * @param
+     * @return 코드리스트
+     */    
+    //public List<CommCdVO> techInvestEmp(String unitNo){
+    //    return selectList("common.code.techInvestEmp" , unitNo);
+   // }
+    
+    public List<CommCdVO> techInvestEmp(CommCdVO commCdVO){
+        return selectList("common.code.techInvestEmp" , commCdVO);
+    }
+
+    
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.common.file">
+    <resultMap id="attachFileResultMap" type="com.common.file.domain.AttachFile">
+        <result property="path" column="PATH" />
+        <result property="name" column="FILE_NM" />
+        <result property="convertName" column="NEW_FILE" />
+    </resultMap>
+
+    <select id="getAttachFileDrawMngNo"  parameterType="map" resultMap="attachFileResultMap">
+    --첨부파일 다운로드
+           
+        SELECT s.sftp_key || i.dir_path as path
+             , f.new_file new_file
+             , f.org_file file_nm
+          FROM edm_server_info s
+             , edm_doc d
+             , edm_file f
+             , edm_directory i
+         WHERE d.doc_seq = #{drawMngNo}
+           AND d.doc_seq = f.f_category_id
+           AND f.dir_id = i.dir_id
+           AND s.svr_id = '1'
+           AND s.svr_kind = 'S'       
+           
+    </select>
+    
+    <select id="getAttachFileDrawMngDevNo"  parameterType="map" resultMap="attachFileResultMap">
+    --첨부파일 다운로드
+    
+        SELECT s.sftp_key || i.dir_path as path
+             , f.new_file new_file
+             , f.org_file file_nm
+          FROM edm_server_info s
+             , edm_doc d
+             , edm_file f
+             , edm_directory i
+         WHERE d.doc_seq = #{drawMngNo}
+           AND d.doc_seq = f.f_category_id
+           AND f.dir_id = i.dir_id
+           AND s.svr_id = '1'
+           AND s.svr_kind = 'S'   
+    </select>
+    
+</mapper>

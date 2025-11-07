@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="scheduling">
+    <resultMap id="jobAttributesResultMap" type="com.base.scheduling.JobAttributes">
+        <id property="id" column="JOB_SER_NO" />
+        <result property="jobName" column="JOB_NM" />
+        <result property="programName" column="JOB_PGM_NM" />
+        <result property="parameter" column="JOB_PARM_VAR" />
+        <result property="executionStartTime" column="EXEC_STA_DT" />
+        <result property="executionEndTime" column="EXEC_END_DT" />
+        <result property="state" column="EXEC_ST_CD" typeHandler="org.apache.ibatis.type.EnumOrdinalTypeHandler" />
+        <result property="errorMessage" column="ERR_CTT" />
+        <result property="stackTrace" column="ERR_TRACE" />
+        <result property="nextFireTime" column="NXT_EXEC_DT" />
+        <result property="totalRecordCount" column="TOT_CNT" />
+    </resultMap>
+
+    <insert id="insertJobAttributes" parameterType="com.base.scheduling.JobAttributes">
+        <selectKey keyProperty="id" resultType="string" order="BEFORE">
+        --스케줄러 인서트 
+            SELECT job_schdr_exec_info_s1.NEXTVAL
+              FROM DUAL
+        </selectKey>
+        INSERT INTO job_schdr_exec_info (
+                job_ser_no
+               ,job_nm
+               ,job_pgm_nm
+               ,job_parm_var
+               ,exec_sta_dt
+               ,exec_st_cd
+               ,nxt_exec_dt
+               ,fst_rgstr
+               ,fst_rgst_dt )
+            VALUES (
+                #{id}
+               ,#{jobName}
+               ,#{programName}
+               ,#{parameter}
+               ,#{executionStartTime}
+               ,#{state.value}
+               ,#{nextFireTime}
+               ,'SYSTEM'
+               ,SYSDATE )
+    </insert>
+
+    <update id="updateJobAttributes" parameterType="com.base.scheduling.JobAttributes">
+        UPDATE job_schdr_exec_info
+           SET job_parm_var = #{parameter}
+              ,exec_end_dt = #{executionEndTime}
+              ,exec_st_cd = #{state.value}
+              ,err_ctt = #{errorMessage}
+              ,err_trace = #{stackTrace:CLOB}
+        WHERE job_ser_no = #{id}
+    </update>
+</mapper>

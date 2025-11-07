@@ -1,0 +1,418 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="mr.mngr">
+    <resultMap id="codeMap" type="com.mr.common.domain.CommCdVO">
+        <result property="mrCommGrpCd" column="MR_COMM_GRP_CD" />
+        <result property="mrCommGrpNm" column="MR_COMM_GRP_NM" />
+        <result property="mrCommCd" column="MR_COMM_CD" />
+        <result property="mrCommNm" column="MR_COMM_NM" />
+        <result property="priority" column="PRIORITY" />
+        <result property="sapCd" column="SAP_CD" />
+        <result property="sapNm" column="SAP_NM" />
+        <result property="div1" column="DIV_1" />
+        <result property="div2" column="DIV_2" />
+        <result property="div3" column="DIV_3" />
+        <result property="div4" column="DIV_4" />
+        <result property="div5" column="DIV_5" />
+
+        <result property="delYn" column="DEL_YN" />
+
+    </resultMap>
+
+
+    <select id="selectCode" resultMap="codeMap">
+        SELECT MR_COMM_GRP_CD,
+               MR_COMM_CD,
+               MR_COMM_GRP_NM,
+               MR_COMM_NM,
+               PRIORITY,
+               SAP_CD,
+               SAP_NM,
+               DIV_1,
+               DIV_2,
+               DIV_3,
+               DIV_4,
+               DIV_5,
+               DEL_YN
+          FROM MR_COMM_COD
+         WHERE MR_COMM_GRP_CD = #{mrCommGrpCd}
+           AND MR_COMM_CD = #{mrCommCd}
+    </select>
+
+    <select id="selectCodeList" resultMap="codeMap">
+        SELECT MR_COMM_GRP_CD,
+               MR_COMM_CD,
+               MR_COMM_GRP_NM,
+               MR_COMM_NM,
+               PRIORITY,
+               SAP_CD,
+               SAP_NM,
+               DEL_YN
+          FROM MR_COMM_COD
+         WHERE 1=1
+
+      <if test="mrCommGrpCd != null">
+           AND MR_COMM_GRP_CD = #{mrCommGrpCd}
+      </if>
+
+      <if test="mrCommCd != null">
+           AND MR_COMM_CD = #{mrCommCd}
+      </if>
+
+      <if test="mrCommGrpNm != null">
+           AND MR_COMM_GRP_NM LIKE '%' || UPPER(#{mrCommGrpNm}) || '%'
+      </if>
+
+      <if test="mrCommNm != null">
+           AND MR_COMM_NM LIKE '%' || UPPER(#{mrCommNm}) || '%'
+      </if>
+
+      <if test="sapNm != null">
+           AND SAP_NM LIKE '%' || UPPER(#{sapNm}) || '%'
+      </if>
+           AND MR_COMM_GRP_CD != 'XXX'
+      ORDER BY MR_COMM_GRP_CD, MR_COMM_CD
+
+    </select>
+
+
+    <update id="updateCode" parameterType="map">
+        UPDATE MR_COMM_COD
+           SET MR_COMM_GRP_CD = #{mrCommGrpCd},
+               MR_COMM_CD = #{mrCommCd},
+               MR_COMM_GRP_NM = #{mrCommGrpNm},
+               MR_COMM_NM = #{mrCommNm},
+               PRIORITY = #{priority},
+               SAP_CD = #{sapCd},
+               SAP_NM = #{sapNm},
+               DIV_1 = #{div1},
+               DIV_2 = #{div2},
+               DIV_3 = #{div3},
+               DIV_4 = #{div4},
+               DIV_5 = #{div5}
+         WHERE MR_COMM_GRP_CD = #{mrCommGrpCd}
+           AND MR_COMM_CD = #{mrCommCd}
+    </update>
+
+    <update id="updateCodeDelYn" parameterType="map">
+        UPDATE MR_COMM_COD
+           SET DEL_YN=1,
+               LAST_CHG_DT = SYSDATE,
+               LAST_CHGR = #{loginEmpNo}
+         WHERE MR_COMM_GRP_CD = #{mrCommGrpCd}
+           AND MR_COMM_CD = #{mrCommCd}
+    </update>
+
+
+    <insert id="insertCode" parameterType="com.mr.common.domain.CommCdVO">
+       INSERT INTO MR_COMM_COD(
+                   MR_COMM_GRP_CD,
+                   MR_COMM_CD,
+                   MR_COMM_GRP_NM,
+                   MR_COMM_NM,
+                   PRIORITY,
+                   SAP_CD,
+                   SAP_NM,
+                   DIV_1,
+                   DIV_2,
+                   DIV_3,
+                   DIV_4,
+                   DIV_5,
+                   DEL_YN,
+                   FST_RGST_DT,
+                   FST_RGSTR,
+                   LAST_CHG_DT,
+                   LAST_CHGR
+             ) VALUES ( #{mrCommGrpCd},
+                        #{mrCommCd},
+                        #{mrCommGrpNm},
+                        #{mrCommNm},
+                        #{priority},
+                        #{sapCd},
+                        #{sapNm},
+                        #{div1},
+                        #{div2},
+                        #{div3},
+                        #{div4},
+                        #{div5},
+                        0,
+                        SYSDATE,
+                        #{loginEmpNo},
+                        SYSDATE,
+                        #{loginEmpNo} )
+    </insert>
+
+
+    <resultMap id="chrgrChgHistMap" type="com.mr.step.domain.ChrgrChgHist">
+        <id property="mrReqProcStepDetNo" column="MR_REQ_PROC_STEP_DET_NO" />
+        <result property="mrReqProcStepNo" column="MR_REQ_PROC_STEP_NO" />
+        <result property="status" column="STATUS" />
+        <result property="chrgrClCd" column="CHRGR_CL_CD" />
+        <result property="effEndDtm" column="EFF_END_DTM" />
+        <result property="effStaDtm" column="EFF_STA_DTM" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="empEmail" column="EMP_EMAIL" />
+        <result property="fstProcTrmDt" column="FST_PROC_TRM_DT" />
+        <result property="mrReqNo" column="MR_REQ_NO" />
+        <result property="chrgTeamNo" column="CHRG_TEAM_NO" />
+        <result property="chrgEmpNo" column="CHRG_EMP_NO" />
+        <result property="chrgEmpName" column="CHRG_EMP_NAME" />
+        <result property="aprvChgYn" column="APRV_CHG_YN" />
+        <result property="thdayTeam" column="THDAY_TEAM" />
+        <result property="thdayPos" column="THDAY_POS" />
+        <result property="jobRvCd" column="JOB_RV_CD" />
+        <result property="sugg" column="SUGG" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+    </resultMap>
+
+    <select id="selectMngrChangeList" resultMap="chrgrChgHistMap">
+    --mr정보 
+    SELECT DET.MR_REQ_PROC_STEP_DET_NO,
+           CASE WHEN STEP.MR_STEP_CD = DET.MR_STEP_CD
+                 AND DET.FST_PROC_TRM_DT IS NOT NULL
+                 AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                 AND HIST.CHRGR_CL_CD NOT LIKE 'Z02L%'
+                 AND STEP.EFF_END_DTM = '99991231235959'
+                THEN 'ING'
+                WHEN		STEP.MR_STEP_CD = DET.MR_STEP_CD
+                	AND	(HIST.CHRGR_CL_CD LIKE 'Z02H%' OR HIST.CHRGR_CL_CD LIKE 'Z02L%') -- 기술검토 OR PORC
+                	AND	DET.PROC_ST_CD = 'Z0110'
+                THEN 'ING'
+            ELSE 'END' END STATUS,
+           DET.MR_STEP_CD,
+           DET.PROC_ST_CD,
+           HIST.CHRGR_CL_CD,
+           DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+           EMP.EMP_NAME AS CHRG_EMP_NAME,
+           EMP.EMP_EMAIL,
+           HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+           DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+           HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO,
+           DET.FST_PROC_TRM_DT,
+           HIST.LAST_CHG_DT
+      FROM MR_REQ_PROC_STEP STEP,
+           MR_REQ_PROC_STEP_DET DET,
+           MR_REQ_CHRGR_CHG_HIST HIST,
+           EDM_EMP EMP,
+           EDM_ORG ORG,
+           EDM_DUTY DUTY
+     WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+       AND EMP.DUTY_ID = DUTY.DUTY_ID
+       AND EMP.EMP_ID(+) = HIST.CHRG_EMP_NO
+       AND ORG.ORG_ID(+) = HIST.CHRG_TEAM_NO
+       AND DET.DEL_YN    = 0
+       AND HIST.DEL_YN   = 0
+       AND STEP.EFF_END_DTM = '99991231235959'
+       AND HIST.EFF_END_DTM = '99991231235959'
+       AND DET.MR_REQ_PROC_STEP_DET_NO IN
+                   (SELECT DET.MR_REQ_PROC_STEP_DET_NO
+                      FROM MR_REQ_PROC_STEP STEP,
+                           MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                       AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       AND STEP.EFF_END_DTM = '99991231235959'
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+                       AND HIST.CHRGR_CL_CD NOT LIKE 'Z02L%'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0
+                     UNION
+                    SELECT DET.MR_REQ_PROC_STEP_DET_NO
+                      FROM MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       AND (
+                            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02A') OR --요청자
+                            --(DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0122' AND HIST.CHRGR_CL_CD = 'Z02B') OR --1차승인
+                            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02C') OR --2차승인
+                            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0122' AND HIST.CHRGR_CL_CD = 'Z02C') OR --2차승인
+                            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0132' AND HIST.CHRGR_CL_CD = 'Z02C') OR --2차승인
+                            (DET.MR_STEP_CD = 'Z0010' AND HIST.CHRGR_CL_CD = 'Z02D') OR --REQ 기술검토자
+                            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02D') OR --기술검토 기술검토자
+                            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0133' AND HIST.CHRGR_CL_CD = 'Z02F') OR --기술검토 기술검토팀장
+                            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02G') OR --기술검토 수행팀장
+                            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02G1') OR --직무과장
+                            (DET.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02I') OR --투자비산정 PROJECT ENG
+                            (DET.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD ='Z0133' AND HIST.CHRGR_CL_CD = 'Z02I') OR --투자비산정 PROJECT ENG
+                            (DET.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD ='Z0132' AND HIST.CHRGR_CL_CD = 'Z02C') OR --MR검토확인 1차승인자
+                            (DET.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD ='Z0131' AND HIST.CHRGR_CL_CD = 'Z02F') OR --MR검토확인 2차승인자
+                            (DET.MR_STEP_CD = 'Z0050' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02D') OR --투자품의 기술검토자
+                            (DET.MR_STEP_CD = 'Z00R0' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02C') OR --위험성검토승인자
+                            (DET.MR_STEP_CD = 'Z00R0' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD LIKE 'Z02H%') OR -- 위험성검토 담당자s
+                            (DET.MR_STEP_CD = 'Z0040' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD LIKE 'Z02H%') OR -- 직무검토 담당자
+                            (DET.MR_STEP_CD = 'Z00P0' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD LIKE 'Z02L%') OR -- PORC 담당자
+                            (DET.MR_STEP_CD = 'Z0070' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD LIKE 'Z02P%') OR -- MR수행 담당자
+                            (DET.MR_STEP_CD = 'Z0080' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02Q') OR -- 문서등록 담당자 
+                            (DET.MR_STEP_CD = 'Z00Z0' AND DET.PROC_ST_CD ='Z0132' AND HIST.CHRGR_CL_CD = 'Z02D') -- MR종료 승인
+                            )
+                       AND HIST.DEL_YN=0
+                       AND DET.DEL_YN=0)
+     ORDER BY DET.MR_REQ_PROC_STEP_DET_NO DESC
+    </select>
+
+    <select id="selectMngrChangeList1" resultMap="chrgrChgHistMap">
+    SELECT DET.MR_REQ_PROC_STEP_DET_NO,
+           'END' AS STATUS,
+           DET.MR_STEP_CD,
+           DET.PROC_ST_CD,
+           HIST.CHRGR_CL_CD,
+           DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+           EMP.EMP_NAME AS CHRG_EMP_NAME,
+           HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+           DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+           HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO
+      FROM MR_REQ_PROC_STEP_DET DET,
+           MR_REQ_CHRGR_CHG_HIST HIST,
+           EDM_EMP EMP,
+           EDM_ORG ORG,
+           EDM_DUTY DUTY
+     WHERE DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+       AND EMP.DUTY_ID = DUTY.DUTY_ID
+       AND EMP.EMP_ID = HIST.CHRG_EMP_NO
+       AND ORG.ORG_ID = HIST.CHRG_TEAM_NO
+       AND DET.MR_REQ_NO = #{mrReqNo}
+       AND (
+            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02A') OR --요청자
+            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0122' AND HIST.CHRGR_CL_CD = 'Z02B') OR --1차승인
+            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0132' AND HIST.CHRGR_CL_CD = 'Z02C') OR --2차승인
+            (DET.MR_STEP_CD = 'Z0010' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02D') OR --REQ 기술검토자
+            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0121' AND HIST.CHRGR_CL_CD = 'Z02D') OR --기술검토 기술검토자
+            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0133' AND HIST.CHRGR_CL_CD = 'Z02F') OR --기술검토 기술검토팀장
+            (DET.MR_STEP_CD = 'Z0020' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02G') OR --기술검토 수행팀장
+            (DET.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD ='Z0133' AND HIST.CHRGR_CL_CD = 'Z02I') OR --투자비산정 PROJECT ENG
+            (DET.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD ='Z0132' AND HIST.CHRGR_CL_CD = 'Z02C') OR --MR검토확인 1차승인자
+            (DET.MR_STEP_CD = 'Z0030' AND DET.PROC_ST_CD ='Z0131' AND HIST.CHRGR_CL_CD = 'Z02F') OR --MR검토확인 2차승인자
+            (DET.MR_STEP_CD = 'Z0050' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD = 'Z02D') OR --투자품의 기술검토자
+            (DET.MR_STEP_CD = 'Z0040' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD LIKE 'Z02H%') OR -- 직무검토 담당자
+            (DET.MR_STEP_CD = 'Z0040' AND DET.PROC_ST_CD ='Z0110' AND HIST.CHRGR_CL_CD LIKE 'Z02L%')-- PORC 담당자
+            )
+       AND HIST.DEL_YN=0
+       AND DET.DEL_YN=0
+    UNION ALL
+    SELECT DET.MR_REQ_PROC_STEP_DET_NO,
+           'ING' AS STATUS,
+           DET.MR_STEP_CD,
+           DET.PROC_ST_CD,
+           HIST.CHRGR_CL_CD,
+           DECODE(THDAY_POS, NULL, DUTY_NAME, THDAY_POS) AS THDAY_POS,
+           EMP.EMP_NAME AS CHRG_EMP_NAME,
+           HIST.CHRG_EMP_NO AS CHRG_EMP_NO,
+           DECODE(THDAY_TEAM, NULL, ORG_NAME, THDAY_TEAM) AS THDAY_TEAM,
+           HIST.CHRG_TEAM_NO AS CHRG_TEAM_NO
+              FROM MR_REQ_PROC_STEP STEP,
+                   MR_REQ_CHRGR_CHG_HIST HIST,
+                   MR_REQ_PROC_STEP_DET DET,
+                   EDM_EMP EMP,
+                   EDM_ORG ORG,
+                   EDM_DUTY DUTY
+             WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+               AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+               AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+               AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+               AND EMP.ORG_ID = ORG.ORG_ID
+               AND EMP.DUTY_ID = DUTY.DUTY_ID
+               AND DET.MR_REQ_PROC_STEP_DET_NO IN
+                   (SELECT DET.MR_REQ_PROC_STEP_DET_NO
+                      FROM MR_REQ_PROC_STEP STEP,
+                           MR_REQ_PROC_STEP_DET DET,
+                           MR_REQ_CHRGR_CHG_HIST HIST
+                     WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                       AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                       AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                       AND DET.FST_PROC_TRM_DT IS NOT NULL
+                       AND DET.MR_REQ_NO = #{mrReqNo}
+                       AND STEP.EFF_END_DTM = '99991231235959'
+                       AND HIST.EFF_END_DTM = '99991231235959'
+                       AND DET.DEL_YN=0
+                       AND HIST.DEL_YN=0)
+              AND HIST.CHRGR_CL_CD NOT LIKE 'Z02H%'
+              AND HIST.CHRGR_CL_CD NOT LIKE 'Z02L%'
+    </select>
+
+    <select id="selectStepCdList" resultMap="chrgrChgHistMap">
+		SELECT DISTINCT MR_STEP_CD FROM MR_REQ_PROC_STEP_DET WHERE MR_REQ_NO = #{mrReqNo} ORDER BY MR_STEP_CD
+    </select>
+	
+    <resultMap id="incompleteFileMap" type="com.mr.comp.domain.CompFileVO">
+        <id property="mrReqNo" column="MR_REQ_NO" />
+        <result property="mrReqTitle" column="MR_REQ_TITLE" />
+        <result property="mrNo" column="MR_NO" />
+        <result property="mrTmpNo" column="MR_TMP_NO" />
+        <result property="mrStepCd" column="MR_STEP_CD" />
+        <result property="procStCd" column="PROC_ST_CD" />
+        <result property="plant" column="PLANT" />
+        <result property="plantNm" column="PLANT_NM" />
+        <result property="reqClCd" column="REQ_CL_CD" />
+        <result property="reqClDtlCd" column="REQ_CL_DTL_CD" />
+        <result property="workPsblClCd" column="WORK_PSBL_CL_CD" />
+        <result property="workPsblClNm" column="WORK_PSBL_CL_NM" />
+        <result property="workPsblDt" column="WORK_PSBL_DT" />
+        <result property="workPsblClRsn" column="WORK_PSBL_CL_RSN" />
+        <result property="rigionCd" column="RIGION_CD" />
+        <result property="issueCtt" column="ISSUE_CTT" />
+        <result property="inflnceLoss" column="INFLNCE_LOSS" />
+        <result property="incnvCtt" column="INCNV_CTT" />
+        <result property="useCnt" column="USE_CNT" />
+        <result property="useCntPrd" column="USE_CNT_PRD" />
+        <result property="imprvPrpslCtt" column="IMPRV_PRPSL_CTT" />
+        <result property="qualEptEftCtt" column="QUAL_EPT_EFT_CTT" />
+        <result property="quanEptEftCtt" column="QUAN_EPT_EFT_CTT" />
+        <result property="quanEptEftCd" column="QUAN_EPT_EFT_CD" />
+        <result property="cnclEmpNo" column="CNCL_EMP_ID" />
+        <result property="cnclDt" column="CNCL_DT" />
+        <result property="cnclRsnCtt" column="CNCL_RSN_CTT" />
+        <result property="safetyChkDt" column="SAFETY_CHK_DT" />
+        <result property="safetyChkLoc" column="SAFETY_CHK_LOC" />
+        <result property="invstCostNo" column="INVST_COST_NO" />
+        <result property="capexNo" column="CAPEX_NO" />
+        <result property="delYn" column="DEL_YN" />
+        <result property="fstRgstDt" column="FST_RGST_DT" />
+        <result property="fstRgstr" column="FST_RGSTR" />
+        <result property="lastChgDt" column="LAST_CHG_DT" />
+        <result property="lastChgr" column="LAST_CHGR" />
+        <result property="invstCd" column="INVST_CD" />
+        <result property="invstPurpCd" column="INVST_PURP_CD" />
+        <result property="invstCdNm" column="INVST_CD_NM" />
+        <result property="invstPurpCdNm" column="INVST_PURP_CD_NM" />
+        <result property="chrgrDiv" column="CHRGR_DIV" />
+    </resultMap>
+    
+    <select id="selectIncompleteMr" resultMap="incompleteFileMap">
+    	--selectIncompleteMr (미완료 MR에 대한 데이타 검출)
+         SELECT MT.MR_NO, MT.MR_REQ_TITLE, MT.CAPEX_NO, MT.MR_REQ_NO, MT.PROC_ST_CD, ST.MR_STEP_CD, HT.CHRG_TEAM_NO AS CHRGR_DIV, HT.CHRG_EMP_NO AS CNCL_EMP_ID, 
+         EM.EMP_NAME AS WORK_PSBL_CL_NM, HT.FST_RGST_DT,ADD_MONTHS(HT.FST_RGST_DT, 2) AS LAST_CHG_DT, HT.CHRG_TEAM_NO AS RIGION_CD
+		  FROM MR_REQ_CHRGR_CHG_HIST HT,
+		       MR_REQ_PROC_STEP_DET DT,
+		       MR_REQ_PROC_STEP ST,
+		       MR_REQ_MST MT,
+		       EDM_EMP EM
+		WHERE HT.MR_REQ_PROC_STEP_DET_NO = DT.MR_REQ_PROC_STEP_DET_NO
+		   AND HT.MR_REQ_NO = DT.MR_REQ_NO
+		   AND HT.CHRGR_CL_CD = 'Z02D'
+		   AND DT.MR_REQ_PROC_STEP_NO = ST.MR_REQ_PROC_STEP_NO
+		   AND DT.MR_REQ_NO = ST.MR_REQ_NO
+		   AND ST.MR_REQ_NO = MT.MR_REQ_NO
+		   AND ST.MR_STEP_CD = MT.MR_STEP_CD
+		   AND ST.PROC_ST_CD = MT.PROC_ST_CD
+		   AND ST.DEL_YN = '0'
+		   AND MT.DEL_YN = '0'
+		   AND MT.PLANT <![CDATA[ <> ]]> '8700'
+		   AND MT.MR_STEP_CD = 'Z0090'
+		   AND MT.PROC_ST_CD NOT IN ('Z0131','Z0141')
+		   AND MT.CAPEX_NO  IS NOT NULL
+		   AND DT.FST_PROC_TRM_DT <![CDATA[ < ]]> SYSDATE
+		   AND HT.CHRG_EMP_NO = EM.EMP_ID
+           ORDER BY RIGION_CD, WORK_PSBL_CL_NM, MT.MR_NO
+    </select>
+</mapper>

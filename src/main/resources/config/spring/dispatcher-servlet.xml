@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:util="http://www.springframework.org/schema/util"
+    xmlns:task="http://www.springframework.org/schema/task"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd
+        http://www.springframework.org/schema/task http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+
+    <!--
+    <mvc:annotation-driven validator="validator" />
+
+    <task:annotation-driven executor="executor" scheduler="scheduler" />
+    <task:executor id="executor" queue-capacity="100" />
+    <task:scheduler id="scheduler" pool-size="5" />
+    -->
+
+    <aop:aspectj-autoproxy proxy-target-class="true" />
+
+    <!-- scan component -->
+    <context:component-scan base-package="com">
+        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+    </context:component-scan>
+    <context:annotation-config />
+
+    <!-- jsp handler -->
+    <bean class="org.springframework.web.servlet.mvc.annotation.DefaultAnnotationHandlerMapping">
+        <property name="interceptors">
+            <list>
+                <bean class="com.base.servlet.handler.TilesViewDecisionInterceptor">
+                    <property name="mappings">
+                        <util:map id="tilesViewMap" key-type="java.lang.String" value-type="java.lang.String" map-class="java.util.LinkedHashMap">
+                            <entry key="/admin/**" value="admin/" />
+                            <entry key="/**/popup/*" value="popup/" />
+                            <entry key="/**/print/*" value="print/" />
+                            <entry key="/**/login.do" value="empty/" />
+                            <entry key="/**/toExcel.do" value="excel/" />
+                            <entry key="/**" value="default/" />
+
+                        </util:map>
+                    </property>
+                    <property name="pathMatcher">
+                        <bean class="org.springframework.util.AntPathMatcher" />
+                    </property>
+                    <property name="prefix" value="/WEB-INF/views/" />
+                    <property name="suffix" value=".jsp" />
+                </bean>
+                <bean class="com.mr.common.prehandle.PreInterceptor" />
+            </list>
+        </property>
+        <property name="order" value="2" />
+    </bean>
+
+    <bean class="org.springframework.web.servlet.mvc.annotation.AnnotationMethodHandlerAdapter">
+        <property name="messageConverters">
+            <list>
+                <bean class="org.springframework.http.converter.ByteArrayHttpMessageConverter" />
+                <bean class="org.springframework.http.converter.ResourceHttpMessageConverter" />
+                <bean class="org.springframework.http.converter.StringHttpMessageConverter" />
+                <bean class="org.springframework.http.converter.json.MappingJacksonHttpMessageConverter">
+                   <property name="objectMapper">
+                       <bean class="com.base.servlet.json.map.CustomObjectMapper" />
+                   </property>
+                </bean>
+                <bean class="org.springframework.http.converter.xml.SourceHttpMessageConverter" />
+                <bean class="org.springframework.http.converter.xml.XmlAwareFormHttpMessageConverter" />
+            </list>
+        </property>
+        <property name="webBindingInitializer">
+            <bean class="com.base.servlet.bind.support.CustomWebBindingInitializer">
+                <property name="conversionService">
+                    <bean class="org.springframework.format.support.FormattingConversionServiceFactoryBean" />
+                </property>
+                <property name="validator">
+                    <bean class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean" />
+                </property>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- set view resolver -->
+    <bean id="tilesConfigurer" class="org.springframework.web.servlet.view.tiles2.TilesConfigurer">
+        <property name="completeAutoload" value="true" />
+        <property name="definitions">
+            <list>
+                <value>classpath:config/tiles/tiles-def.xml</value>
+            </list>
+        </property>
+    </bean>
+
+    <bean id="negotiatingViewResolver" class="org.springframework.web.servlet.view.ContentNegotiatingViewResolver" p:order="0" >
+        <property name="viewResolvers">
+            <list>
+                <bean id="tilesViewResolver" class="org.springframework.web.servlet.view.UrlBasedViewResolver">
+                    <property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView" />
+                </bean>
+                <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+                    <property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+                    <property name="prefix" value="/WEB-INF/views/" />
+                    <property name="suffix" value=".jsp" />
+                </bean>
+            </list>
+        </property>
+        <property name="defaultViews">
+            <list>
+                <bean class="org.springframework.web.servlet.view.json.MappingJacksonJsonView">
+                    <property name="prefixJson" value="false" />
+                </bean>
+            </list>
+        </property>
+        <property name="ignoreAcceptHeader" value="false" />
+        <property name="favorPathExtension" value="false" />
+    </bean>
+
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="41943040"/> <!-- 40M -->
+        <property name="maxInMemorySize" value="10485760"/> <!-- 10M -->
+        <property name="uploadTempDir" ref="uploadDir" />
+    </bean>
+    <bean id="uploadDir" class="org.springframework.core.io.FileSystemResource">
+        <constructor-arg>
+            <value>${attach-path.temp}</value>
+        </constructor-arg>
+    </bean>
+</beans>

@@ -1,0 +1,143 @@
+package com.mr.main.controller;
+
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+
+import com.base.servlet.BaseController;
+import com.mr.common.domain.EmpInfoVo;
+import com.mr.main.domain.MrListVO;
+import com.mr.main.domain.MrSummary;
+import com.mr.main.domain.MrSummaryEx;
+import com.mr.main.service.MainService;
+
+/**
+ * 메인컨트롤러
+ *
+ * @author 박성룡
+ * @version 1.0
+ *
+ *          <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.06.20 박성룡 최초 작성
+ * 2014.08.11 박성룡 상세검색 리스트 엑셀 다운로드 추가
+ * </pre>
+ */
+
+@Controller
+@RequestMapping(value = "/")
+public class MainController extends BaseController {
+    private final Logger logger = Logger.getLogger(this.getClass());
+
+    @Autowired
+    MainService mainService;
+
+
+    /**
+     * 사용자 접속시 메인화면
+     * @param EmpInfoVo 
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/main.do")
+    public String main(EmpInfoVo empInfoVo, Model model) {
+
+        model.addAttribute("summary", mainService.selectMrSummary(empInfoVo));
+        model.addAttribute("appSummary", mainService.selectAppSummary(empInfoVo));
+        model.addAttribute("techInvestCnt",mainService.getTechInvestCnt(empInfoVo));
+        /*model.addAttribute("tempSummary", mainService.selectTempMrSummary(empInfoVo));*/
+        return "main/main";
+    }
+
+
+
+    @RequestMapping(value = "/toExcel.do")
+    public String main(String innerHtml,String browser, Model model) {
+        model.addAttribute("fileName", "detailSearch");
+        model.addAttribute("excelSource", innerHtml);
+        return "/toExcel";
+    }
+
+
+
+
+    /**
+     * MR상세 Ajax
+     * @return
+     */
+    @RequestMapping(value = "/mrList.do")
+    public Model getMrList(MrListVO inMrListVO, Model model) {
+        /*        MrListVO inMrListVO = new MrListVO();
+        inMrListVO.setMrStepCd(mrStepCd);
+        inMrListVO.setProcStCd(procStCd);*/
+
+        List<Map> mrSearchList = new ArrayList<Map>();
+        Map<String, String> codeValue;
+
+        for(MrListVO mrListVO : mainService.selectMrList(inMrListVO)){
+            codeValue = new LinkedHashMap<String, String>();
+
+            codeValue.put("mrNo", mrListVO.getMrNo()==null ? " " : mrListVO.getMrNo());
+            codeValue.put("mrReqNo", mrListVO.getMrReqNo()==null ? " " : mrListVO.getMrReqNo());
+            codeValue.put("mrStepCd", mrListVO.getMrStepCd()==null ? " " : mrListVO.getMrStepCd());
+            codeValue.put("procStCd", mrListVO.getProcStCd()==null ? " " : mrListVO.getProcStCd());
+            codeValue.put("mrTitle", mrListVO.getMrReqTitle()==null ? " " : mrListVO.getMrReqTitle());
+            codeValue.put("mrReqDate", mrListVO.getFstRgstDt()==null ? " " : mrListVO.getFstRgstDt());
+            codeValue.put("mrReqEmp", mrListVO.getEmpName()==null ? " " : mrListVO.getEmpName());
+            codeValue.put("mrReqTeam", mrListVO.getTeamName()==null ? " " : mrListVO.getTeamName());
+            codeValue.put("mrActionTeam", mrListVO.getActTeamName()==null ? " " : mrListVO.getActTeamName());
+            codeValue.put("mrStepNm", mrListVO.getProcStNm()==null ? " " : mrListVO.getProcStNm());
+            mrSearchList.add(codeValue);
+        }
+        model.addAttribute("mrSearchList",mrSearchList);
+
+
+        return model;
+    }
+
+
+    /**
+     * MR상세 Ajax
+     * @return
+     */
+    @RequestMapping(value = "/mrAppList.do")
+    public Model mrAppList(MrListVO inMrListVO, Model model) {
+        List<Map> mrSearchList = new ArrayList<Map>();
+        Map<String, String> codeValue;
+
+        for(MrListVO mrListVO : mainService.selectAppMrList(inMrListVO)){
+            codeValue = new LinkedHashMap<String, String>();
+
+            codeValue.put("mrNo", mrListVO.getMrNo()==null ? " " : mrListVO.getMrNo());
+            codeValue.put("mrReqNo", mrListVO.getMrReqNo()==null ? " " : mrListVO.getMrReqNo());
+            codeValue.put("mrStepCd", mrListVO.getMrStepCd()==null ? " " : mrListVO.getMrStepCd());
+            codeValue.put("procStCd", mrListVO.getProcStCd()==null ? " " : mrListVO.getProcStCd());
+            codeValue.put("mrTitle", mrListVO.getMrReqTitle()==null ? " " : mrListVO.getMrReqTitle());
+            codeValue.put("mrReqDate", mrListVO.getFstRgstDt()==null ? " " : mrListVO.getFstRgstDt());
+            codeValue.put("mrReqEmp", mrListVO.getEmpName()==null ? " " : mrListVO.getEmpName());
+            codeValue.put("mrReqTeam", mrListVO.getTeamName()==null ? " " : mrListVO.getTeamName());
+            codeValue.put("mrActionTeam", mrListVO.getActTeamName()==null ? " " : mrListVO.getActTeamName());
+            codeValue.put("mrStepNm", mrListVO.getProcStNm()==null ? " " : mrListVO.getProcStNm());
+            mrSearchList.add(codeValue);
+        }
+        model.addAttribute("mrSearchList",mrSearchList);
+
+
+        return model;
+    }
+
+    @RequestMapping(value = "popup/help.do")
+    public String help(Model model) {
+
+        return "help";
+    }
+
+}

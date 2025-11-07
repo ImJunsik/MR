@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="examples">
+    <!--
+    본 프로젝트에서는 컬럼 alias를 Java 쪽 변수와의 일치성을 맞추기 위해
+    "" 사용하여 컬럼명이 대문자로 출력되는 것을 제한하고 있다.
+    아래 쿼리에서는 Domain Object를 사용하지만 resultMap을 사용하지 않고
+    resultType를 사용하고 있다.
+    이 예제는 꼭 resultMap을 사용하지 않더라도 Domain Object내의 변수명과 컬럼명이
+    일치한다면 resultMap을 거치지 않더라도 Domain Object에 바로 바인딩될 수 있다는 것을
+    보여주기 예제이다.
+    하지만 특별한 경우가 아니라면 resultMap 사용을 권고한다.
+    -->
+    <select id="getDepartmentList" resultType="com.examples.domain.Department">
+        SELECT dept_no AS "departmentNo"
+              ,dept_name AS "departmentName"
+              ,location AS "location"
+          FROM exam_dept
+    </select>
+</mapper>

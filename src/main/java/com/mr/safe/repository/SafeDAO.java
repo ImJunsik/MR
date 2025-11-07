@@ -1,0 +1,172 @@
+package com.mr.safe.repository;
+
+import org.springframework.stereotype.Repository;
+
+import com.base.orm.ibatis.BaseSqlMapRepository;
+import com.mr.safe.domain.SafeCheckVO;
+import com.mr.safe.domain.SafeChrgrChgHistVO;
+import com.mr.safe.domain.SafeProcStepDetVO;
+
+/**
+ * 가동전 안전점검 작성 DB 처리
+ *
+ * @author 조상욱
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.07.21 조상욱 최초 작성
+ * </pre>
+ */
+
+@Repository
+public class SafeDAO  extends BaseSqlMapRepository {
+
+
+    /**
+     * 가동전 안전점검 조회
+     * @param mrReqNo
+     * @return
+     */
+    public SafeCheckVO selectSafeCheck(int mrReqNo){
+        return selectOne("mr.safe.selectSafeCheck", mrReqNo);
+    }
+	/**
+     * 가동전 안전점검 조회 (VO를 통한 파라미터 전달) ★ 추가
+     */
+    public SafeCheckVO selectSafeCheck(SafeCheckVO safeCheckVO){
+        return selectOne("mr.safe.selectSafeCheck", safeCheckVO);
+    }
+
+    /**
+     * 가동전 안전점검 등록여부
+     * @param mrReqNo
+     * @return
+     */
+    /*public SafeChrgrChgHistVO countSafeCheck(SafeCheckVO safeCheckVO){
+        return selectOne("mr.safe.countSafeCheck", safeCheckVO);
+    }*/
+    /**
+     * 가동전 안전점검 등록여부
+     */
+    public SafeChrgrChgHistVO countSafeCheck(SafeCheckVO safeCheckVO){
+        return selectOne("mr.safe.countSafeCheck", safeCheckVO);
+    }
+    
+    
+    /**
+     * 가동전 안전점검 저장
+     * @param safeCheckVO
+     * @return
+     */
+    public int insertSafeCheck(SafeCheckVO safeCheckVO){
+        return insert("mr.safe.insertSafeCheck", safeCheckVO);
+    }
+
+    /**
+     * 가동전 안전점검 수정(STEP,가동전안전점검일시/장소) FAA,GAA 단계에서만 실행
+     * @param safeCheckVO
+     * @return
+     */
+    public int updateSafeCheck(SafeCheckVO safeCheckVO){
+        return update("mr.safe.updateSafeCheck", safeCheckVO);
+    }
+    
+    /**
+     * 기술 검토 확인시 PNID_DT 업데이트
+     * @param safeCheckVO
+     * @return
+     */
+    public int updateCheckPnidDt(SafeCheckVO safeCheckVO){
+        return update("mr.safe.updateCheckPnidDt", safeCheckVO);
+    }
+    
+    /**
+     * MR 수행 확인시 MR_PRFM_DT 업데이트
+     * @param safeCheckVO
+     * @return
+     */
+    public int updateCheckMrPrfmDt(SafeCheckVO safeCheckVO){
+        return update("mr.safe.updateCheckMrPrfmDt", safeCheckVO);
+    }
+
+    /**
+     * 가동전 안전점검 진행상세 저장(신규)
+     * @param safeProcStepDetVO
+     * @return
+     */
+    public int insertSafeProcStepDet(SafeProcStepDetVO safeProcStepDetVO){
+        return insert("mr.safe.insertSafeProcStepDet", safeProcStepDetVO);
+    }
+
+    /**
+     * 가동전 안전점검 담당자 저장(신규)
+     * @param safeChrgrChgHistVO
+     * @return
+     */
+    public int insertSafeChrgrChgHist(SafeChrgrChgHistVO safeChrgrChgHistVO){
+        return insert("mr.safe.insertSafeChrgrChgHist", safeChrgrChgHistVO);
+    }
+
+    /**
+     * 가동전 안전점검 진행상세 저장(수정)
+     * @param safeProcStepDetVO
+     * @return
+     */
+    public int updateSafeProcStepDet(SafeChrgrChgHistVO safeChrgrChgHistVO){
+        return update("mr.safe.updateSafeProcStepDet", safeChrgrChgHistVO);
+    }
+
+    /**
+     * 가동전 안전점검 진행상세 저장(수정)
+     * @param safeChrgrChgHistVO
+     * @return
+     */
+    public int updateSafeChrgrChgHist(SafeChrgrChgHistVO safeChrgrChgHistVO){
+        return update("mr.safe.updateSafeChrgrChgHist", safeChrgrChgHistVO);
+    }
+/**
+     * 가동전 안전점검 진행상세 UPDATE가 안되면 다시 다른 쿼리로 업데이트 시킴
+     * @param safeChrgrChgHistVO
+     * @return
+     */
+    
+    public int updateSafeChrgrChgHist2(SafeChrgrChgHistVO safeChrgrChgHistVO){
+        return update("mr.safe.updateSafeChrgrChgHist2", safeChrgrChgHistVO);
+    }
+    
+    /**
+     * 가동전 안전점검 완료
+     * @param safeCheckVO
+     * @return
+     */
+    public int compSafeCheck(SafeCheckVO safeCheckVO){
+        return update("mr.safe.compSafeCheck", safeCheckVO);
+    }
+
+    /**
+     * 가동전 안전점검 완료시 담당자 기한수정
+     * @param safeCheckVO
+     * @return
+     */
+    public int updateSafeChrgrEffEnd(SafeCheckVO safeCheckVO){
+        return update("mr.safe.updateSafeChrgrEffEnd", safeCheckVO);
+    }
+
+    /*
+     * 201905 가동전 안전점검 
+     */
+	public int updateCheckZ02d(SafeCheckVO safeCheckVO) {		
+		return update("mr.safe.updateCheckZ02d", safeCheckVO);		
+	}
+	
+	 /**
+     * 201909 가동전 안전점검 완료시 mr->she 인터페이스
+     * @param safeCheckVO
+     * @return
+     */
+    public int insertMrSheInterfaceTask(int mrReqNo){
+        return update("mr.safe.insertMrSheInterfaceTask", mrReqNo);
+    }
+}

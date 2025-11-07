@@ -1,0 +1,824 @@
+package com.base.util;
+
+import java.io.File;
+
+import javax.mail.internet.AddressException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeUtility;
+
+import org.springframework.mail.MailParseException;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.mail.javamail.MimeMessagePreparator;
+
+/**
+ * <pre>
+ * 메일 발송 프로그램
+ *
+ *  - TEXT기반 메일발송과 HTML기반 메일발송으로 분리
+ *    . sendText() : TEXT기반 메일발송 Method
+ *    . sendHtml() : HTML기반 메일발송 Method
+ *
+ *  - 파일첨부 형태의 메일은 sendHtml() Method 를 사용
+ *
+ *  - 참조자와 숨은참조자가 필요한 경우 이를 String array 형태로 사용
+ *    단일한 참조자/숨은참조자를 위한 별도의 Utility Method 를 제공하지 않음
+ *
+ *  - 메일주소와 함께 Alias가 필요하다면 메일주소 문자열을 가공하여 사용할 것
+ *    ex) "semis@sama.or.kr" -&gt; "SEMA &lt;semis@sama.or.kr&gt;"
+ *    ※ 한글 문제가 발생할 가능성이 있음.
+ *       : MimeUtility.encodeText(name) 사용
+ *
+ *  - 첨부파일은 두가지 형태로 사용 가능함
+ *    . File
+ *        java.util.File instance
+ *        해당 파일의 실제 파일명이 첨부파일명으로 사용
+ *    . Attachment
+ *        현 클래스의 static inner class
+ *        실제 파일명과 첨부파일명이 달라야 하는 경우 사용
+ *
+ *  - 사용방법 : Mailer를 사용하고자 하는 클래스의 instance 변수로 선언 및 Autowiring
+ *  <p style="border: 1px solid; #777; padding: 3px;">
+ *    public class MailTest {
+ *
+ *        @Autowired
+ *        private Mailer mailer;
+ *
+ *        public void sendTestMail() {
+ *            mailer.sendText(
+ *            	"sender@sema.or.kr",
+ *              "receiver@sema.or.kr",
+ *              "This is Mail Subject",
+ *              "This is Test Mail Body"
+ *            );
+ *        }
+ *    }
+ *  </p>
+ * </pre>
+ *
+ * @author 조용상
+ * @version 1.0
+ *
+ * <pre>
+ * 수정일 | 수정자 | 수정내용
+ * ---------------------------------------------------------------------
+ * 2014.01.27 조용상 최초 작성
+ * </pre>
+ */
+public class Mailer {
+    public static final InternetAddress[] EMPTY_INTERNETADDRESS_ARRAY = new InternetAddress[0];
+    public static final Attachment[] EMPTY_ATTACHMENT_ARRAY = new Attachment[0];
+    private JavaMailSender mailSender;
+
+    /**
+     * 메일발송 시 첨부되는 파일정보
+     * 수신자에게 보여질 파일명과 실제 파일정보를 캡슐링
+     * 실제 파일명과 첨부될 파일명이 달라야 할 경우에만 사용
+     */
+    public static class Attachment {
+        private final String name;
+        private final File file;
+
+        /**
+         * @param file 첨부될 실제 파일
+         */
+        public Attachment(File file) {
+            this.name = file.getName();
+            this.file = file;
+        }
+
+        /**
+         * @param file 첨부될 실제 파일
+         * @param name 수신자에게 보여질 파일명
+         */
+        public Attachment(File file, String name) {
+            this.file = file;
+            this.name = name;
+        }
+
+        /**
+         * @param name 수신자에게 보여질 파일명
+         * @param file 첨부될 실제 파일
+         */
+        public Attachment(String name, File file) {
+            this.name = name;
+            this.file = file;
+        }
+
+        /**
+         * @param name 수신자에게 보여질 파일명
+         * @param path 첨부될 실제 파일의 전체경로
+         */
+        public Attachment(String name, String path) {
+            this.name = name;
+            this.file = new File(path);
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public File getFile() {
+            return this.file;
+        }
+    }
+
+    /**
+     * <pre>
+     * Mailer에서 사용될 MailSender의 instance set
+     * Injection 된다.
+     * </pre>
+     * @param sender MailSender
+     */
+    public void setMailSender(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+    }
+
+    /**
+     * <pre>
+     * TEXT 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일
+     * @param subject 제목
+     * @param contents 내용
+     */
+    public void sendText(String from, String to, String subject, String contents) {
+        sendText(from, toArray(to), subject, contents, null, null);
+    }
+
+    /**
+     * <pre>
+     * TEXT 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     */
+    public void sendText(String from, String to[], String subject, String contents) {
+        sendText(from, to, subject, contents, null, null);
+    }
+
+    /**
+     * <pre>
+     * TEXT 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 복수 참조자
+     *   - 복수 숨은참조자
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일
+     * @param subject 제목
+     * @param contents 내용
+     * @param cc 참조자 이메일의 배열 (필요없으면 null)
+     * @param bcc 숨은참조자 이메일의 배열 (필요없으면 null)
+     */
+    public void sendText(String from, String to, String subject, String contents, String[] cc, String[] bcc) {
+        sendText(from, toArray(to), subject, contents, cc, bcc);
+    }
+
+    /**
+     * <pre>
+     * TEXT 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 참조자
+     *   - 복수 숨은참조자
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param cc 참조자 이메일의 배열 (필요없으면 null)
+     * @param bcc 숨은참조자 이메일의 배열 (필요없으면 null)
+     */
+    public void sendText(String from, String[] to, String subject, String contents, String[] cc, String[] bcc) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+
+            message.setFrom(from);
+            message.setTo(to);
+            message.setSubject(subject);
+            message.setText(contents);
+
+            if (cc != null) {
+                message.setCc(cc);
+            }
+
+            if (bcc != null) {
+                message.setBcc(bcc);
+            }
+
+            mailSender.send(message);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일
+     * @param subject 제목
+     * @param contents 내용
+     */
+    public void sendHtml(String from, String to, String subject, String contents) {
+        sendHtml(from, to, subject, contents, EMPTY_ATTACHMENT_ARRAY);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     * </pre>
+     *
+     * @param from 송신자 이메일 (javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일 (javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     */
+    public void sendHtml(InternetAddress from, InternetAddress to,
+            String subject, String contents) {
+
+        sendHtml(from, to, subject, contents, EMPTY_ATTACHMENT_ARRAY);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     */
+    public void sendHtml(String from, String[] to, String subject, String contents) {
+        sendHtml(from, to, subject, contents, EMPTY_ATTACHMENT_ARRAY);
+    }
+
+    
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     */
+    public void sendHtml(String from, String[] to, String subject, String contents, String[] cc) {
+        sendHtml(from, to, subject, contents, EMPTY_ATTACHMENT_ARRAY, cc);
+    }
+    
+    
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     * </pre>
+     *
+     * @param from 송신자 이메일 (javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일의 배열 (javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     */
+    public void sendHtml(InternetAddress from, InternetAddress[] to, String subject, String contents) {
+        sendHtml(from, to, subject, contents, EMPTY_ATTACHMENT_ARRAY);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 단일 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일(javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일(javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일
+     */
+    public void sendHtml(String from, String to, String subject, String contents, File file) {
+        sendHtml(from, to, subject, contents, toAttachmentArray(file));
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 단일 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일(javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일(javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일
+     */
+    public void sendHtml(InternetAddress from, InternetAddress to, String subject, String contents, File file) {
+        sendHtml(from, to, subject, contents, EMPTY_ATTACHMENT_ARRAY);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 복수 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열
+     */
+    public void sendHtml(String from, String to, String subject, String contents, File[] files) {
+        sendHtml(from, to, subject, contents, toAttachmentArray(files));
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 복수 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일(javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일의 배열(javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열
+     */
+    public void sendHtml(InternetAddress from, InternetAddress to, String subject, String contents, File[] files) {
+        sendHtml(from, to, subject, contents, toAttachmentArray(files));
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 단일 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param attachment 첨부파일 (Mailer.Attachment)
+     */
+    public void sendHtml(String from, String to, String subject, String contents, Attachment attachment) {
+        sendHtml(from, to, subject, contents, toArray(attachment));
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 단일 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일 (javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일의 배열 (javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     * @param attachment 첨부파일 (Mailer.Attachment)
+     */
+    public void sendHtml(InternetAddress from, InternetAddress to, String subject, String contents, Attachment attachment) {
+        sendHtml(from, to, subject, contents, toArray(attachment));
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 복수 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param attachments 첨부파일의 배열 (Mailer.Attachment)
+     */
+    public void sendHtml(String from, String to, String subject, String contents, Attachment[] attachments) {
+        sendHtml(toAddress(from), toAddressArray(to), subject, contents, attachments, null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 단일 수신자
+     *   - 복수 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일 (javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일의 배열 (javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     * @param attachments 첨부파일의 배열 (Mailer.Attachment)
+     */
+    public void sendHtml(InternetAddress from, InternetAddress to, String subject, String contents, Attachment[] attachments) {
+        sendHtml(from, toArray(to), subject, contents, attachments, null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 단일 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일
+     */
+    public void sendHtml(String from, String[] to, String subject, String contents, File file) {
+        sendHtml(from, to, subject, contents, toAttachmentArray(file), null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 단일 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일 (javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일의 배열 (javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일
+     */
+    public void sendHtml(InternetAddress from, InternetAddress[] to, String subject, String contents, File file) {
+        sendHtml(from, to, subject, contents, toAttachmentArray(file), null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일 (javax.mail.internet.InternetAddress)
+     * @param to 수신자 이메일의 배열 (javax.mail.internet.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열
+     */
+    public void sendHtml(String from, String[] to, String subject, String contents, File[] files) {
+        sendHtml(from, to, subject, contents, files, null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자 (javax.mail.internet.InternetAddress)
+     *   - 복수 수신자 (javax.mail.internet.InternetAddress)
+     *   - 복수 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열
+     */
+    public void sendHtml(InternetAddress from, InternetAddress[] to, String subject, String contents, File[] files) {
+        sendHtml(from, to, subject, contents, toAttachmentArray(files), null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 단일 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일 (Mailer.Attachment)
+     */
+    public void sendHtml(String from, String[] to, String subject, String contents, Attachment attachment) {
+        sendHtml(from, to, subject, contents, toArray(attachment), null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자 (javax.mail.internet.InternetAddress)
+     *   - 복수 수신자 (javax.mail.internet.InternetAddress)
+     *   - 단일 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일 (Mailer.Attachment)
+     */
+    public void sendHtml(InternetAddress from, InternetAddress[] to, String subject, String contents, Attachment attachment) {
+        sendHtml(from, to, subject, contents, toArray(attachment), null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열 (Mailer.Attachment)
+     */
+    public void sendHtml(String from, String[] to, String subject, String contents, Attachment[] attachment) {
+        sendHtml(from, to, subject, contents, attachment, null, null);
+    }
+
+    
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열 (Mailer.Attachment)
+     */
+    public void sendHtml(String from, String[] to, String subject, String contents, Attachment[] attachment, String[] cc) {
+        sendHtml(from, to, subject, contents, attachment, cc, null);
+    }
+
+  
+    
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자 (javax.mail.internet.InternetAddress)
+     *   - 복수 수신자 (javax.mail.internet.InternetAddress)
+     *   - 복수 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열 (Mailer.Attachment)
+     */
+    public void sendHtml(InternetAddress from, InternetAddress[] to, String subject, String contents, Attachment[] attachment) {
+        sendHtml(from, to, subject, contents, attachment, null, null);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열
+     * @param cc 참조자 이메일의 배열
+     * @param bcc 숨은참조자 이메일의 배열
+     */
+    public void sendHtml(final String from, final String[] to,
+            final String subject, final String contents, final File[] files,
+            final String[] cc, final String[] bcc) {
+        sendHtml(from, to, subject, contents, toAttachmentArray(files), cc, bcc);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param cc 참조자 이메일의 배열
+     * @param bcc 숨은참조자 이메일의 배열
+     */
+    public void sendHtml(final String from, final String[] to,
+            final String subject, final String contents,
+            final String[] cc, final String[] bcc) {
+        sendHtml(from, to, subject, contents, EMPTY_ATTACHMENT_ARRAY, cc, bcc);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 첨부파일 (실제 파일의 파일명 그대로 사용)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열
+     * @param cc 참조자 이메일의 배열
+     * @param bcc 숨은참조자 이메일의 배열
+     */
+    public void sendHtml(final InternetAddress from, final InternetAddress[] to,
+            final String subject, final String contents, final File[] files,
+            final InternetAddress[] cc, final InternetAddress[] bcc) {
+        sendHtml(from, to, subject, contents, toAttachmentArray(files), cc, bcc);
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일
+     * @param to 수신자 이메일의 배열
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열 (Mailer.Attachment)
+     * @param cc 참조자 이메일의 배열
+     * @param bcc 숨은참조자 이메일의 배열
+     */
+    public void sendHtml(final String from, final String[] to,
+            final String subject, final String contents, final Attachment[] attachments,
+            final String[] cc, final String[] bcc) {
+        sendHtml(toAddress(from), toAddressArray(to), subject, contents, attachments, toAddressArray(cc), toAddressArray(bcc));
+    }
+
+    /**
+     * <pre>
+     * HTML 메일발송
+     *   - 단일 송신자
+     *   - 복수 수신자
+     *   - 복수 첨부파일 (필요한 파일명 Setting)
+     * </pre>
+     *
+     * @param from 송신자 이메일 (javax.mail.InternetAddress)
+     * @param to 수신자 이메일의 배열 (javax.mail.InternetAddress)
+     * @param subject 제목
+     * @param contents 내용
+     * @param file 첨부파일의 배열 (Mailer.Attachment)
+     * @param cc 참조자 이메일의 배열 (javax.mail.InternetAddress)
+     * @param bcc 숨은참조자 이메일의 배열 (javax.mail.InternetAddress)
+     */
+    public void sendHtml(final InternetAddress from, final InternetAddress[] to,
+            final String subject, final String contents, final Attachment[] attachments,
+            final InternetAddress[] cc, final InternetAddress[] bcc) {
+
+        try {
+            mailSender.send(new MimeMessagePreparator() {
+                //              public void prepare(MimeMessage message) throws Exception {
+                @Override
+                public void prepare(MimeMessage message) {
+                    try {
+                        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+                        helper.setFrom(from);
+                        helper.setTo(to);
+                        helper.setSubject(subject);
+                        helper.setText(contents, true);
+
+                        if (cc != null && cc.length > 0) {
+                            helper.setCc(cc);
+                        }
+
+                        if (bcc != null && bcc.length > 0) {
+                            helper.setBcc(bcc);
+                        }
+
+                        if (attachments != null && attachments.length > 0) {
+                            for (Attachment attachment : attachments) {
+                                helper.addAttachment(MimeUtility.encodeText(attachment.getName()), attachment.getFile());
+                            }
+                        }
+                    } catch (Exception e) {
+                        System.out.println(e.getMessage());
+                    }
+                }
+            });
+        } catch (Exception e) {
+
+        }
+    }
+
+    private String[] toArray(String address) {
+        return new String[] { address };
+    }
+
+    private InternetAddress[] toArray(InternetAddress address) {
+        return new InternetAddress[] { address };
+    }
+
+    private Attachment[] toArray(Attachment attach) {
+        return new Attachment[] { attach };
+    }
+
+    private InternetAddress toAddress(String mail) {
+        try {
+            return new InternetAddress(mail);
+        } catch (AddressException ae) {
+            throw new MailParseException(ae);
+        }
+    }
+
+    public InternetAddress[] toAddressArray(String address) {
+        return toArray(toAddress(address));
+    }
+
+    private InternetAddress[] toAddressArray(String[] mails) {
+        if (mails == null) {
+            return EMPTY_INTERNETADDRESS_ARRAY;
+        }
+        InternetAddress[] addresses = new InternetAddress[mails.length];
+
+        try {
+            for (int i = 0, n = mails.length; i < n; i++) {
+                addresses[i] = new InternetAddress(mails[i]);
+            }
+        } catch (AddressException ae) {
+            throw new MailParseException(ae);
+        }
+        return addresses;
+    }
+
+    private Attachment toAttachment(File file) {
+        return new Attachment(file);
+    }
+
+    private Attachment[] toAttachmentArray(File file) {
+        return new Attachment[] { toAttachment(file) };
+    }
+
+    private Attachment[] toAttachmentArray(File[] files) {
+        if (files == null) {
+            return EMPTY_ATTACHMENT_ARRAY;
+        }
+        Attachment[] attachments = new Attachment[files.length];
+
+        for (int i = 0, n = files.length; i < n; i++) {
+            attachments[i] = new Attachment(files[i].getName(), files[i]);
+        }
+        return attachments;
+    }
+}

@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svn/repos_edims/!svn/ver/34/trunk/src/mr/src/main/resources/sqlmap/mapper/mr/tech
+END
+TechReview-sql.xml
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/repos_edims/!svn/ver/188/trunk/src/mr/src/main/resources/sqlmap/mapper/mr/tech/TechReview-sql.xml
+END
+TechInvest-sql.xml
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svn/repos_edims/!svn/ver/205/trunk/src/mr/src/main/resources/sqlmap/mapper/mr/tech/TechInvest-sql.xml
+END
