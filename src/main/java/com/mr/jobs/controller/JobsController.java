@@ -550,6 +550,44 @@ public class JobsController extends BaseController{
         return "redirect:mrRiskCheck.do?mrReqNo=" + mrRvRstVO.getMrReqNo();
     }
 
+    
+    /**
+     * MR수행 위험성검토 승인요청
+     * @param mrRvRstVO
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/mrRiskCheckAppReq.do")
+    public String mrRiskCheckAppReqExe(MrRvRstVO mrRvRstVO, Model model){
+        jobsReviewService.insertRiskCheckAppReqExe(mrRvRstVO);
+        //201912 JobsReviewServiceImpl 에 she인터페이스 추가, porc위원 email발송 추가
+        return "redirect:mrPopRiskCheck.do?mrReqNo=" + mrRvRstVO.getMrReqNo();
+    }
+
+    /**
+     * MR수행 위험성검토 승인
+     * @param mrRvRstVO
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/mrRiskCheckAppExe.do")
+    public String mrRiskCheckAppExe(MrRvRstVO mrRvRstVO, Model model){
+        jobsReviewService.insertRiskCheckApp(mrRvRstVO.getMrReqNo());
+        return "redirect:mrPopRiskCheck.do?mrReqNo=" + mrRvRstVO.getMrReqNo();
+    }
+
+    /**
+     * MR수행 위험성검토 반려
+     * @param mrRvRstVO
+     * @param model
+     * @return
+     */
+    @RequestMapping(value = "/mrRiskCheckReturnExe.do")
+    public String mrRiskCheckReturnExe(MrRvRstVO mrRvRstVO, Model model){
+        jobsReviewService.insertRiskCheckReturnExe(mrRvRstVO);
+        return "redirect:mrPopRiskCheck.do?mrReqNo=" + mrRvRstVO.getMrReqNo();
+    }
+    
     /**
      * HAZOP 페이지
      * @param mrReqNo

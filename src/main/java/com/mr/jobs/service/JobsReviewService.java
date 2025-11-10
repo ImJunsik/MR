@@ -167,6 +167,26 @@ public interface JobsReviewService {
      * @param mrRvRstVO
      */
     void insertRiskCheckReturn(MrRvRstVO mrRvRstVO);
+    
+    /**
+     * MR수행 위험성 검토 승인요청
+     * @param mrRvRstVO
+     */
+    void insertRiskCheckAppReqExe(MrRvRstVO mrRvRstVO);
+
+
+    /**
+     * MR수행 위험성 검토 승인
+     * @param mrReqNo
+     */
+    void insertRiskCheckAppExe(Integer mrReqNo);
+
+
+    /**
+     * MR수행 위험성 검토 반려
+     * @param mrRvRstVO
+     */
+    void insertRiskCheckReturnExe(MrRvRstVO mrRvRstVO);
 
 
     /**

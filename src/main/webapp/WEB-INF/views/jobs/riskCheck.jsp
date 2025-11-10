@@ -282,6 +282,7 @@
 <input type="hidden" id= "porcLineListCnt" value="0"> 
 <input type="hidden" id= "checkListCnt" value="0"> 
 </div>
+
 <script>
 $(window).ready(function() {
 	$("#porcLineListCnt").val("${riskCheck.porcLineList.size()}");
@@ -332,6 +333,16 @@ $(window).ready(function() {
             $("form").attr("action", "${saveURL}").submit();	//mrRiskCheckSave.do, mrRiskCheckUpdate.do
             //window.open("", "_self").close();
         }
+
+     	alert("저장이 완료되었습니다.");
+        
+        // 부모 창에 완료 알림
+        if(window.opener && typeof window.opener.handleHazopSaveComplete === 'function') {
+            window.opener.handleHazopSaveComplete();
+        }
+     	
+        // 팝업 닫기
+        window.close();
     });
 
     $(".appReq").click(function () {

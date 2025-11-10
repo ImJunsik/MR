@@ -2,16 +2,21 @@
 <%@ include file="/WEB-INF/includes/taglibs.jsp" %>
 <!-- title -->
 <div id="content_header">
-    <h4 class="content_header title">위험성검토</h4>
+    <h4 class="content_header title">MR수행 위험성검토</h4>
 </div>
 <!-- button -->
 
 <!-- HSW 재전송 추가  -->
 
-<div class="button_top">    
-    <input type="image" src="images/btn_complete.png"  class="cursor save"/><!-- 저장 :확인-->
-    <input type="image" src="images/btn_close.png" class="cursor close"/><!-- 닫기-->
+<div class="button_top">  
+    <input type="image" src="images/btn_requestApproval.png" style="display:none" class="vam cursor appReq IAD"/><!-- 승인요청 -->
+    <input type="image" src="images/btn_approve.png" style="display:none" class="vam cursor app IAC"/><!-- 승인 -->
+    <input type="image" src="images/btn_return.png" style="display:none" class="vam cursor return IAC"/><!-- 반려 -->
+    <input type="image" src="images/btn_temp.png" style="display:none" class="cursor save IAD"/><!-- 임시저장 -->
 </div>
+<!-- 인터페이스 및 메일테스트 -->
+<!-- <input type="image" src="images/btn_requestApproval.png" class="vam cursor appReq2 IAD"/> --> <!-- 승인요청 -->
+<!-- <input type="image" src="images/btn_temp.png" class="cursor save IAD"/> --><!-- 임시저장 -->
 
 <form id="registerForm" method="post">
 <input type="hidden" id="mrReqNo" name="mrReqNo" value="<c:out value="${riskCheck.mrReqNo}"/>"/>
@@ -376,7 +381,14 @@ $(window).ready(function() {
         	if(riskFileCnt < 1 && hazopActFlag =="Y"){
         		alert("첨부파일을 첨부하세요.");
         		return;
-        	}            
+        	}     
+            if(confirm("승인요청 하시겠습니까?")) {
+                $.removeComma();
+                $('#pageLoadingWrap').show();
+                $("form").attr("action", "mrRiskCheckAppReqExe.do").submit();
+            }
+            //201912 승인요청시 HAZOP 체크후 she 인터페이스 추가 개발완료
+            //201912 지정된 porc 위원에게 e-mail 발송 
         }
     });
 
@@ -387,13 +399,34 @@ $(window).ready(function() {
             if(confirm("승인요청 하시겠습니까?")) {
                 $.removeComma();
                 $('#pageLoadingWrap').show();
-                $("form").attr("action", "mrRiskCheckAppReq.do").submit();
+                $("form").attr("action", "mrRiskCheckAppReqExe.do").submit();
             }
             //201912 승인요청시 HAZOP 체크후 she 인터페이스 추가
             //201912 지정된 porc 위원에게 e-mail 발송 
        
     });
+    
+    
+    $(".app").click(function () {
+    	if($("#checkListCnt").val()<1 && $("input:radio[name='hazopActYn']:checked").val() =="N" ){
+    		alert("checkList 정보가 아직 등록되지 않았습니다.");
+    		return;
+    	}
+        if(confirm("승인 하시겠습니까?")) {
+            $.removeComma();
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "mrRiskCheckAppExe.do").submit();            
+        }
+    });
 
+    $(".return").click(function () {
+        if(confirm("반려 하시겠습니까?")) {
+            $.removeComma();
+            $('#pageLoadingWrap').show();
+            $("form").attr("action", "mrRiskCheckReturnExe.do").submit();
+        }
+    });
+/* 
     $(".porcSelect").click(function () {
     	//aaaaaaaa
     	
@@ -493,14 +526,39 @@ $(window).ready(function() {
     	
     	
         
-    });
+    }); */
+
+/*     $(".porcWrite").click(function () {
+    	
+    	var selectValue = $("input[type=radio][name=porcActYn]:checked").val();
+    	//console.log(('input[name="porcActYn"]:checked').value);
+    	console.log(selectValue);
+    	
+    	switch (selectValue) {
+  	  
+		  	case 'Y':		// 필요
+		  	  {
+		  		$.popup({url:"popup/mrJobsPorcWrite.do?&mrReqNo="+$("#mrReqNo").val(), scroll:"yes", width:"880", height:"600"});
+		  	  }break;
+		  	case 'S':		// 내용 공유
+		  	  {
+		  		$.popup({url:"popup/mrShareContent.do?&mrReqNo="+$("#mrReqNo").val(), scroll:"yes", width:"880", height:"600"});  	  
+		  	  }break;
+		  	case 'N':		// 불필요
+		  	  {
+		  	  	// 표시 금지
+		  	  }break;
+    	}
+    	
+        
+    }); */
 
     //202007 6번(clCtt06)항목 제외처리
     $.validation = function(){
         var isValid = false;
         isValid = $.validator({
         	 agreeText : {method:"class",type:"text", msg:"승인자를 입력하세요."},
-        	 //agreeEndDate : {method:"class",type:"text", msg:"승인기한을 입력하세요."},
+        	 agreeEndDate : {method:"class",type:"text", msg:"승인기한을 입력하세요."},
         	 clCtt01 : {method:"class",type:"check", msg:"1번 항목을 선택하세요."},
         	 clCtt02 : {method:"class",type:"check", msg:"2번 항목을 선택하세요."},
         	 clCtt03 : {method:"class",type:"check", msg:"3번 항목을 선택하세요."},
@@ -508,6 +566,7 @@ $(window).ready(function() {
         	 clCtt05 : {method:"class",type:"check", msg:"5번 항목을 선택하세요."},
         	 clCtt07 : {method:"class",type:"check", msg:"6번 항목을 선택하세요."},
         	 clCtt08 : {method:"class",type:"check", msg:"7번 항목을 선택하세요."}
+        	 //porcActYn : {method:"class",type:"check", msg:"PORC수행여부를 선택하세요."}
         });
         return isValid;
     };
@@ -515,9 +574,9 @@ $(window).ready(function() {
 
 });
 
-if("${riskCheck.porcActYn}" == "Y" && "${porcClass}" == "IASA") {
+/* if("${riskCheck.porcActYn}" == "Y" && "${porcClass}" == "IASA") {
 	$.popup({url:"mrJobsPorcWrite.do?&mrReqNo="+$("#mrReqNo").val(), scroll:"yes", width:"880", height:"500"});
-};
+}; */
 
 
 $(function() {
