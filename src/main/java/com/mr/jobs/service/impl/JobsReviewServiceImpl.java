@@ -48,7 +48,7 @@ import com.mr.tech.repository.TechInvestDao;
  */
 
 @Service
-public class JobsReviewServiceImpl extends BaseService implements JobsReviewService {
+public abstract class JobsReviewServiceImpl extends BaseService implements JobsReviewService {
     private final Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
@@ -780,6 +780,21 @@ public class JobsReviewServiceImpl extends BaseService implements JobsReviewServ
         jobsReviewDao.insertMrSheInterface(mrRvRstVO.getMrReqNo());
     }
 
+    @Override
+    public void insertRiskCheckAppReqExe(MrRvRstVO mrRvRstVO) {
+        MrRvRstVO checkMrRvRst = selectMrRiskCheckExe(mrRvRstVO.getMrReqNo());
+        if(checkMrRvRst==null || (mrRvRstVO!=null && mrRvRstVO.getMrRvRstNo()==null)) {
+            insertRiskCheckExe(mrRvRstVO);
+        } else {
+            updateRiskCheck(mrRvRstVO);
+        }
+        mrStepService.insertIsolationNextAppEmp(mrRvRstVO.getMrReqNo(), "Z00R0", "Z0122");
+
+        mrMailService.mailSendMulti(mrRvRstVO.getMrReqNo(), "Z00R0", "Z0122", "Z02C");
+        
+        //201912 she 인터페이스 추가  하잡일경우 인터페이스 테이블에 인서트
+        jobsReviewDao.insertMrSheInterface(mrRvRstVO.getMrReqNo());
+    }
 
 
     @Override
