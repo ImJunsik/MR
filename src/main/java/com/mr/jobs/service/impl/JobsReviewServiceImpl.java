@@ -48,7 +48,7 @@ import com.mr.tech.repository.TechInvestDao;
  */
 
 @Service
-public abstract class JobsReviewServiceImpl extends BaseService implements JobsReviewService {
+public class JobsReviewServiceImpl extends BaseService implements JobsReviewService {
     private final Logger logger = Logger.getLogger(this.getClass());
 
     @Autowired
@@ -786,7 +786,7 @@ public abstract class JobsReviewServiceImpl extends BaseService implements JobsR
         if(checkMrRvRst==null || (mrRvRstVO!=null && mrRvRstVO.getMrRvRstNo()==null)) {
             insertRiskCheckExe(mrRvRstVO);
         } else {
-            updateRiskCheck(mrRvRstVO);
+            updateRiskCheckExe(mrRvRstVO);
         }
         mrStepService.insertIsolationNextAppEmp(mrRvRstVO.getMrReqNo(), "Z00R0", "Z0122");
 
@@ -817,6 +817,26 @@ public abstract class JobsReviewServiceImpl extends BaseService implements JobsR
         mrMailService.mailSendMulti(mrRvRstVO.getMrReqNo(), "Z00R0", "Z0110", "Z02D");
     }
 
+
+    @Override
+    public void insertRiskCheckAppExe(Integer mrReqNo) { 
+        //승인시 DT를 변경하여 승인하였는지 판단하도록 한다.
+        mrRvRstService.updateMrRvRstAppExe(mrReqNo, "RISK");
+        mrStepService.insertIsolationNextAppEmp(mrReqNo, "Z00R0", "Z0132");
+
+        if(isJobsComplete(mrReqNo)){
+            mrMailService.selectMailSend(mrReqNo, "Z0040", "COMPLETE", "Z0020", "Z02D");
+        }
+
+    }
+
+
+
+    @Override
+    public void insertRiskCheckReturnExe(MrRvRstVO mrRvRstVO) {
+        mrStepService.insertIsolationPrevAppEmp(mrRvRstVO.getMrReqNo(), "Z00R0", "Z0110", mrRvRstVO.getAppLine(), "Z02D");
+        mrMailService.mailSendMulti(mrRvRstVO.getMrReqNo(), "Z00R0", "Z0110", "Z02D");
+    }
 
     @Override
     public MrRvRstVO selectMrHazop(int mrReqNo) {

@@ -159,7 +159,8 @@ public class MrRvRstDAO  extends BaseSqlMapRepository {
     public void updateMrRvRstAppExe(int mrReqNo, String itemCd) {
         MrRvRstVO mrRvRstVO = new MrRvRstVO();
         mrRvRstVO.setMrReqNo(mrReqNo);
-        mrRvRstVO.setItemCd(itemCd);
-        update("mr.rvRst.updateMrRvRstAppExe",mrRvRstVO);
+        mrRvRstVO.setItemCd(itemCd);     /*여기에 itemCd값을 강제 매핑 해야 할 듯*/
+        update("mr.rvRst.updateMrRvRstApp",mrRvRstVO);
+        //update("mr.rvRst.updateMrRvRstAppExe",mrRvRstVO);
     }
 }
