@@ -44,8 +44,8 @@ public class IvstController  extends BaseController {
     MrStepService mrStepService;
     
     @Autowired
-    JobsReviewService jobsReviewService;
-
+    private JobsReviewService jobsReviewService;
+    
     @RequestMapping(value = "/ivstCostRegister.do")
     public String register(Integer mrReqNo, Model model){
 

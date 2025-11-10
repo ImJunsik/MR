@@ -139,7 +139,7 @@ public class JobsReviewDao extends BaseSqlMapRepository{
     }
 
     /**
-     * 실행 HAZOP 조회
+     * MR수행 HAZOP 조회
      * @param mrReqNo
      * @return
      */
@@ -148,7 +148,7 @@ public class JobsReviewDao extends BaseSqlMapRepository{
     }
 
     /**
-     * 실행 HAZOP 수정
+     * MR수행  HAZOP 수정
      * @param mrRvRstVO
      * @return
      */
@@ -157,7 +157,7 @@ public class JobsReviewDao extends BaseSqlMapRepository{
     }
 
     /**
-     * 실행 HAZOP 저장
+     * MR수행  HAZOP 저장
      * @param mrRvRstVO
      * @return
      */
@@ -166,7 +166,7 @@ public class JobsReviewDao extends BaseSqlMapRepository{
     }
 
     /**
-     * 실행 CHECK 조회
+     * MR수행  CHECK 조회
      * @param mrReqNo
      * @param mrStepCd
      * @return
@@ -179,7 +179,7 @@ public class JobsReviewDao extends BaseSqlMapRepository{
     }
 
     /**
-     * 실행 CHECK 저장
+     * MR수행  CHECK 저장
      * @param jobsCheckMasterVO
      * @return
      */
@@ -188,7 +188,7 @@ public class JobsReviewDao extends BaseSqlMapRepository{
     }
 
     /**
-     * 실행 CHECK 수정
+     * MR수행  CHECK 수정
      * @param jobsCheckMasterVO
      * @return
      */

@@ -557,7 +557,7 @@ public class JobsController extends BaseController{
      * @param model
      * @return
      */
-    @RequestMapping(value = "/mrRiskCheckAppReq.do")
+    @RequestMapping(value = "/mrRiskCheckAppReqExe.do")
     public String mrRiskCheckAppReqExe(MrRvRstVO mrRvRstVO, Model model){
         jobsReviewService.insertRiskCheckAppReqExe(mrRvRstVO);
         //201912 JobsReviewServiceImpl 에 she인터페이스 추가, porc위원 email발송 추가
