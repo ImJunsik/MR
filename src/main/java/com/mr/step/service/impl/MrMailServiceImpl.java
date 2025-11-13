@@ -51,6 +51,7 @@ import com.mr.step.repository.MrMailDao;
 import com.mr.step.repository.MrStepRepository;
 import com.mr.step.service.MrMailService;
 import com.mr.step.service.MrStepService;
+import com.mr.step.domain.MrReqProcStepDetVO;
 
 @Service
 public class MrMailServiceImpl extends BaseService implements MrMailService{
@@ -127,7 +128,7 @@ public class MrMailServiceImpl extends BaseService implements MrMailService{
 	        if(IsOperDistinc.m_bOper)
 	        	mrMailVO.setTo(appInfo.getEmpEmail());
 	        else
-	        	mrMailVO.setTo("ob009yl@oilbank.co.kr");
+	        	mrMailVO.setTo("obljs2745@oilbank.co.kr");
 	        mrMailVO.setChrgrClCd(appInfo.getChrgrClCd());
 	
 	        //메일내용 셋팅
@@ -139,6 +140,47 @@ public class MrMailServiceImpl extends BaseService implements MrMailService{
     	
         return false;
     }
+    
+
+    @Override
+    public boolean mailSend_I0(int mrReqNo, String mrStepCd, String ProcStCd) {
+    	logger.info("m_bOper : [" + IsOperDistinc.m_bOper + "]");
+    	//if(IsOperDistinc.m_bOper)		// Yoo 운영서버일때만 동작 한다
+    	//{
+	        //보내는 사람 정보 셋팅
+	        MrMailVO mrMailVO = getMailInfo(mrReqNo, null, null);
+	        //mrMailVO.getMrStepCd() 값이 "Z0040"인지 "Z00I0" 인지  값 확인, "Z00I0"값이 아니면 아래 로직 추가  
+	        //2025-11-11 ijs 투자비재산정 메일 전송용
+	        mrMailVO.setMailStep("Z00I0");	
+	
+	        //받는 사람 정보 셋팅
+	        ChrgrChgHist appInfo = mrStepRepository.selectAppStepEmpI0(mrReqNo,null);
+	        
+	        if(mrMailVO == null || appInfo == null)
+	        	return true;
+	        
+	        mrMailVO.setFstProcTrmDt(appInfo.getFstProcTrmDt());
+	        mrMailVO.setToNm(appInfo.getChrgEmpName());
+	        
+	        System.out.println(appInfo.getChrgEmpName() + " ----- send email ----- " + appInfo.getEmpEmail());
+	        logger.info(appInfo.getChrgEmpName() + " ----- send email ----- " + appInfo.getEmpEmail());
+	        logger.info(" IsOperDistinc.m_bOper :  " + IsOperDistinc.m_bOper);
+	        if(IsOperDistinc.m_bOper)
+	        	mrMailVO.setTo(appInfo.getEmpEmail());
+	        else
+	        	mrMailVO.setTo("obljs2745@oilbank.co.kr");
+	        mrMailVO.setChrgrClCd(appInfo.getChrgrClCd());
+	
+	        //메일내용 셋팅
+	        generateMailContent(mrMailVO);
+	
+	        //메일발송 (개발서버는 주석.승인, 반려시(메일발송됨)
+	        send(mrMailVO);
+    	//}
+    	
+        return false;
+    }
+    
 //yoo 240731 add
     @Override
     public boolean mailSend(int mrReqNo, MrMailVO mrMailVo) {
@@ -160,7 +202,7 @@ public class MrMailServiceImpl extends BaseService implements MrMailService{
 		        if(IsOperDistinc.m_bOper)
 		        	mrMailVO.setTo(appInfo.getEmpEmail());
 		        else
-		        	mrMailVO.setTo("ob009yl@oilbank.co.kr");
+		        	mrMailVO.setTo("obljs2745@oilbank.co.kr");
 		        mrMailVO.setChrgrClCd(appInfo.getChrgrClCd());
 		
 		        //메일내용 셋팅
@@ -1103,6 +1145,10 @@ public class MrMailServiceImpl extends BaseService implements MrMailService{
         } else if (mrMailVO.getMrStepCd().equals("Z00P0")) {
             content += mrMailVO.getMrReqTitle() + " PORC위원으로 지정되셨습니다. <br>";
 
+        } else if (mrMailVO.getMrStepCd().equals("Z0040") && mrMailVO.getMailStep().equals("Z00I0")) {  /*투자비재산정용*/
+
+            content += mrMailVO.getMrReqTitle() + "의 투자비재산정이 완료되었습니다. 승인요청 드립니다. <br>";
+
         } else if (mrMailVO.getMrStepCd().equals("Z0040") && mrMailVO.getProcStCd().equals("COMPLETE")) {
             content += mrMailVO.getMrReqTitle() + "의 직무검토 작성이 완료되었습니다. <br>";
             content += "직무검토 완료처리 하시기 바랍니다.<br>";
@@ -1314,7 +1360,7 @@ public class MrMailServiceImpl extends BaseService implements MrMailService{
                             if(IsOperDistinc.m_bMail)
                             	to[0] = mrMailVO.getTo();
                             else
-                            	to[0] = "ob009yl@bp.hd.com";
+                            	to[0] = "obljs2745@bp.hd.com";
 
                             mailer.sendHtml(mrMailVO.getFrom(), to, mrMailVO.getMailTitle(), mrMailVO.getContent()+getMailLink(mrMailVO, null, true), ccs, null);
                         }else if(mrMailVO.getToInfos()!=null) {
@@ -1324,7 +1370,7 @@ public class MrMailServiceImpl extends BaseService implements MrMailService{
                             	if(IsOperDistinc.m_bMail)
                             		to[i] = infoVos.getToMailAddress();
                             	else
-                            		to[i] = "ob009yl@bp.hd.com";
+                            		to[i] = "obljs2745@bp.hd.com";
                                 i++;
                             }
                             mailer.sendHtml(mrMailVO.getFrom(), to, mrMailVO.getMailTitle(), mrMailVO.getContent()+getMailLink(mrMailVO, null, true), ccs, null);

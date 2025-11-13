@@ -458,6 +458,13 @@ public class MrStepRepository extends BaseSqlMapRepository {
         return selectOne("mr.step.selectAppStepEmp", chrgrChgHist);
     }
     
+    public ChrgrChgHist selectAppStepEmpI0(int mrReqNo, String chrgrClCd) {
+        ChrgrChgHist chrgrChgHist = new ChrgrChgHist();
+        chrgrChgHist.setMrReqNo(mrReqNo);
+        chrgrChgHist.setChrgrClCd(chrgrClCd);
+        return selectOne("mr.step.selectAppStepEmpI0", chrgrChgHist);
+    }
+    
     /**
      * yoo 20240104
      * @param mrReqNo

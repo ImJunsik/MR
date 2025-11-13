@@ -225,5 +225,16 @@ public class MrMailVO extends Domain {
         this.chrgEmpNo = chrgEmpNo;
     }
 
+    /*2025-11-11 ijs 투자비재산정 용도 추가*/
+    private String mailStep;
+    
+
+    public String getMailStep() {
+        return mailStep;
+    }
+
+    public void setMailStep(String mailStep) {
+        this.mailStep = mailStep;
+    }
 
 }

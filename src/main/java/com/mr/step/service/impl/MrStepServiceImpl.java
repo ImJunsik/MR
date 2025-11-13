@@ -26,6 +26,7 @@ import com.mr.step.domain.MrReqProcStepDetVO;
 import com.mr.step.domain.MrReqProcStepVO;
 import com.mr.step.repository.MrStepRepository;
 import com.mr.step.service.MrStepService;
+import com.mr.step.service.MrMailService;
 
 @Service
 public class MrStepServiceImpl extends BaseService implements MrStepService {
@@ -37,6 +38,10 @@ public class MrStepServiceImpl extends BaseService implements MrStepService {
     @Autowired
     MrAtchFileRepository mrAtchFileRepository;
 
+
+    @Autowired
+    MrMailService mrMailService;
+    
     @Autowired
     MrAtchFileService mrAtchFileService;
 
@@ -530,6 +535,7 @@ public class MrStepServiceImpl extends BaseService implements MrStepService {
             chrgrChgHist.setMrReqProcStepDetNo(mrReqProcStepDetVO.getMrReqProcStepDetNo());
             
             //결재라인생성
+            //chrgrChgHist.getChrgrClCd("Z02C") 인지 확인 필요
             mrStepRepository.insertChrgrChgHist(chrgrChgHist);            
         }
     }
@@ -1082,13 +1088,18 @@ public class MrStepServiceImpl extends BaseService implements MrStepService {
 
     @Override
     public void insertIsolationNextAppEmp(int mrReqNo, String mrStepCd, String nextProcStCd) {
-
+    	
+    	//nextProcStCd가 Z0122 - 투자비재산정 승인 요청, Z0132 - 투자비재산정 승인 
+    	
         ChrgrChgHist appInfo = mrStepRepository.selectAppIsolationStepEmp(mrReqNo, mrStepCd, null);
+        
+        MrReqProcStepDetVO mrReqProcStepDetVO = new MrReqProcStepDetVO();
+        
         if (appInfo!=null) {
 
             mrStepRepository.updateAppLineEffEnd(appInfo);
 
-            MrReqProcStepDetVO mrReqProcStepDetVO = new MrReqProcStepDetVO();
+            
             mrReqProcStepDetVO.setMrReqNo(mrReqNo);
             mrReqProcStepDetVO.setMrReqProcStepNo(appInfo.getMrReqProcStepNo());
             mrReqProcStepDetVO.setMrStepCd(appInfo.getMrStepCd());
@@ -1098,6 +1109,9 @@ public class MrStepServiceImpl extends BaseService implements MrStepService {
             appInfo.setMrReqProcStepDetNo(mrReqProcStepDetVO.getMrReqProcStepDetNo());
             mrStepRepository.insertChrgrChgHist(appInfo);
         }
+        //2025-11-11 ijs
+        //mrMailService.mailSend(mrReqNo);
+        mrMailService.mailSend_I0(mrReqNo, mrStepCd, nextProcStCd);
     }
 
     @Override

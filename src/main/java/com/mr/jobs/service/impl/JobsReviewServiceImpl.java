@@ -1332,7 +1332,7 @@ public class JobsReviewServiceImpl extends BaseService implements JobsReviewServ
 
     }
 
-
+    //투자비재승인 요청
     @Override
     public void insertInvestCostAppReq(TechInvestVO techInvestVO) {
         insertMrTechInvest(techInvestVO);

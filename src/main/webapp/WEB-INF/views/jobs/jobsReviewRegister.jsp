@@ -1911,9 +1911,9 @@ $(document).on("change",".jobFileForm", function () {
 
 //<br>IANN
 //alert("wj costModeClass:" + "${costModeClass}");
-if("${costModeClass}"!="IAFF" && "${costModeClass}"!="IFF") {
+//if("${costModeClass}"!="IAFF" && "${costModeClass}"!="IFF") {
 	$.popup({url:"popup/techInvestCostModify.do?&mrReqNo="+$("#mrReqNo").val(), scroll:"yes", width:"880", height:"700",popupName:"techInvestCostModify"});
-}
+//}
 
 $.jobsValidation = function (){
 	var div;

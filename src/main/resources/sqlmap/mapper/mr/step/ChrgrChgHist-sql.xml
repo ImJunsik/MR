@@ -635,6 +635,89 @@
                        AND DET.DEL_YN =0
                        AND HIST.DEL_YN=0)
     </select>
+    
+   <select id="selectAppStepEmpI0" resultMap="appLineMap">
+       --권한체크(selectAppStepEmp 투자비재산정 결재자 찾기)
+       SELECT  DISTINCT   DET.MR_REQ_PROC_STEP_DET_NO, DET.MR_REQ_NO,
+              DET.MR_REQ_PROC_STEP_NO,
+              STEP.MR_STEP_CD,
+              STEP.PROC_ST_CD,
+              HIST.CHRGR_CL_CD,
+              DUTY.DUTY_NAME AS THDAY_POS,
+              ORG.ORG_ID AS CHRG_TEAM_NO,
+              ORG.ORG_NAME AS THDAY_TEAM,
+              HIST.CHRG_EMP_NO,
+              EMP.EMP_NAME AS CHRG_EMP_NAME,
+              EMP.EMP_EMAIL,
+              DET.FST_PROC_TRM_DT
+	    FROM MR_REQ_MST MST
+		    INNER JOIN MR_REQ_PROC_STEP STEP ON MST.MR_REQ_NO = STEP.MR_REQ_NO
+		    INNER JOIN MR_REQ_PROC_STEP_DET DET ON STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+		    INNER JOIN MR_REQ_CHRGR_CHG_HIST HIST ON DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+		    INNER JOIN EDM_EMP EMP ON HIST.CHRG_EMP_NO = EMP.EMP_ID
+		    INNER JOIN EDM_ORG ORG ON EMP.ORG_ID = ORG.ORG_ID
+		    INNER JOIN EDM_DUTY DUTY ON EMP.DUTY_ID = DUTY.DUTY_ID
+		WHERE 1 = 1
+		    AND MST.MR_NO = #{mrReqNo}
+		    AND HIST.EFF_END_DTM = '99991231235959'
+		    AND STEP.EFF_END_DTM = '99991231235959'
+		    AND STEP.MR_STEP_CD = 'Z0040'
+		    AND HIST.CHRGR_CL_CD = 'Z02C'
+		    AND HIST.DEL_YN = 0
+		    AND DET.DEL_YN=0
+		    AND STEP.DEL_YN=0
+    ;
+     <!--   SELECT distinct   DET.MR_REQ_PROC_STEP_DET_NO, DET.MR_REQ_NO,
+              DET.MR_REQ_PROC_STEP_NO,
+              STEP.MR_STEP_CD,
+              STEP.PROC_ST_CD,
+              HIST.CHRGR_CL_CD,
+              DUTY.DUTY_NAME AS THDAY_POS,
+              ORG.ORG_ID AS CHRG_TEAM_NO,
+              ORG.ORG_NAME AS THDAY_TEAM,
+              HIST.CHRG_EMP_NO,
+              EMP.EMP_NAME AS CHRG_EMP_NAME,
+              EMP.EMP_EMAIL,
+              DET.FST_PROC_TRM_DT
+         FROM MR_REQ_PROC_STEP STEP,
+              MR_REQ_CHRGR_CHG_HIST HIST,
+              MR_REQ_PROC_STEP_DET DET,
+              EDM_EMP EMP,
+              EDM_ORG ORG,
+              EDM_DUTY DUTY
+        WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+          AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+          AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+          AND HIST.CHRG_EMP_NO = EMP.EMP_ID
+          AND EMP.ORG_ID = ORG.ORG_ID
+          AND EMP.DUTY_ID = DUTY.DUTY_ID
+          <if test="chrgrClCd!=null">
+          AND DET.MR_REQ_NO = #{mrReqNo}
+          AND HIST.CHRGR_CL_CD = #{chrgrClCd}
+          AND HIST.EFF_END_DTM = '99991231235959'
+          AND STEP.EFF_END_DTM = '99991231235959'
+          AND HIST.DEL_YN = 0
+          AND DET.DEL_YN=0
+          AND STEP.DEL_YN=0
+          </if>
+          <if test="chrgrClCd==null">
+          AND DET.MR_REQ_PROC_STEP_DET_NO =
+              (SELECT MIN(DET.MR_REQ_PROC_STEP_DET_NO)
+                 FROM MR_REQ_PROC_STEP STEP,
+                      MR_REQ_PROC_STEP_DET DET,
+                      MR_REQ_CHRGR_CHG_HIST HIST
+                WHERE STEP.MR_REQ_PROC_STEP_NO = DET.MR_REQ_PROC_STEP_NO
+                  AND STEP.MR_STEP_CD = DET.MR_STEP_CD
+                  AND DET.MR_REQ_PROC_STEP_DET_NO = HIST.MR_REQ_PROC_STEP_DET_NO
+                  AND DET.FST_PROC_TRM_DT IS NOT NULL
+                  AND DET.MR_REQ_NO = #{mrReqNo}
+                  AND STEP.EFF_END_DTM = '99991231235959'
+                  AND HIST.EFF_END_DTM = '99991231235959'
+                  AND STEP.DEL_YN = 0  /*2025-07-17 IJS 조건 추가*/
+                  AND DET.DEL_YN=0
+                  AND HIST.DEL_YN=0)
+         </if> -->
+    </select>
   
     <select id="selectAppStepEmp60" resultMap="appLineMap">
             --권한체크(selectAppStepEmp3)

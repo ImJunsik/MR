@@ -1,63 +1,53 @@
-<%@ page language="java" contentType="text/html; charset=EUC-KR"
-    pageEncoding="EUC-KR"%>
-<%@ page import="java.io.BufferedOutputStream"%>
-<%@ page import="java.io.FileInputStream"%>
-<%@ page import="java.io.BufferedInputStream"%>
-<%@ page import="java.io.File"%>
+<%@ page language="java" contentType="text/html; charset=EUC-KR" pageEncoding="EUC-KR"%>
+<%@ page import="java.io.*" %>
+<%@ page import="java.net.URLEncoder" %>
+
 <%
+request.setCharacterEncoding("EUC-KR");
+response.setCharacterEncoding("EUC-KR");
+response.setContentType("text/html;charset=EUC-KR");
 
- request.setCharacterEncoding("EUC-KR");
- response.setCharacterEncoding("EUC-KR");
- response.setContentType("text/html;charset=EUC-KR");
+// 상대 경로 설정
+String relativePath = "/images/HDO_safeRPT.docx";
+String filename = application.getRealPath(relativePath);
 
-// String filename = request.getParameter("downfilename");
-// String filename = "C:/Development/workspaces/mr/src/main/webapp/images/HDO_safeRPT.docx";
- String filename = "D:/OpenMinds/EDIMS/mr/images/HDO_safeRPT.docx";
+File file = new File(filename);
+System.out.println("Resolved Path: " + filename);
 
- File file = new File(filename);
+if (file.exists() && file.isFile()) {
+    response.setContentType("application/x-msdownload");
 
- System.out.println(filename);
- System.out.println(file.getAbsoluteFile());
- System.out.println(file.length());
+    String encodedFileName = URLEncoder.encode(file.getName(), "EUC-KR");
+    response.setHeader("Content-Disposition", "attachment;filename=" + encodedFileName + ";");
 
- byte b[] = new byte[(int)file.length()];
+    BufferedInputStream input = null;
+    BufferedOutputStream output = null;
 
- if(file.length() > 0 && file.isFile()){
+    try {
+        input = new BufferedInputStream(new FileInputStream(file));
+        output = new BufferedOutputStream(response.getOutputStream());
 
-  response.setContentType("application/x-msdownload");
-  response.setHeader("Content-Disposition", "attachment;filename="+ file.getName() + ";");
+        byte[] buffer = new byte[8192];
+        int bytesRead;
+        while ((bytesRead = input.read(buffer)) != -1) {
+            output.write(buffer, 0, bytesRead);
+        }
+        output.flush();
+        out.clear();
+        out = pageContext.pushBody();
 
-  BufferedInputStream input = new BufferedInputStream(new FileInputStream(file));
-  BufferedOutputStream output = new BufferedOutputStream(response.getOutputStream());
-
-  int read = 0;
-
-  try{
-
-   while((read = input.read(b)) != -1){
-    output.write(b, 0, read);
-   }
-
-   output.close();
-   input.close();
-   out.clear();
-   out = pageContext.pushBody();
-
-  }catch(Exception e){
-   System.out.println("에러메세지: " + e.getMessage());
-  }finally{
-
-   if(output != null){output.close();}
-   if(input != null){input.close();}
-  }
- }else{
+    } catch (Exception e) {
+        System.out.println("에러메세지: " + e.getMessage());
+    } finally {
+        if (output != null) try { output.close(); } catch (IOException e) {}
+        if (input != null) try { input.close(); } catch (IOException e) {}
+    }
+} else {
 %>
-
 <script>
-alert("파일이 존재 하지 않습니다.");
-self.close();
+    alert("파일이 존재하지 않습니다.");
+    self.close();
 </script>
-
 <%
- }
+}
 %>

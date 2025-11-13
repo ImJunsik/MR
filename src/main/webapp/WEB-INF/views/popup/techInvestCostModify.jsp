@@ -7,6 +7,10 @@
     <input type="image" src="../images/btn_return.png" style="display:none" class="vam cursor return IAC"/>
     <input type="image" src="../images/btn_temp.png" style="display:none" class="cursor save IAI"/>
 </div>
+
+    <input type="image" src="../images/btn_requestApproval.png" class="vam cursor appReq"/>
+    <input type="image" src="../images/btn_temp.png" class="cursor save"/>
+
 <form id="registerForm" method="post">
 <input type="hidden" id="mrReqNo" name="mrReqNo" value="<c:out value="${techInvest.mrReqNo}"/>"/>
 <input type="hidden" name="mrInvstCostNo" value="<c:out value="${techInvest.mrInvstCostNo}"/>"/>

@@ -19,6 +19,13 @@ public interface MrMailService {
     boolean mailSend(int mrReqNo);
     
     /**
+    * 투자비재산정
+    * @param mrReqNo
+    * @return
+    */
+   boolean mailSend_I0(int mrReqNo, String mrStepCd, String ProcStCd);
+   
+    /**
     *
     * @param mrReqNo
     * @return
