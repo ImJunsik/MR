@@ -14,16 +14,17 @@
 
 <!-- button -->
 <div class="button_top">
-	<c:if test="${register.jobsSkipCheck=='false'}">
+	<%-- <c:if test="${register.jobsSkipCheck == 'false'}"> --%>
+	<c:if test="${(register.sheChgYn == 'N')}">
 	    <input type="image" src="images/btn_temp.png" class="save FAA GAA" name="save" style="display:none" /><!-- 임시저장 -->
 	    <input type="image" src="images/btn_temp.png" class="save2 FAD" name="save2" style="display:none" /><!-- 임시저장 기술검토자용 -->
 	    <input type="image" src="images/btn_complete.png" class="comp FAA GAA" name="comp" style="display:none" /><!-- 완료 -->
 	    <input type="image" src="images/btn_approve.png" class="appr GBA" name="appr" style="display:none" /><!-- 승인 -->
 	    <input type="image" src="images/btn_exec_complete.png" class="safeCNF FAI" name="safeCNF"  style="display:none"/><!-- mr수행완료 -->
 		<input type="image" src="images/btn_checkZ02D.png" class="checkZ02D FAD" name="checkZ02D" style="display:none" /><!-- 기술검토 확인 -->
-	    <input type="image" src="images/btn_checkitem.png" class="safeRPT FAA GAA" name="safeRPT" /><!-- 점검항목 -->
+	    <!-- <input type="image" src="images/btn_checkitem.png" class="safeRPT FAA GAA" name="safeRPT" /> --><!-- 점검항목 -->
 	</c:if>
-	
+	<input type="image" src="images/btn_checkitem.png" class="safeRPT FAA GAA" name="safeRPT" /><!-- 점검항목 -->
 	<br/><!-- <input type="image" src="images/btn_approve.png" class="appr GBA" name="appr"  /> --><!-- 승인 -->
 	<c:if test="${register.jobsSkipCheck=='true'}">
 		<div class="red"> * 직무검토 보류건이 있습니다.</div>
@@ -95,7 +96,7 @@
     <div class="she_system_notice" style="border: 2px solid #0066cc; background-color: #f0f8ff; padding: 20px; margin: 10px 0; height: 200px; text-align: center; border-radius: 5px;">
         <div style="color: #0066cc; font-size: 18px; font-weight: bold;padding: 70px;">
             SHE시스템 PSM에서 가동전 안전점검을 진행하시기 바랍니다.<BR><BR>
-            <a href="https://www.naver.com" target="_blank" style="color: #B21016; font-size : 16px; text-decoration: none; font-weight: bold;">PSM 가동전 안전점검 바로가기  </a>  <!-- 기술검토 확인 -->
+            <a href="http://she.oilbank.co.kr/c/sso.do?mid=99003517&mr_no=${register.mrNo}" target="_blank" style="color: #B21016; font-size : 16px; text-decoration: none; font-weight: bold;">PSM 가동전 안전점검 바로가기  </a>  <!-- 기술검토 확인 -->
         </div>
     </div>
 </c:if>

@@ -4,7 +4,7 @@
     xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
  
     <bean id="configurationSetting" class="com.mr.common.domain.ConfigurationSetting">
-        <property name="mail" value="false"/>   
+        <property name="mail" value="true"/>   
         <property name="oper" value="true"/>
     </bean>
 </beans> 

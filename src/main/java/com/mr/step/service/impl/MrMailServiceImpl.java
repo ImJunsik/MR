@@ -1376,6 +1376,8 @@ public class MrMailServiceImpl extends BaseService implements MrMailService{
                             mailer.sendHtml(mrMailVO.getFrom(), to, mrMailVO.getMailTitle(), mrMailVO.getContent()+getMailLink(mrMailVO, null, true), ccs, null);
                         }
                         
+                        logger.info(" Mail 내용 : " + mrMailVO.getContent() );
+                        
                         /*
                         if(ccs.length > 0) {
                             mailer.sendHtml(mrMailVO.getFrom(), ccs, mrMailVO.getMailTitle(), mrMailVO.getContent()+getMailLink(mrMailVO, null, true));
